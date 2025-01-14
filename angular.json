@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "LMISS": {
+    "HouseProfiling": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -23,7 +23,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/lmiss",
+            "outputPath": "dist/house-profiling",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -31,15 +31,21 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
+              "src/assets",
               {
                 "glob": "**/*",
                 "input": "public"
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/assets/css/demo.css",
+              "src/assets/vendor/css/core.css"
+
+
             ],
-            "scripts": []
+            "scripts": [
+
+            ]
           },
           "configurations": {
             "production": {
@@ -69,10 +75,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "LMISS:build:production"
+              "buildTarget": "HouseProfiling:build:production"
             },
             "development": {
-              "buildTarget": "LMISS:build:development"
+              "buildTarget": "HouseProfiling:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -89,18 +95,24 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
+              "src/assets",
               {
                 "glob": "**/*",
                 "input": "public"
+
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/assets/css/demo.css",
+              "src/assets/vendor/css/core.css"
             ],
             "scripts": []
           }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
