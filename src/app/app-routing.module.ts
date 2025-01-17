@@ -4,7 +4,7 @@ import { LoginLayoutComponent } from './layout/login-layout/login-layout.compone
 import { LoginComponent } from './Auth/login/login.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-
+import { UserRegComponent } from './user-reg/user-reg.component';
 
 const routes: Routes = [
 
@@ -22,6 +22,10 @@ const routes: Routes = [
   {
     path:'dashboard',
     component:DashboardComponent
+  },
+  {
+    path:'userReg',
+    component:UserRegComponent
   }
  ]
   },
