@@ -19,122 +19,232 @@
   
         <div class="tab-content custom-tab-content">
           <div class="tab-pane fade active show" id="form-tabs-personal" role="tabpanel">
-            <form>
+            <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
               <div class="row">
                 <div class="col-md-6">
                   <label class="form-label" for="fname">First Name</label>
-                  <input type="text" id="fname" class="form-control custom-input" placeholder="First Name">
+                  <input
+                    type="text"
+                    id="fname"
+                    class="form-control custom-input"
+                    formControlName="firstName"
+                    placeholder="First Name"
+                  />
+                  <div *ngIf="userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched" class="text-danger">
+                    <small *ngIf="userForm.get('firstName')?.errors?.['required']">First Name is required</small>
+                  </div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" for="mname">Middle Name</label>
-                  <input type="text" id="mname" class="form-control custom-input" placeholder="Middle Name">
+                  <input
+                    type="text"
+                    id="mname"
+                    class="form-control custom-input"
+                    formControlName="middleName"
+                    placeholder="Middle Name"
+                  />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" for="lname">Last Name</label>
-                  <input type="text" id="lname" class="form-control custom-input" placeholder="Last Name">
+                  <input
+                    type="text"
+                    id="lname"
+                    class="form-control custom-input"
+                    formControlName="lastName"
+                    placeholder="Last Name"
+                  />
+                  <div *ngIf="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched" class="text-danger">
+                    <small *ngIf="userForm.get('lastName')?.errors?.['required']">Last Name is required</small>
+                  </div>
                 </div>
                 <div class="col-md-4">
                   <label class="form-label" for="extName">Name Ext.</label>
-                  <input type="text" id="extName" class="form-control custom-input" placeholder="Extension">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label" for="formtabs-phone">Phone No</label>
-                  <input type="text" id="formtabs-phone" class="form-control custom-input" placeholder="0912 345 6789">
+                  <input
+                    type="text"
+                    id="extName"
+                    class="form-control custom-input"
+                    formControlName="nameExtension"
+                    placeholder="Extension"
+                  />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" for="utype">User Type</label>
-                  <select id="utype" class="form-select custom-input">
+                  <select id="utype" class="form-select custom-input" formControlName="userType">
                     <option value="">Select</option>
+                    <option value="Admin">Admin</option>
+                    <option value="User">User</option>
                   </select>
+                  <div *ngIf="userForm.get('userType')?.invalid && userForm.get('userType')?.touched" class="text-danger">
+                    <small *ngIf="userForm.get('userType')?.errors?.['required']">User Type is required</small>
+                  </div>
                 </div>
+          
+               
                 <div class="col-md-6">
                   <label class="form-label" for="formtabs-username">Username</label>
-                  <input type="text" id="formtabs-username" class="form-control custom-input" placeholder="john.doe">
+                  <input
+                    type="text"
+                    id="formtabs-username"
+                    class="form-control custom-input"
+                    formControlName="username"
+                    placeholder="Enter username"
+                  />
+                    <div *ngIf="userForm.get('username')?.invalid && userForm.get('username')?.touched" class="text-danger">
+              <small *ngIf="userForm.get('username')?.errors?.['required']">Username is required</small>
+              <small *ngIf="userForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</small>
+            </div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" for="formtabs-password">Password</label>
-                  <div class="input-group input-group-merge">
-                    <input type="password" id="formtabs-password" class="form-control custom-input" placeholder="••••••••••">
-                    <span class="input-group-text cursor-pointer">
-                      <i class="icon-base bx bx-hide"></i>
-                    </span>
+                  <input
+                    type="password"
+                    id="formtabs-password"
+                    class="form-control custom-input"
+                    formControlName="password"
+                    placeholder="••••••••••"
+                  />
+                  <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" class="text-danger">
+                    <small *ngIf="userForm.get('password')?.errors?.['required']">Password is required</small>
+                    <small *ngIf="userForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</small>
                   </div>
                 </div>
+          
+                <!-- Confirm Password -->
                 <div class="col-md-6">
                   <label class="form-label" for="formtabs-confirm-password">Confirm Password</label>
-                  <div class="input-group input-group-merge">
-                    <input type="password" id="formtabs-confirm-password" class="form-control custom-input" placeholder="••••••••••">
-                    <span class="input-group-text cursor-pointer">
-                      <i class="icon-base bx bx-hide"></i>
-                    </span>
+                  <input
+                    type="password"
+                    id="formtabs-confirm-password"
+                    class="form-control custom-input"
+                    formControlName="confirmPassword"
+                    placeholder="••••••••••"
+                  />
+                  <div *ngIf="userForm.get('confirmPassword')?.invalid && userForm.get('confirmPassword')?.touched" class="text-danger">
+                    <small *ngIf="userForm.get('confirmPassword')?.errors?.['required']">Confirm Password is required</small>
+                    <small *ngIf="userForm.hasError('passwordMismatch')">Passwords do not match</small>
                   </div>
                 </div>
               </div>
+          
+              <!-- Submit & Reset Buttons -->
               <div class="pt-4">
-                <button type="submit" class="btn btn-primary me-2" style="color:white">Submit</button>
-                <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary me-2" [disabled]="userForm.invalid" style="color: white;">Submit</button>
+                <button type="reset" class="btn btn-outline-secondary" (click)="onReset()">Cancel</button>
               </div>
             </form>
           </div>
+          
           <div class="tab-pane fade active hide" id="form-edit-personal" role="tabpanel">
-            <form>
-              <div class="row g-6">
+            <form [formGroup]="userUpForm" (ngSubmit)="onUpdate()">
+              <div class="row">
                 <div class="col-md-6">
                   <label class="form-label" for="fname">First Name</label>
-                  <input type="text" id="fname" class="form-control custom-input" placeholder="First Name">
+                  <input
+                    type="text"
+                    id="fname"
+                    class="form-control custom-input"
+                    formControlName="firstName"
+                    placeholder="First Name"
+                  />
+                  <div *ngIf="userUpForm.get('firstName')?.invalid && userUpForm.get('firstName')?.touched" class="text-danger">
+                    <small *ngIf="userUpForm.get('firstName')?.errors?.['required']">First Name is required</small>
+                  </div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" for="mname">Middle Name</label>
-                  <input type="text" id="mname" class="form-control custom-input" placeholder="Middle Name">
+                  <input
+                    type="text"
+                    id="mname"
+                    class="form-control custom-input"
+                    formControlName="middleName"
+                    placeholder="Middle Name"
+                  />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" for="lname">Last Name</label>
-                  <input type="text" id="lname" class="form-control custom-input" placeholder="Last Name">
+                  <input
+                    type="text"
+                    id="lname"
+                    class="form-control custom-input"
+                    formControlName="lastName"
+                    placeholder="Last Name"
+                  />
+                  <div *ngIf="userUpForm.get('lastName')?.invalid && userUpForm.get('lastName')?.touched" class="text-danger">
+                    <small *ngIf="userUpForm.get('lastName')?.errors?.['required']">Last Name is required</small>
+                  </div>
                 </div>
                 <div class="col-md-4">
                   <label class="form-label" for="extName">Name Ext.</label>
-                  <input type="text" id="extName" class="form-control custom-input" placeholder="Extension">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label" for="formtabs-phone">Phone No</label>
-                  <input type="text" id="formtabs-phone" class="form-control custom-input" placeholder="0912 345 6789">
+                  <input
+                    type="text"
+                    id="extName"
+                    class="form-control custom-input"
+                    formControlName="nameExtension"
+                    placeholder="Extension"
+                  />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" for="utype">User Type</label>
-                  <select id="utype" class="form-select custom-input">
+                  <select id="utype" class="form-select custom-input" formControlName="userType">
                     <option value="">Select</option>
+                    <option value="Admin">Admin</option>
+                    <option value="User">User</option>
                   </select>
+                  <div *ngIf="userUpForm.get('userType')?.invalid && userUpForm.get('userType')?.touched" class="text-danger">
+                    <small *ngIf="userUpForm.get('userType')?.errors?.['required']">User Type is required</small>
+                  </div>
                 </div>
+          
+               
                 <div class="col-md-6">
                   <label class="form-label" for="formtabs-username">Username</label>
-                  <input type="text" id="formtabs-username" class="form-control custom-input" placeholder="john.doe">
+                  <input
+                    type="text"
+                    id="formtabs-username"
+                    class="form-control custom-input"
+                    formControlName="username"
+                    placeholder="Enter username"
+                  />
+                    <div *ngIf="userUpForm.get('username')?.invalid && userUpForm.get('username')?.touched" class="text-danger">
+              <small *ngIf="userUpForm.get('username')?.errors?.['required']">Username is required</small>
+              <small *ngIf="userUpForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</small>
+            </div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" for="formtabs-password">Password</label>
-                  <div class="input-group input-group-merge">
-                    <input type="password" id="formtabs-password" class="form-control custom-input" placeholder="••••••••••">
-                    <span class="input-group-text cursor-pointer">
-                      <i class="icon-base bx bx-hide"></i>
-                    </span>
+                  <input
+                    type="password"
+                    id="formtabs-password"
+                    class="form-control custom-input"
+                    formControlName="password"
+                    placeholder="••••••••••"
+                  />
+                  <div *ngIf="userUpForm.get('password')?.invalid && userUpForm.get('password')?.touched" class="text-danger">
+                    <small *ngIf="userUpForm.get('password')?.errors?.['required']">Password is required</small>
+                    <small *ngIf="userUpForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</small>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" for="formtabs-confirm-password">Confirm Password</label>
-                  <div class="input-group input-group-merge">
-                    <input type="password" id="formtabs-confirm-password" class="form-control custom-input" placeholder="••••••••••">
-                    <span class="input-group-text cursor-pointer">
-                      <i class="icon-base bx bx-hide"></i>
-                    </span>
+                  <input
+                    type="password"
+                    id="formtabs-confirm-password"
+                    class="form-control custom-input"
+                    formControlName="confirmPassword"
+                    placeholder="••••••••••"
+                  />
+                  <div *ngIf="userUpForm.get('confirmPassword')?.invalid && userUpForm.get('confirmPassword')?.touched" class="text-danger">
+                    <small *ngIf="userUpForm.get('confirmPassword')?.errors?.['required']">Confirm Password is required</small>
+                    <small *ngIf="userUpForm.hasError('passwordMismatch')">Passwords do not match</small>
                   </div>
                 </div>
               </div>
               <div class="pt-4">
-                <button type="submit" class="btn btn-primary me-2" style="color:white">Update</button>
-                <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary me-2" [disabled]="userUpForm.invalid" style="color: white;">Update</button>
+                <button type="reset" class="btn btn-outline-secondary" (click)="onUpReset()">Cancel</button>
               </div>
             </form>
           </div>
-          <!-- Additional tabs like Account Details and Social Links follow a similar structure -->
         </div>
       </div>
     </div>
