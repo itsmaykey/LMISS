@@ -1,0 +1,119 @@
+.menu-item.active {
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }
+  /* Modals */
+
+/* Modal Shadow */
+.modal-content {
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Example shadow */
+}
+
+/* Modal Header close btn style */
+.modal .btn-close {
+  background-color: #f8f9fa; /* Replace with your $card-bg variable */
+  border-radius: 4px; /* Replace with $border-radius-sm variable */
+  opacity: 1;
+  padding: 0.563rem;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); /* Example box-shadow */
+  background-size: 0.75rem 0.6875rem;
+  transition: all 0.23s ease 0.1s;
+  transform: translate(23px, -25px);
+}
+
+.modal .btn-close:hover,
+.modal .btn-close:focus,
+.modal .btn-close:active {
+  opacity: 1;
+  outline: none;
+  transform: translate(20px, -20px);
+}
+
+/* Modal Header position */
+.modal-header {
+  position: relative;
+}
+
+.modal-header .btn-close {
+  position: absolute;
+  top: 0.1875rem; /* Replace with $modal-dialog-margin variable */
+  right: -0.1875rem; /* Replace with $modal-footer-margin-between variable */
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 1rem; /* Replace with $modal-footer-padding variable */
+}
+
+.modal-footer > * {
+  margin-block: 0;
+}
+
+.modal-footer > *:last-child {
+  margin-left: 0;
+}
+
+.modal-footer > *:first-child {
+  margin-right: 0;
+}
+
+/* Remove close button animation & shadow for .modal-dialog-scrollable, .modal-fullscreen, .modal-top modal */
+.modal-dialog-scrollable .btn-close,
+.modal-fullscreen .btn-close,
+.modal-top .btn-close {
+  box-shadow: none;
+  transform: translate(0, 0) !important;
+}
+
+.modal-dialog-scrollable .btn-close:hover,
+.modal-fullscreen .btn-close:hover,
+.modal-top .btn-close:hover {
+  transform: translate(0, 0) !important;
+}
+
+/* Top modals */
+.modal-top .modal-dialog {
+  margin-top: 0;
+}
+
+.modal-top .modal-content {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* Responsive Styles */
+
+/* For smaller screens (less than lg) */
+@media (max-width: 991px) {
+  .modal-onboarding .onboarding-horizontal {
+    flex-direction: column;
+  }
+
+  .modal .modal-dialog:not(.modal-fullscreen) {
+    padding: 0 0.75rem;
+    padding-left: 0.75rem !important;
+  }
+
+  .modal .carousel-control-prev,
+  .modal .carousel-control-next {
+    display: none;
+  }
+}
+
+/* For medium screens and up (md and greater) */
+@media (min-width: 768px) {
+  .modal .modal-content {
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2); /* Example shadow for larger screens */
+  }
+
+  .modal-sm .modal-dialog {
+    max-width: 300px; /* Replace with your $modal-sm value */
+  }
+}
+
+/* For extra large screens (xl and up) */
+@media (min-width: 1200px) {
+  .modal-xl .modal-dialog {
+    max-width: 1200px; /* Replace with your $modal-xl value */
+  }
+}

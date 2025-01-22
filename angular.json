@@ -32,6 +32,8 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/assets",
+              "src/favicon.ico",
+              "src/assets/wasm",
               {
                 "glob": "**/*",
                 "input": "public"
@@ -39,8 +41,8 @@
             ],
             "styles": [
               "src/assets/css/demo.css",
-              "src/assets/vendor/css/core.css"
-
+              "src/assets/vendor/css/core.css",
+              "src/styles.css"
 
             ],
             "scripts": [

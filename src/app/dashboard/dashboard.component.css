@@ -1,0 +1,22 @@
+.border-emphasis {
+    border: 1px solid #f3f1f5; /* Blue border */
+    border-radius: 10px;       /* Rounded corners */
+    box-shadow: 0 4px 8px rgb(117, 119, 237); /* Subtle shadow for emphasis */
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  
+  .border-emphasis:hover {
+    box-shadow: 0 8px 16px rgba(117, 119, 237); /* Increase shadow on hover */
+    transform: translateY(-4px);              /* Lift effect on hover */
+  }
+  .border-emphasis1:hover {
+    box-shadow: 0 8px 16px rgba(117, 119, 237); /* Increase shadow on hover */
+    transform: translateY(-4px);              /* Lift effect on hover */
+  }
+  .border-emphasis1 {
+    border: 1px solid #4f4f4f; /* Blue border */
+    border-radius: 10px;       /* Rounded corners */
+    box-shadow: 0 4px 8px rgb(183, 183, 185); /* Subtle shadow for emphasis */
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  

@@ -52,30 +52,30 @@
 
       <ul class="menu-inner py-1 ps ps--active-y">
         <!-- Dashboards -->
-        <li class="menu-item active" style="">
+        <li class="menu-item" [ngClass]="{'active': isActive('/dashboard')}">
           <a routerLink="/dashboard" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons bx bx-home-smile"></i>
-            <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
+            <div class="text-truncate" data-i18n="Dashboards">Dashboard</div>
             <!-- <span class="badge rounded-pill bg-danger ms-auto">5</span> -->
           </a>
-
         </li>
-
+        
         <!-- Layouts -->
         <!-- Components -->
-        <li class="menu-header small text-uppercase"><span class="menu-header-text">Data Summary</span></li>
-        <li class="menu-item ">
-          <a routerLink="/householdsummary" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons bx bx-home-smile"></i>
-            <div class="text-truncate" data-i18n="Dashboards">House Summary</div>
+        <li class="menu-header small text-uppercase"><span class="menu-header-text">user dashboard</span></li>
+        <li class="menu-item" [ngClass]="{'active': isActive('/userReg')}">
+          <a routerLink="/userReg" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons bx bx-user"></i>
+            <div class="text-truncate" data-i18n="userReg">User Management</div>
           </a>
         </li>
-        <li class="menu-item ">
+        
+        <!-- <li class="menu-item ">
           <a routerLink="/houseowners" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons bx bx-home-smile"></i>
             <div class="text-truncate" data-i18n="Dashboards">House Owners</div>
           </a>
-        </li>
+        </li> -->
         <!-- <li class="menu-item ">
           <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons bx bx-home-smile"></i>
@@ -124,57 +124,46 @@
             </li>
 
             <!-- User -->
-            <!-- <li class="nav-item navbar-dropdown dropdown-user dropdown">
-              <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
-                <div class="avatar avatar-online">
-                  <img src="../assets/img/avatars/1.png" alt="" class="w-px-40 h-auto rounded-circle">
-                </div>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <a class="dropdown-item" href="#">
-                    <div class="d-flex">
-                      <div class="flex-shrink-0 me-3">
-                        <div class="avatar avatar-online">
-                          <img src="../assets/img/avatars/1.png" alt="" class="w-px-40 h-auto rounded-circle">
+              <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
+                  <div class="avatar avatar-online">
+                    <img src="../assets/img/avatars/1.png" alt="" class="w-px-40 h-auto rounded-circle">
+                  </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="#">
+                      <div class="d-flex">
+                        <div class="flex-shrink-0 me-3">
+                          <div class="avatar avatar-online">
+                            <img src="../assets/img/avatars/1.png" alt="" class="w-px-40 h-auto rounded-circle">
+                          </div>
+                        </div>
+                        <div class="flex-grow-1">
+                          <h6 class="mb-0">John Doe</h6>
+                          <small class="text-muted">Admin</small>
                         </div>
                       </div>
-                      <div class="flex-grow-1">
-                        <h6 class="mb-0">John Doe</h6>
-                        <small class="text-muted">Admin</small>
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <div class="dropdown-divider my-1"></div>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">
-                    <i class="bx bx-user bx-md me-3"></i><span>My Profile</span>
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#"> <i class="bx bx-cog bx-md me-3"></i><span>Settings</span> </a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">
-                    <span class="d-flex align-items-center align-middle">
-                      <i class="flex-shrink-0 bx bx-credit-card bx-md me-3"></i><span class="flex-grow-1 align-middle">Billing Plan</span>
-                      <span class="flex-shrink-0 badge rounded-pill bg-danger">4</span>
-                    </span>
-                  </a>
-                </li>
-                <li>
-                  <div class="dropdown-divider my-1"></div>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="javascript:void(0);">
-                    <i class="bx bx-power-off bx-md me-3"></i><span>Log Out</span>
-                  </a>
-                </li>
-              </ul>
-            </li> -->
+                    </a>
+                  </li>
+                  <li>
+                    <div class="dropdown-divider my-1"></div>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#">
+                      <i class="bx bx-user bx-md me-3"></i><span>My Profile</span>
+                    </a>
+                  </li>
+                  <li>
+                    <div class="dropdown-divider my-1"></div>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="javascript:void(0);">
+                      <i class="bx bx-power-off bx-md me-3"></i><span>Log Out</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
             <!--/ User -->
           </ul>
         </div>
