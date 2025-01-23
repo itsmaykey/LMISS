@@ -6,30 +6,32 @@ import { LoginLayoutComponent } from './layout/login-layout/login-layout.compone
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { NgxScannerQrcodeModule } from 'ngx-scanner-qrcode';
-<<<<<<< HEAD
-import { ClientDashboardComponent } from './client-dashboard/client-dashboard.component';
-=======
->>>>>>> 7dd2b81167d5e5338225b7967260acf04674c0c2
-
-
+import { LoginComponent } from './Auth/login/login.component';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import {ReactiveFormsModule} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import { UserRegComponent } from './user-reg/user-reg.component';
 @NgModule({
   declarations: [
     AppComponent,
     LoginLayoutComponent,
     MainLayoutComponent,
-<<<<<<< HEAD
     DashboardComponent,
-    ClientDashboardComponent
+    LoginComponent,
+    UserRegComponent
 
-=======
-    DashboardComponent
-    
->>>>>>> 7dd2b81167d5e5338225b7967260acf04674c0c2
+
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    NgxScannerQrcodeModule
+    NgxScannerQrcodeModule,
+    FormsModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    CommonModule
+
   ],
   providers: [],
   bootstrap: [AppComponent]
