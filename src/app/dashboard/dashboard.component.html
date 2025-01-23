@@ -14,7 +14,7 @@
             <label class="small mb-1">Scan QR</label>
             <div class="avatar flex-shrink-0">
               <button 
-                (click)="toggleCamera()" 
+                (click)="handle(action, action.isStart ? 'stop' : 'start')"
                 style="border: none; background: none; padding: 0; cursor: pointer;" 
                 [disabled]="scanner?.isLoading || false">
                 <img src="../../assets/img/icons/unicons/Camera.png" alt="camera icon" class="rounded border-emphasis1" style="width: 32px; height: 32px; cursor: pointer;">
@@ -159,12 +159,14 @@
       <form class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="modalTopTitle">Scan QR</h5>
-          <p class="data">{{output}}</p> <!-- This will show the output if needed -->
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
         </div>
         <div class="modal-body">
           <div [style.padding.px]="20">
-            <ngx-scanner-qrcode #action="scanner" (data)="onData($event)" (error)="onError($event)"></ngx-scanner-qrcode>
+            <ngx-scanner-qrcode #action="scanner" (event)="onEvent($event)"></ngx-scanner-qrcode>
+            <div *ngIf="scannedData">
+              <p>Scanned Data: {{ scannedData }}</p> 
+            </div>
             <p *ngIf="action.isLoading">Loading Camera...</p>
           </div>
         </div>
@@ -176,7 +178,5 @@
     </div>
   </div>
   
-  <div class="input-group input-group-merge" style="flex-grow: 0; margin-right: 5px;">
-    <span class="input-group-text" id="basic-addon-search31"><i class="bx bx-search"></i></span>
-    <input type="text" class="form-control data" [value]="output" placeholder="Scanned QR Code..." aria-label="Scanned QR Code..." readonly>
-  </div>
+  
+    

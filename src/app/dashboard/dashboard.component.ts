@@ -1,53 +1,84 @@
-import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { NgxScannerQrcodeComponent } from 'ngx-scanner-qrcode';  // Import the component
+import { Component, OnDestroy, OnInit, ViewChild, } from '@angular/core';
+import { NgxScannerQrcodeComponent, ScannerQRCodeResult } from 'ngx-scanner-qrcode';  
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit, OnDestroy {
   isModalVisible = false;
-  output: string = '';
+  scannedData: string = ''; 
   isCameraActive: boolean = false;
 
   @ViewChild(NgxScannerQrcodeComponent) scanner: NgxScannerQrcodeComponent | undefined;
 
-  constructor(private cdRef: ChangeDetectorRef) {}
+  ngOnInit(): void {
+    console.log('Dashboard initialized');
+  }
 
-  hideModal(): void {
-    this.isModalVisible = false;
+  ngOnDestroy(): void {
     if (this.scanner && this.isCameraActive) {
-      this.scanner.stop();  // Stop the camera when the modal is closed
-      this.isCameraActive = false;
+      this.scanner.stop(); 
     }
   }
 
-  onError(error: any): void {
-    console.error("Error scanning QR code: ", error);
-  }
-
-  onData(event: any): void {
-    if (typeof event === 'string') {
-      this.output = event;
-      alert('Scanned QR Code: ' + this.output); // Alert the scanned QR code
-    }
-  }
-
-  toggleCamera(): void {
-    this.isModalVisible = true;
-    if (this.scanner) {
-      if (this.isCameraActive) {
-        this.scanner.stop();  
-      } else {
-        this.scanner.start(); 
-      }
-      this.isCameraActive = !this.isCameraActive;
+  public handle(action: NgxScannerQrcodeComponent, fn: string): void {
+    const validMethods = ['start', 'stop'];
+  
+    if (!validMethods.includes(fn)) {
+      console.error(`Invalid method: ${fn}`);
+      return;
     }
   
-    // Delay to allow Angular to finish change detection
-    setTimeout(() => {
-      this.cdRef.detectChanges();
-    });
+    if (fn === 'start') {
+      this.isModalVisible = true;
+      action.start((devices: MediaDeviceInfo[]) => {
+        const backCamera = devices.find((device) =>
+          /back|rear|environment/gi.test(device.label)
+        );
+        action.playDevice(backCamera ? backCamera.deviceId : devices[0]?.deviceId);
+      }).subscribe(
+        (result) => console.log('Start success', result),
+        (error) => this.onError(error)
+      );
+    } else if (fn === 'stop') {
+      action.stop().subscribe(
+        (result) => {
+          console.log('Stop success', result);
+          this.isModalVisible = false;
+        },
+        (error) => this.onError(error)
+      );
+    }
   }
-}  
+  
+  
+
+  public onEvent(results: ScannerQRCodeResult[]): void {
+    if (results && results.length) {
+      this.scannedData = results[0].value; 
+      console.log('Scanned QR Code:', this.scannedData);
+    }
+  }
+
+  onError(error: Error): void {
+    console.error('QR Scan Error:', error);
+    this.scannedData = 'An error occurred while scanning. Please try again.';
+  }
+
+  hideModal(): void {
+    this.isModalVisible = false; 
+    if (this.scanner) {
+      this.scanner.stop().subscribe(
+        () => {
+          console.log('Camera stopped successfully');
+          this.isCameraActive = false; 
+          this.scannedData ='';
+        },
+        (error) => console.error('Error stopping camera:', error)
+      );
+    }
+  }
+}
+
