@@ -6,7 +6,10 @@ import { LoginLayoutComponent } from './layout/login-layout/login-layout.compone
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { NgxScannerQrcodeModule } from 'ngx-scanner-qrcode';
+<<<<<<< HEAD
 import { ClientDashboardComponent } from './client-dashboard/client-dashboard.component';
+=======
+>>>>>>> 7dd2b81167d5e5338225b7967260acf04674c0c2
 
 
 @NgModule({
@@ -14,9 +17,14 @@ import { ClientDashboardComponent } from './client-dashboard/client-dashboard.co
     AppComponent,
     LoginLayoutComponent,
     MainLayoutComponent,
+<<<<<<< HEAD
     DashboardComponent,
     ClientDashboardComponent
 
+=======
+    DashboardComponent
+    
+>>>>>>> 7dd2b81167d5e5338225b7967260acf04674c0c2
   ],
   imports: [
     BrowserModule,
