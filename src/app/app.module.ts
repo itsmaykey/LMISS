@@ -6,6 +6,7 @@ import { LoginLayoutComponent } from './layout/login-layout/login-layout.compone
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { NgxScannerQrcodeModule } from 'ngx-scanner-qrcode';
+import { PatientDashboardComponent } from './dashboard/pages/patient-dashboard/patient-dashboard/patient-dashboard.component';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { NgxScannerQrcodeModule } from 'ngx-scanner-qrcode';
     AppComponent,
     LoginLayoutComponent,
     MainLayoutComponent,
-    DashboardComponent
+    DashboardComponent,
+    PatientDashboardComponent
     
   ],
   imports: [

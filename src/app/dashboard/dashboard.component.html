@@ -11,7 +11,7 @@
             </div>
           </div>
           <div class="d-flex flex-column align-items-center">
-            <label class="small mb-1">Scan QR</label>
+            <label class="small mb-1">Scan <span class="bx bx-qr"></span></label>
             <div class="avatar flex-shrink-0">
               <button 
                 (click)="handle(action, action.isStart ? 'stop' : 'start')"
@@ -158,7 +158,7 @@
     <div class="modal-dialog">
       <form class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalTopTitle">Scan QR</h5>
+          <h5 class="modal-title" id="modalTopTitle">Scan <span class="bx bx-qr"></span></h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
         </div>
         <div class="modal-body">
