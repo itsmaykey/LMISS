@@ -55,12 +55,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   
   
 
-  public onEvent(results: ScannerQRCodeResult[]): void {
+  public onEvent(event: any): void {
+    const results = event as ScannerQRCodeResult[]; // Cast to ScannerQRCodeResult[]
     if (results && results.length) {
-      this.scannedData = results[0].value; 
+      this.scannedData = results[0].value; // Update scanned data
       console.log('Scanned QR Code:', this.scannedData);
     }
   }
+  
 
   onError(error: Error): void {
     console.error('QR Scan Error:', error);
