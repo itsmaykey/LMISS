@@ -31,13 +31,19 @@
                                   <table class="datatables-ajax table table-bordered dataTable" id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info" style="width: 100%;">
                                       <thead>
                                           <tr>
+                                              <th>#</th>
                                               <th>Appl. date</th>
                                               <th>Status</th>
                                               <th>Action</th>
                                           </tr>
                                       </thead>
                                       <tbody>
-                                          <!-- Empty body -->
+                                        <tr>
+                                          <th scope="row">1</th>
+                                          <td>----</td>
+                                          <td>----</td>
+                                          <td>----</td>
+                                        </tr>
                                       </tbody>
                                       <tfoot></tfoot>
                                   </table>
@@ -56,120 +62,127 @@
     </div>
     <div class="col-xl-8 col-lg-7 order-0 order-md-1">
       <!-- User Pills -->
-      <div class="nav-align-top">
-        <ul class="nav nav-pills flex-column flex-md-row mb-6 flex-wrap row-gap-2">
+      <div class="nav-align-top bg-label-primary">
+        <span class="badge badge-custom">Selected Application:</span>
+        <ul class="nav nav-pills flex-column flex-md-row">
           <li class="nav-item">
-            <a class="nav-link active" href="javascript:void(0);"><i class="icon-base bx bx-user icon-sm me-1_5"></i>Account</a>
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#FinanceTab" type="button">
+              <i class="icon-base bx bx-wallet icon-sm me-1_5"></i>Finance Record
+            </button>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="app-user-view-security.html"><i class="icon-base bx bx-lock-alt icon-sm me-1_5"></i>Security</a>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#SWPNTab" type="button">
+              <i class="icon-base bx bx-lock-alt icon-sm me-1_5"></i>SWPN
+            </button>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="app-user-view-billing.html"><i class="icon-base bx bx-detail icon-sm me-1_5"></i>Billing &amp; Plans</a>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#NurseTab" type="button">
+              <i class="icon-base bx bx-pencil icon-sm me-1_5"></i>Nurses Notes
+            </button>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="app-user-view-notifications.html"><i class="icon-base bx bx-bell icon-sm me-1_5"></i>Notifications</a>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#PPNTab" type="button">
+              <i class="icon-base bx bx-message-detail icon-sm me-1_5"></i>PPN
+            </button>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="app-user-view-connections.html"><i class="icon-base bx bx-link icon-sm me-1_5"></i>Connections</a>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#PETab" type="button">
+              <i class="icon-base bx bx-book icon-sm me-1_5"></i>PE
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#TreatmentTab" type="button">
+              <i class="icon-base bx bx-briefcase icon-sm me-1_5"></i>Treatment Plan
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#TraisTab" type="button">
+              <i class="icon-base  icon-sm me-1_5"></i>Trais
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#DoctorsTab" type="button">
+              <i class="icon-base bx bx-user-check icon-sm me-1_5"></i>Doctors Order
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#MedicationTab" type="button">
+              <i class="icon-base bx bx-capsule icon-sm me-1_5"></i>Medication
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#LaboratoryTab" type="button">
+              <i class="icon-base bx bx-test-tube icon-sm me-1_5"></i>Laboratory
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#PsychEvalTab" type="button">
+              <i class="icon-base bx bx-brain icon-sm me-1_5"></i>Psych Eval
+            </button>
           </li>
         </ul>
+        
       </div>
       <!--/ User Pills -->
-
-      <!-- Project table -->
-      <div class="col-lg-12">
-        <div class="card h-100 border-emphasis">
-        <div class="card m-4 shadow-none"> 
-              <div class="card-datatable text-nowrap">
-                  <div id="DataTables_Table_0_wrapper" class="dt-container dt-bootstrap5 dt-empty-footer">
-                      <div class="row mx-3 my-0 justify-content-between">
-                          <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto">
-                              <div class="dt-length">
-                                  <label for="dt-length-0">Show
-                                      <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select" id="dt-length-0">
-                                          <option value="7">7</option>
-                                          <option value="10">10</option>
-                                          <option value="25">25</option>
-                                          <option value="50">50</option>
-                                          <option value="100">100</option>
-                                      </select>
-                                      entries
-                                  </label>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="justify-content-between dt-layout-table">
-                          <div class="d-md-flex justify-content-between align-items-center dt-layout-full table-responsive">
-                              <div id="DataTables_Table_0_processing" class="dt-processing card" role="status" style="display: none;">
-                                  <div>
-                                      <div></div>
-                                      <div></div>
-                                      <div></div>
-                                      <div></div>
-                                  </div>
-                              </div>
-                              <table class="datatables-ajax table table-bordered dataTable" id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info" style="width: 100%;">
-                                  <colgroup>
-                                      <col data-dt-column="0" style="width: 180.875px;">
-                                      <col data-dt-column="1" style="width: 203.475px;">
-                                      <col data-dt-column="2" style="width: 244.2px;">
-                                      <col data-dt-column="3" style="width: 138px;">
-                                      <col data-dt-column="4" style="width: 128.975px;">
-                                      <col data-dt-column="5" style="width: 118.075px;">
-                                  </colgroup>
-                                  <thead>
-                                      <tr>
-                                          <th>Full name</th>
-                                          <th>Email</th>
-                                          <th>Position</th>
-                                          <th>Office</th>
-                                          <th>Start date</th>
-                                          <th>Salary</th>
-                                      </tr>
-                                  </thead>
-                                  <tbody>
-                                      <!-- Empty body -->
-                                  </tbody>
-                                  <tfoot></tfoot>
-                              </table>
-                          </div>
-                      </div>
-                      <div class="row mx-3 justify-content-between">
-                          <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto">
-                              <div class="dt-info" aria-live="polite" id="DataTables_Table_0_info" role="status">Showing 0 to 0 of 0 entries</div>
-                          </div>
-                          <div class="d-md-flex justify-content-between align-items-center dt-layout-end col-md-auto ms-auto mt-0">
-                              <div class="dt-paging">
-                                  <nav aria-label="pagination">
-                                      <ul class="pagination">
-                                          <li class="dt-paging-button page-item disabled">
-                                              <button class="page-link previous" role="link" type="button" aria-controls="DataTables_Table_0" aria-disabled="true" aria-label="Previous" data-dt-idx="previous" tabindex="-1">
-                                                  <i class="icon-base bx bx-chevron-left scaleX-n1-rtl icon-sm"></i>
-                                              </button>
-                                          </li>
-                                          <li class="dt-paging-button page-item disabled">
-                                              <button class="page-link" role="link" type="button" aria-controls="DataTables_Table_0" data-dt-idx="0">1</button>
-                                          </li>
-                                          <li class="dt-paging-button page-item disabled">
-                                              <button class="page-link next" role="link" type="button" aria-controls="DataTables_Table_0" aria-label="Next" data-dt-idx="next">
-                                                  <i class="icon-base bx bx-chevron-right scaleX-n1-rtl icon-sm"></i>
-                                              </button>
-                                          </li>
-                                      </ul>
-                                  </nav>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+    
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="FinanceTab">
+          <div class="card">
+            <h5 class="card-header">Finance Record</h5>
+            <div class="card-body">
+              <div>
+                <label for="defaultFormControlInput" class="form-label">Name</label>
+                <input type="text" class="form-control" id="defaultFormControlInput" placeholder="John Doe" aria-describedby="defaultFormControlHelp">
+               
               </div>
+            </div>
           </div>
-          
+        </div>
+        <div class="tab-pane fade" id="SWPNTab">
+          <h5>Social Work Progress Notes (SWPN)</h5>
+          <p>Details about social work progress notes go here.</p>
+        </div>
+        <div class="tab-pane fade" id="NurseTab">
+          <h5>Nurses Notes</h5>
+          <p>Details about nurses' notes go here.</p>
+        </div>
+        <div class="tab-pane fade" id="PPNTab">
+          <h5>Psychological Progress Notes (PPN)</h5>
+          <p>Details about psychological progress notes go here.</p>
+        </div>
+        <div class="tab-pane fade" id="PETab">
+          <h5>Psychological Evaluation (PE)</h5>
+          <p>Details about psychological evaluations go here.</p>
+        </div>
+        <div class="tab-pane fade" id="TreatmentTab">
+          <h5>Treatment Plan</h5>
+          <p>Details about the treatment plan go here.</p>
+        </div>
+        <div class="tab-pane fade" id="TraisTab">
+          <h5>Trais</h5>
+          <p>Details about Trais go here.</p>
+        </div>
+        <div class="tab-pane fade" id="DoctorsTab">
+          <h5>Doctors Order</h5>
+          <p>Details about doctors' orders go here.</p>
+        </div>
+        <div class="tab-pane fade" id="MedicationTab">
+          <h5>Medication</h5>
+          <p>Details about medication go here.</p>
+        </div>
+        <div class="tab-pane fade" id="LaboratoryTab">
+          <h5>Laboratory</h5>
+          <p>Details about laboratory results go here.</p>
+        </div>
+        <div class="tab-pane fade" id="PsychEvalTab">
+          <h5>Psychiatric Evaluation (Psych Eval)</h5>
+          <p>Details about psychiatric evaluations go here.</p>
         </div>
       </div>
-    
-      
-    
+      <!--/ Tab Content -->
     </div>
+    
+    
     <!--/ User Content -->
   </div>

@@ -14,7 +14,7 @@ export class UserRegComponent implements OnInit {
 service = inject(UserRegService);
 
 positions: any = [];
-
+userData: any = [];
 
   userForm!: FormGroup;
   userUpForm!: FormGroup;
@@ -22,12 +22,13 @@ positions: any = [];
   isUpdateDisabled: boolean = false;
   constructor(private fb: FormBuilder) {
     this.userForm = this.fb.group({
+      
       firstName: ['', Validators.required],
       middleName: [''],
       lastName: ['', Validators.required],
-      nameExtension: [''],
-      userType: ['', Validators.required],
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      extName: [''],
+      positionCode: ['', Validators.required],
+      userName: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
     }, { validators: this.passwordMatchValidator });
@@ -39,11 +40,38 @@ positions: any = [];
     return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.userForm.valid) {
-      console.log('Form Data:', this.userForm.value);
+      const formData = { ...this.userForm.value };
+      delete formData.confirmPassword; 
+      formData.isActive = true;
+      this.service.postRegistration(formData).subscribe({
+        next: (response) => {
+          console.log('User registered successfully:', response);
+          alert('User registered successfully!');
+          this.onReset();
+          this.refreshUserList();
+        },
+        error: (err) => {
+          console.error('API Error:', err);
+  
+          if (err.status === 400) {
+            alert('Validation failed. Please check your inputs.');
+          } else if (err.status === 401) {
+            alert('Unauthorized. Please check your permissions.');
+          } else if (err.status === 500) {
+            alert('Server error. Please try again later.');
+          } else {
+            alert('Failed to register user. Please try again.');
+          }
+        }
+      });
+    } else {
+      console.warn('Form is invalid!');
+      alert('Please fill in all required fields correctly.');
     }
   }
+  
 
   onReset() {
     this.userForm.reset();
@@ -54,16 +82,15 @@ positions: any = [];
         firstName: ['', Validators.required],
         middleName: [''],
         lastName: ['', Validators.required],
-        nameExtension: [''],
-        userType: ['', Validators.required],
-        username: ['', [Validators.required, Validators.minLength(3)]],
+        extName: [''],
+        positionCode: ['', Validators.required],
+        userName: ['', [Validators.required, Validators.minLength(3)]],
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', Validators.required],
       },
       { validators: this.passwordMatchValidator }
     );
 
-    this.loadExistingUserData();
     this.service.getPositions().subscribe({
       next: (response) => {
         this.positions = response;
@@ -73,8 +100,27 @@ positions: any = [];
         console.error('Error:', error);
       }
     });
+    this.service.getUserList().subscribe({
+      next: (response) => {
+        this.userData = response;
+        console.log('userData:',  this.userData);
+      },
+      error: (error) => {
+        console.error('Error:', error);
+      }
+    });
   }
-
+  refreshUserList(): void {
+  this.service.getUserList().subscribe({
+    next: (response) => {
+      this.userData = response;
+      console.log('userData:', this.userData);
+    },
+    error: (error) => {
+      console.error('Error:', error);
+    }
+  });
+}
   loadExistingUserData(): void {
     const mockUserData = {
       firstName: 'John',
@@ -82,7 +128,7 @@ positions: any = [];
       lastName: 'Smith',
       nameExtension: 'Jr.',
       userType: 'Admin',
-      username: 'johnsmith',
+      userName: 'johnsmith',
       password: 'password123',
       confirmPassword: 'password123',
     };

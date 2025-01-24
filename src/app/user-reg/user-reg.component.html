@@ -63,20 +63,21 @@
                     type="text"
                     id="extName"
                     class="form-control custom-input"
-                    formControlName="nameExtension"
+                    formControlName="extName"
                     placeholder="Extension"
                   />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" for="utype">User Type</label>
-                  <select id="utype" class="form-select custom-input" formControlName="userType">
+                  <select id="utype" class="form-select custom-input" formControlName="positionCode">
                     <option value="" disabled>Select Position</option>
-                    <option *ngFor="let x of positions" value="{{x.positionCode}}">{{x.positionName}}</option>
+                    <option *ngFor="let x of positions" [value]="x.positionCode">{{ x.positionName }}</option>
                   </select>
-                  <div *ngIf="userForm.get('userType')?.invalid && userForm.get('userType')?.touched" class="text-danger">
-                    <small *ngIf="userForm.get('userType')?.errors?.['required']">User Type is required</small>
+                  <div *ngIf="userForm.get('positionCode')?.invalid && userForm.get('positionCode')?.touched" class="text-danger">
+                    <small *ngIf="userForm.get('positionCode')?.errors?.['required']">User Type is required</small>
                   </div>
                 </div>
+                
 
 
                 <div class="col-md-6">
@@ -85,12 +86,12 @@
                     type="text"
                     id="formtabs-username"
                     class="form-control custom-input"
-                    formControlName="username"
+                    formControlName="userName"
                     placeholder="Enter username"
                   />
-                    <div *ngIf="userForm.get('username')?.invalid && userForm.get('username')?.touched" class="text-danger">
-              <small *ngIf="userForm.get('username')?.errors?.['required']">Username is required</small>
-              <small *ngIf="userForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</small>
+                    <div *ngIf="userForm.get('userName')?.invalid && userForm.get('userName')?.touched" class="text-danger">
+              <small *ngIf="userForm.get('userName')?.errors?.['required']">Username is required</small>
+              <small *ngIf="userForm.get('userName')?.errors?.['minlength']">Username must be at least 3 characters</small>
             </div>
                 </div>
                 <div class="col-md-6">
@@ -105,6 +106,7 @@
                   <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" class="text-danger">
                     <small *ngIf="userForm.get('password')?.errors?.['required']">Password is required</small>
                     <small *ngIf="userForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</small>
+                    <small *ngIf="userForm.hasError('passwordMismatch')">Passwords do not match</small>
                   </div>
                 </div>
 
@@ -178,19 +180,17 @@
                     type="text"
                     id="extName"
                     class="form-control custom-input"
-                    formControlName="nameExtension"
+                    formControlName="extName"
                     placeholder="Extension"
                   />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label" for="utype">User Type</label>
-                  <select id="utype" class="form-select custom-input" formControlName="userType">
+                  <select id="utype" class="form-select custom-input" formControlName="positionCode">
                     <option value="">Select</option>
-                    <option value="Admin">Admin</option>
-                    <option value="User">User</option>
                   </select>
-                  <div *ngIf="userUpForm.get('userType')?.invalid && userUpForm.get('userType')?.touched" class="text-danger">
-                    <small *ngIf="userUpForm.get('userType')?.errors?.['required']">User Type is required</small>
+                  <div *ngIf="userUpForm.get('positionCode')?.invalid && userUpForm.get('positionCode')?.touched" class="text-danger">
+                    <small *ngIf="userUpForm.get('positionCode')?.errors?.['required']">User Type is required</small>
                   </div>
                 </div>
 
@@ -201,12 +201,12 @@
                     type="text"
                     id="formtabs-username"
                     class="form-control custom-input"
-                    formControlName="username"
+                    formControlName="userName"
                     placeholder="Enter username"
                   />
-                    <div *ngIf="userUpForm.get('username')?.invalid && userUpForm.get('username')?.touched" class="text-danger">
-              <small *ngIf="userUpForm.get('username')?.errors?.['required']">Username is required</small>
-              <small *ngIf="userUpForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</small>
+                    <div *ngIf="userUpForm.get('userName')?.invalid && userUpForm.get('userName')?.touched" class="text-danger">
+              <small *ngIf="userUpForm.get('userName')?.errors?.['required']">Username is required</small>
+              <small *ngIf="userUpForm.get('userName')?.errors?.['minlength']">Username must be at least 3 characters</small>
             </div>
                 </div>
                 <div class="col-md-6">
@@ -259,12 +259,15 @@
                 </tr>
               </thead>
               <tbody class="table-border-bottom-0">
-                <tr>
-                  <td>Albert Cook</td>
+                <tr *ngFor="let s of userData">
+                  <td>{{s.firstName}} {{s.middleName}} {{s.lastName}}</td>
                   <td>
-
+                      {{s.positionName}}
                   </td>
-                  <td><span class="badge bg-label-primary me-1">Active</span></td>
+                  <td>
+                    <span  *ngIf="s.isActive === true" class="badge bg-label-primary me-1">Active</span>
+                    <span  *ngIf="s.isActive === false" class="badge bg-label-danger me-1">Deactivate</span>
+                  </td>
                   <td>
                     <div class="dropdown">
                       <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
@@ -272,7 +275,8 @@
                       </button>
                       <div class="dropdown-menu">
                         <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-edit-alt me-1"></i> Edit</a>
-                        <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Delete</a>
+                        <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Deactivate</a>
+                        <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Activate</a>
                       </div>
                     </div>
                   </td>

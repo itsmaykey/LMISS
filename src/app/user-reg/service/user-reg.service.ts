@@ -9,7 +9,9 @@ export class UserRegService {
 
   constructor(private http: HttpClient) { }
 
-
+  getUserList() {
+    return this.http.get(`${environment.apiUrl}Auth/GetUsersData`);
+  }
   getPositions() {
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/GetrefUserPositions`);
   }
