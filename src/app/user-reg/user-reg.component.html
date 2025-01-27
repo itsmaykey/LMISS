@@ -22,7 +22,7 @@
             <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
               <div class="row">
                 <div class="col-md-6">
-                  <label class="form-label" for="fname">First Name</label>
+                  <label class="form-label" for="fname">First Name<span style="color:red">*</span></label>
                   <input
                     type="text"
                     id="fname"
@@ -45,7 +45,7 @@
                   />
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label" for="lname">Last Name</label>
+                  <label class="form-label" for="lname">Last Name<span style="color:red">*</span></label>
                   <input
                     type="text"
                     id="lname"
@@ -68,7 +68,7 @@
                   />
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label" for="utype">User Type</label>
+                  <label class="form-label" for="utype">User Type<span style="color:red">*</span></label>
                   <select id="utype" class="form-select custom-input" formControlName="positionCode">
                     <option value="" disabled>Select Position</option>
                     <option *ngFor="let x of positions" [value]="x.positionCode">{{ x.positionName }}</option>
@@ -81,7 +81,7 @@
 
 
                 <div class="col-md-6">
-                  <label class="form-label" for="formtabs-username">Username</label>
+                  <label class="form-label" for="formtabs-username">Username<span style="color:red">*</span></label>
                   <input
                     type="text"
                     id="formtabs-username"
@@ -95,7 +95,7 @@
             </div>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label" for="formtabs-password">Password</label>
+                  <label class="form-label" for="formtabs-password">Password<span style="color:red">*</span></label>
                   <input
                     type="password"
                     id="formtabs-password"
@@ -112,7 +112,7 @@
 
                 <!-- Confirm Password -->
                 <div class="col-md-6">
-                  <label class="form-label" for="formtabs-confirm-password">Confirm Password</label>
+                  <label class="form-label" for="formtabs-confirm-password">Confirm Password<span style="color:red">*</span></label>
                   <input
                     type="password"
                     id="formtabs-confirm-password"
