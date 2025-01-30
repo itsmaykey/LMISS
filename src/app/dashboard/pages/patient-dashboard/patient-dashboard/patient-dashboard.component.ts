@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-patient-dashboard',
@@ -7,4 +8,10 @@ import { Component } from '@angular/core';
 })
 export class PatientDashboardComponent {
 
+  constructor(private router: Router) {}
+
+  navigateToDashboard(): void {
+    this.router.navigate(['/applicationDashboard']);
+    
+  }
 }

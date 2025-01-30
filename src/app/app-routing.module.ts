@@ -6,14 +6,17 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout.component'
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserRegComponent } from './user-reg/user-reg.component';
 import { PatientDashboardComponent } from './dashboard/pages/patient-dashboard/patient-dashboard/patient-dashboard.component';
+import { ApplicationDashboardComponent } from './application-dashboard/application-dashboard.component';
 const routes: Routes = [
 
+  
 
       {
         path: 'login',
         component: LoginComponent
       },
       { path: '', redirectTo: '/login', pathMatch: 'full' },
+     
 
   {
  path:'',
@@ -30,29 +33,13 @@ const routes: Routes = [
   {
     path:'patientDashboard',
     component:PatientDashboardComponent
+  },
+  {
+    path:'applicationDashboard',
+    component:ApplicationDashboardComponent
   }
  ]
   },
-
-  // Define the login route
-
-
-  // routes = [
-  //   {
-  //     path: 'login'
-  //   },
-  //   {
-  //     path: '' (mao ning layout)
-  //     component: (tawagon tong layout nimo nga component name)
-  //    chilren: [
-  //   {
-  //     path: (katong dashboard component nimo)
-  //   }
-  //   ]
-
-  //   }
-  //   ];
-
 
 ];
 

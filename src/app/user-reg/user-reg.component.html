@@ -139,7 +139,7 @@
             <form [formGroup]="userUpForm" (ngSubmit)="onUpdate()">
               <div class="row">
                 <div class="col-md-6">
-                  <label class="form-label" for="fname">First Name</label>
+                  <label class="form-label" for="fname">First Name<span style="color:red">*</span></label>
                   <input
                     type="text"
                     id="fname"
@@ -162,7 +162,7 @@
                   />
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label" for="lname">Last Name</label>
+                  <label class="form-label" for="lname">Last Name<span style="color:red">*</span></label>
                   <input
                     type="text"
                     id="lname"
@@ -185,18 +185,20 @@
                   />
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label" for="utype">User Type</label>
+                  <label class="form-label" for="utype">User Type<span style="color:red">*</span></label>
                   <select id="utype" class="form-select custom-input" formControlName="positionCode">
-                    <option value="">Select</option>
+                    <option value="" disabled>Select Position</option>
+                    <option *ngFor="let x of positions" [value]="x.positionCode">{{ x.positionName }}</option>
                   </select>
                   <div *ngIf="userUpForm.get('positionCode')?.invalid && userUpForm.get('positionCode')?.touched" class="text-danger">
                     <small *ngIf="userUpForm.get('positionCode')?.errors?.['required']">User Type is required</small>
                   </div>
                 </div>
+                
 
 
                 <div class="col-md-6">
-                  <label class="form-label" for="formtabs-username">Username</label>
+                  <label class="form-label" for="formtabs-username">Username<span style="color:red">*</span></label>
                   <input
                     type="text"
                     id="formtabs-username"
@@ -210,7 +212,7 @@
             </div>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label" for="formtabs-password">Password</label>
+                  <label class="form-label" for="formtabs-password">Password<span style="color:red">*</span></label>
                   <input
                     type="password"
                     id="formtabs-password"
@@ -221,10 +223,13 @@
                   <div *ngIf="userUpForm.get('password')?.invalid && userUpForm.get('password')?.touched" class="text-danger">
                     <small *ngIf="userUpForm.get('password')?.errors?.['required']">Password is required</small>
                     <small *ngIf="userUpForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</small>
+                    <small *ngIf="userUpForm.hasError('passwordMismatch')">Passwords do not match</small>
                   </div>
                 </div>
+
+                <!-- Confirm Password -->
                 <div class="col-md-6">
-                  <label class="form-label" for="formtabs-confirm-password">Confirm Password</label>
+                  <label class="form-label" for="formtabs-confirm-password">Confirm Password<span style="color:red">*</span></label>
                   <input
                     type="password"
                     id="formtabs-confirm-password"
