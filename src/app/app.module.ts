@@ -12,6 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
 import {ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import { UserRegComponent } from './user-reg/user-reg.component';
+import { ApplicationDashboardComponent } from './application-dashboard/application-dashboard.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -19,7 +20,8 @@ import { UserRegComponent } from './user-reg/user-reg.component';
     MainLayoutComponent,
     DashboardComponent,
     LoginComponent,
-    UserRegComponent
+    UserRegComponent,
+    ApplicationDashboardComponent
 
 
   ],
