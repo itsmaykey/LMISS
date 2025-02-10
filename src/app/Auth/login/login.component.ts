@@ -3,50 +3,72 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoginService } from './login.service';
 import { Router } from '@angular/router';
-
+import { AuthService } from './AuthService';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent  {
 
- constructor(private service: LoginService, private router: Router) { }
- username: string = '';
- password: string = '';
- LoginData: any;
-  ngOnInit(): void {
-
-  }
-
-// loginForm!: FormGroup;
-// constructor(private fb: FormBuilder) {
-//   this.loginForm = this.fb.group({
-//     username: ['', [Validators.required, Validators.minLength(3)]],
-//     password: ['', [Validators.required, Validators.minLength(6)]],
-//   });
-// }
+ constructor(private service: LoginService, private router: Router, private authService: AuthService) { }
+username: string = '';
+password: string = '';
 
 
 onLogin() {
-  // console.log(this.username, this.password);
-this.service.PostLogin(this.username, this.password).subscribe({
-  next: (response) => {
-    this.LoginData = response;
-    if(this.LoginData != null){
-      console.log('Data:', this.LoginData);
-      this.router.navigate(['/dashboard']);
-    }
-    else {
-      alert('Invalid Username or Password');
-    }
+  if (!this.username || !this.password) {
+    alert('Username and Password are required.');
+    return;
+  }
 
-
-
-
+  console.log(this.username, this.password);
+  this.service.PostLogin(this.username, this.password).subscribe({
+    next: (response) => {
+      console.log('Response:', response);
+      if (response.status === 200 && response.body?.token) {
+        const expiresIn = response.body.expiresIn || 5; // Assuming the response contains expiresIn in seconds
+        this.authService.setToken(response.body.token, expiresIn);
+        console.log(response.body.token);
+        this.authService.setUserInfo({
+          id: response.body.idNo,
+          name: response.body.firstName + ' ' + response.body.lastName,
+          position: response.body.positionCode,
+          positionName: response.body.positionName
+        });
+        this.router.navigate(['/dashboard']);
+      } else {
+        alert('Invalid Username or Password');
+      }
+    },
+    error: (err) => {
+      console.error('Error fetching Data:', err);
+      if (err.status === 400) {
+        alert('Bad Request: Please check your input.');
+      } else {
+        alert('Invalid Username or Password');
+      }
+    },
+  });
 }
-}) }
+// }) }
 
+// onLogin() {
+//   this.service.PostLogin(this.username, this.password).subscribe({
+//     next: (response) => {
+//       if (response.status === 200 && response.token) {
+//         this.authService.setToken(response.token);
+//         this.router.navigate(['/dashboard']);
+//       } else {
+//         alert('Invalid Username or Password');
+//       }
+//     },
+//     error: (err) => {
+//       console.error('Error fetching Data:', err);
+//       alert('Invalid Username or Password');
+//     },
+//   });
+// }
 
 
 }

@@ -117,3 +117,18 @@
     max-width: 1200px; /* Replace with your $modal-xl value */
   }
 }
+.menu-sub {
+  display: none;
+}
+
+.menu-sub.show {
+  display: block;
+}
+.bx-chevron-down {
+  transform: rotate(360deg);
+  transition: transform 0.3s ease;
+}
+
+.bx-chevron-right {
+  transition: transform 0.3s ease;
+}

@@ -62,12 +62,21 @@
 
         <!-- Layouts -->
         <!-- Components -->
-        <li class="menu-header small text-uppercase"><span class="menu-header-text">user dashboard</span></li>
-        <li class="menu-item" [ngClass]="{'active': isActive('/userReg')}">
-          <a routerLink="/userReg" class="menu-link menu-toggle">
+        <li [hidden]="userRegHidden" class="menu-header small text-uppercase"><span class="menu-header-text">user dashboard</span></li>
+
+        <li [hidden]="userRegHidden" class="menu-item" [ngClass]="{'active': isActive('/userReg')}" (click)="toggleMenu($event)">
+          <a routerLink="/userReg" class="menu-link">
             <i class="menu-icon tf-icons bx bx-user"></i>
             <div class="text-truncate" data-i18n="userReg">User Management</div>
+            <i class="bx" [ngClass]="{'bx-chevron-down': isMenuOpen, 'bx-chevron-right': !isMenuOpen}" style="padding-left:10%;"></i>
           </a>
+          <ul class="menu-sub" [ngClass]="{'show': isMenuOpen}">
+            <li class="menu-item active">
+              <a routerLink="/dashboard" class="menu-link">
+                <div class="text-truncate" data-i18n="Analytics">Analytics</div>
+              </a>
+            </li>
+          </ul>
         </li>
 
         <!-- <li class="menu-item ">
@@ -102,12 +111,12 @@
 
       <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
         <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
-          <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
+          <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)" data-bs-toggle="collapse" data-bs-target="#navbar-collapse">
             <i class="bx bx-menu bx-md"></i>
           </a>
         </div>
 
-        <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <div class="collapse navbar-collapse" id="navbar-collapse">
           <!-- Search -->
           <!-- <div class="navbar-nav align-items-center">
             <div class="nav-item d-flex align-items-center">
@@ -140,8 +149,8 @@
                           </div>
                         </div>
                         <div class="flex-grow-1">
-                          <h6 class="mb-0">John Doe</h6>
-                          <small class="text-muted">Admin</small>
+                          <h6 class="mb-0">{{userInfo.name}}</h6>
+                          <small class="text-muted">{{userInfo.positionName}}</small>
                         </div>
                       </div>
                     </a>
@@ -158,8 +167,8 @@
                     <div class="dropdown-divider my-1"></div>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="javascript:void(0);">
-                      <i class="bx bx-power-off bx-md me-3"></i><span>Log Out</span>
+                    <a class="dropdown-item" style="cursor: pointer;" (click)="logout()">
+                      <i class="bx bx-power-off bx-md me-3" ></i><span>Log Out</span>
                     </a>
                   </li>
                 </ul>
@@ -210,4 +219,3 @@
   <!-- Overlay -->
   <div class="layout-overlay layout-menu-toggle"></div>
 </div>
-
