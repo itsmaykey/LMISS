@@ -1,14 +1,14 @@
 import { NgModule, Component } from '@angular/core';
 import { RouterModule, Routes, CanActivate } from '@angular/router';
 import { LoginLayoutComponent } from './layout/login-layout/login-layout.component';
-import { LoginComponent } from './Auth/login/login.component';
+import { LoginComponent } from './Admin/Auth/Login/login.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { UserRegComponent } from './user-reg/user-reg.component';
-import { PatientDashboardComponent } from './dashboard/pages/patient-dashboard/patient-dashboard/patient-dashboard.component';
-import { ApplicationDashboardComponent } from './application-dashboard/application-dashboard.component';
-import { AuthGuard } from './Auth/login/AuthGuard';
-import { LoginGuard } from './Auth/login/LoginGuard';
+import { UserRegComponent } from './Admin/user-Registration/user-reg.component';
+import { PatientDashboardComponent } from './pages/patient-dashboard/patient-dashboard.component';
+import { ApplicationDashboardComponent } from './pages/application-dashboard/application-dashboard.component';
+import { AuthGuard } from './Admin/Auth/AuthGuard';
+import { LoginGuard } from './Admin/Auth/LoginGuard';
 const routes: Routes = [
 
 

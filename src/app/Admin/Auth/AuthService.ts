@@ -10,7 +10,8 @@ export class AuthService {
   constructor() { }
 
   setToken(token: string, expiresIn: number): void {
-    const expirationDate = new Date().getTime() + expiresIn * 5; // expiresIn is in seconds
+    const expirationDate = new Date().getTime() + expiresIn * 3600; // expiresIn is in seconds
+    //console.log('Expiration Date:', expirationDate);
     localStorage.setItem(this.tokenKey, token);
     localStorage.setItem(this.tokenExpirationKey, expirationDate.toString());
   }

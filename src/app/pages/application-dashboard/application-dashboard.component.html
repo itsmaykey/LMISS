@@ -72,15 +72,14 @@
                       <option value="">Select</option>
                       <option value="1">Male</option>
                       <option value="0">Female</option>
-                 
+
                     </select>
                   </div>
                   <div class="col-md-2">
                     <label for="language" class="form-label">Civil Status</label>
                     <select id="language" class="select2 form-select">
-                      <option value="">Select</option>
-                      <option value="1">Married</option>
-                      <option value="2">Single</option>
+                      <option value="" disabled selected>Select</option>
+                      <option  *ngFor="let x of civilStatus" value="{{x.civ_ID}}">{{x.civ_Name}}</option>
                     </select>
                   </div>
                   <div class="col-md-3">
@@ -91,32 +90,32 @@
                   </div>
                 </div>
                 <div class="row">
-                <div class="col-md-3">
-                  <label for="purok" class="form-label">Purok/Village</label>
-                  <input type="text" class="form-control" id="purok" name="purok" placeholder="Enter Purok/Village">
-                </div>
-                  <div class="col-md-3">
-                    <label for="brgy" class="form-label">Brgy</label>
-                    <select  class="select2 form-select" id="brgy" name="brgy">
-                      <option value="">Select</option>
-                      <option value="1">Brgy 1</option>
-                      <option value="2">Brgy 2</option>
-                    </select>
-                  </div>
-                  <div class="col-md-3">
-                    <label for="mun" class="form-label">Municipality</label>
-                    <select class="select2 form-select" id="mun" name="mun" >
-                      <option value="">Select</option>
-                      <option value="1">Muni 1</option>
-                      <option value="2">Muni 2</option>
-                    </select>
-                  </div>
-                  <div class="col-md-3">
+                  <!-- <div class="col-md-3">
                     <label for="prov" class="form-label">Province</label>
                     <select class="select2 form-select" id="prov" name="prov" >
-                      <option value="">Select</option>
-                      <option value="1">Prov 1</option>
-                      <option value="2">Prov 2</option>
+                      <option value="" disabled selected>Select</option>
+                      <option  *ngFor="let x of citymun" value="{{x.citymunCode}}">{{x.citymunDesc}}</option>
+                    </select>
+                  </div> -->
+                  <div class="col-md-4">
+                    <label for="mun" class="form-label">Municipality</label>
+                    <select class="select2 form-select" id="mun" name="mun" (change)="onMunicipalityChange($event)">
+                      <option value="" disabled selected>Select</option>
+                      <option  *ngFor="let x of citymun" value="{{x.citymunCode}}">{{x.citymunDesc}}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="brgy" class="form-label">Barangay</label>
+                    <select  class="select2 form-select" id="brgy" name="brgy" (change)="onBarangayChange($event)">
+                      <option value="" disabled selected>Select</option>
+                      <option  *ngFor="let x of brgy" value="{{x.brgyCode}}">{{x.brgyDesc}}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="mun" class="form-label">Purok</label>
+                    <select class="select2 form-select" id="prk" name="prk" >
+                      <option value="" disabled selected>Select</option>
+                      <option  *ngFor="let x of prk" value="{{x.prkCode}}">{{x.prkDesc}}</option>
                     </select>
                   </div>
                 </div>
@@ -128,17 +127,16 @@
                   <div class="col-md-3">
                     <label for="national" class="form-label">Nationality</label>
                     <select class="select2 form-select" id="national" name="national" >
-                      <option value="">Select</option>
-                      <option value="1">Nationality 1</option>
-                      <option value="2">Nationality 2</option>
+                      <option value="" selected disabled>Select</option>
+                      <option *ngFor="let x of nationality" value="{{x.citi_ID}}">{{x.city_Description}}</option>
+
                     </select>
                   </div>
                   <div class="col-md-3">
                     <label for="religion" class="form-label">Religion</label>
                     <select class="select2 form-select" id="religion" name="religion" >
-                      <option value="">Select</option>
-                      <option value="1">Religion 1</option>
-                      <option value="2">Religion 2</option>
+                      <option value="" disabled selected>Select</option>
+                      <option  *ngFor="let x of religion" value="{{x.recNo}}">{{x.religionDesc}}</option>
                     </select>
                   </div>
                   <div class="col-md-3">
@@ -150,9 +148,8 @@
                   <div class="col-md-3">
                     <label for="national" class="form-label">Educational Attainment</label>
                     <select class="select2 form-select" id="national" name="national" >
-                      <option value="">Select</option>
-                      <option value="1">Attainment 1</option>
-                      <option value="2">Attainment 2</option>
+                      <option value="" disabled selected>Select</option>
+                      <option  *ngFor="let x of educationalAttainment" value="{{x.edu_ID}}">{{x.edu_Name}}</option>
                     </select>
                   </div>
                   <div class="col-md-2">
@@ -163,7 +160,7 @@
                     <label for="yrGrad" class="form-label">Yr. Graduated</label>
                     <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter Year">
                   </div>
-                 
+
                   <div class="col-md-3">
                     <label for="amount" class="form-label">Amount</label>
                     <input class="form-control" type="number" name="amount" id="amount" placeholder="Enter Amount">

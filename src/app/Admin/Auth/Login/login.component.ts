@@ -3,7 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoginService } from './login.service';
 import { Router } from '@angular/router';
-import { AuthService } from './AuthService';
+import { AuthService } from '../AuthService';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -22,14 +22,14 @@ onLogin() {
     return;
   }
 
-  console.log(this.username, this.password);
+  //console.log(this.username, this.password);
   this.service.PostLogin(this.username, this.password).subscribe({
     next: (response) => {
-      console.log('Response:', response);
+     // console.log('Response:', response);
       if (response.status === 200 && response.body?.token) {
-        const expiresIn = response.body.expiresIn || 5; // Assuming the response contains expiresIn in seconds
+        const expiresIn = response.body.expiresIn || 3600; // Assuming the response contains expiresIn in seconds
         this.authService.setToken(response.body.token, expiresIn);
-        console.log(response.body.token);
+       // console.log(response.body.token);
         this.authService.setUserInfo({
           id: response.body.idNo,
           name: response.body.firstName + ' ' + response.body.lastName,

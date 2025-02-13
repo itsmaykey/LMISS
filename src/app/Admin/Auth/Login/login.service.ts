@@ -14,7 +14,7 @@ export class LoginService {
   PostLogin(username: string, password: string): Observable<HttpResponse<any>> {
     const body = { username, password };
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    console.log('Request Body:', body); // Log the request body
+   // console.log('Request Body:', body); // Log the request body
     return this.http.post<any>(this.apiUrl, body, { headers, observe: 'response' }).pipe(
       catchError(this.handleError)
     );

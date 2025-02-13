@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild, } from '@angular/core';
 import { NgxScannerQrcodeComponent, ScannerQRCodeResult } from 'ngx-scanner-qrcode';
-import { AuthService } from '../Auth/login/AuthService';
+import { AuthService } from '../Admin/Auth/AuthService';
 
 
 @Component({
@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
-    console.log('Dashboard initialized');
+   // console.log('Dashboard initialized');
     this.userInfo = this.authService.getUserInfo();
     //console.log('User Info:', this.userInfo);
   }

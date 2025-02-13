@@ -1,4 +1,4 @@
-import { AuthService } from './../../Auth/login/AuthService';
+import { AuthService } from '../../Admin/Auth/AuthService';
 import { Component , OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -12,7 +12,7 @@ export class MainLayoutComponent implements OnInit {
 
 
 logout(): void {
-  console.log('Logging out');
+ // console.log('Logging out');
     this.authService.logout();
     this.router.navigate(['/login']);
 }
@@ -25,9 +25,9 @@ isMenuOpen = false;
 
   ngOnInit(): void {
     this.userInfo = this.authService.getUserInfo();
-    console.log('User Info:', this.userInfo);
+  // console.log('User Info:', this.userInfo);
 
-    console.log(this.userInfo.position);
+   // console.log(this.userInfo.position);
     if(this.userInfo.position === 'a001'){
       this.userRegHidden = false;
     }
