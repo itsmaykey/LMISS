@@ -33,6 +33,9 @@ constructor(private http: HttpClient) { }
   getEducationalAttainment() {
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/GetrefEdducationalAtt`);
   }
+  getDrugEffect(){
+    return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/GetrefDrugEffect`);
+  }
 
 
 
