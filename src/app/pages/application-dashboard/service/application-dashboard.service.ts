@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../Environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
+import {catchError, Observable, throwError,  } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -37,10 +38,31 @@ constructor(private http: HttpClient) { }
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/GetrefDrugEffect`);
   }
 
+  //Post
+  postPatientData(data: any) {
+    return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientData`, data);
+  }
+
+  // postPatientData(data: any): Observable<any> {
+  //   return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientData`, data)
+  //     .pipe(
+  //       catchError((error: HttpErrorResponse) => {
+  //         console.error('Error Status:', error.status);
+  //         console.error('Error Message:', error.message);
+  //         console.error('Error Response:', error.error);
+  //         return throwError(error);
+  //       })
+  //     );
+
+
+
+  }
 
 
 
 
-}
+
+
+
 
 
