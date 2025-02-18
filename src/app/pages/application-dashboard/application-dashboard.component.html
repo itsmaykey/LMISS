@@ -1,27 +1,29 @@
 <!DOCTYPE html>
+
+
 <div class="row">
         <div class="col-md-12">
           <div class="nav-align-bottom">
             <ul class="nav nav-pills flex-column flex-md-row custom-nav">
               <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#Account" role="tab" aria-selected="true">
+                <a class="nav-link active" data-bs-target="#Account">
                   <i class="bx bx-sm bx-user me-1"></i> Account
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#EducationalAttain" role="tab" aria-selected="false">
-                  <i class="bx bx-sm bx-bell me-1"></i> Educational Attainment
+                <a class="nav-link">
+                  <i class="bx bx-sm bx-bell me-1"></i> Notifications
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#FamHistory" role="tab" aria-selected="false">
-                  <i class="bx bx-sm bx-bell me-1"></i> Family History
+                <a class="nav-link">
+                  <i class="bx bx-sm bx-link-alt me-1"></i> Connections
                 </a>
               </li>
             </ul>
           </div>
           <div class="tab-content">
-        <div class="tab-pane fade show active" id="Account" role="tabpanel">
+        <div class="tab-pane fade show active" id="FinanceTab">
           <!-- //Basic Data -->
           <div class="card mb-5">
             <!-- Account -->
@@ -38,136 +40,187 @@
               </div>
             </div>
             <div class="card-body pt-4">
-              <form id="PatientForm" [formGroup]="patientForm" (ngSubmit)="onSubmit()">
+              <form [formGroup]="patientForm" (ngSubmit)="onSubmit()">
                 <div class="row g-4">
-                <div class="row">
-
-                  <div class="col-md-4">
-                    <label for="lname" class="form-label">Last Name</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-4">
-                    <label for="fName" class="form-label">First Name</label>
-                    <input class="form-control" type="text" id="fName" name="fName" autofocus="" placeholder="Enter First Name">
-                  </div>
-                  <div class="col-md-4">
-                    <label for="Mname" class="form-label">Middle Name</label>
-                    <input class="form-control" type="text" id="Mname" name="Mname" autofocus="" placeholder="Enter Middle Name">
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-2">
-                    <label for="bdate" class="form-label">BirthDate</label>
-                    <input class="form-control" type="date" name="bdate" id="bdate">
-                  </div>
-                  <div class="col-md-1">
-                    <label for="age" class="form-label">Age</label>
-                    <input class="form-control" type="text" id="age" name="age" autofocus="" disabled>
-                  </div>
-                  <div class="col-md-2">
-                    <label for="bPalce" class="form-label">Birth Place</label>
-                    <input type="text" class="form-control" id="bPalce" name="bPalce" placeholder=" Enter Birth Place">
-                  </div>
-                  <div class="col-md-2">
-                    <label for="language" class="form-label">Sex</label>
-                    <select id="language" class="select2 form-select">
-                      <option value="">Select</option>
-                      <option value="1">Male</option>
-                      <option value="0">Female</option>
-
-                    </select>
-                  </div>
-                  <div class="col-md-2">
-                    <label for="language" class="form-label">Civil Status</label>
-                    <select id="language" class="select2 form-select">
-                      <option value="" disabled selected>Select</option>
-                      <option  *ngFor="let x of civilStatus" value="{{x.civ_ID}}">{{x.civ_Name}}</option>
-                    </select>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="form-label" for="phoneNumber">Contact Number</label>
-                    <div class="input-group input-group-merge">
-                      <input type="text" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="09xx xxx xxxx" maxlength="11">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <label for="lname" class="form-label">Last Name</label>
+                      <input class="form-control" type="text" formControlName="PLastName" placeholder="Enter Last Name">
+                    </div>
+                    <div class="col-md-4">
+                      <label for="fName" class="form-label">First Name</label>
+                      <input class="form-control" type="text" formControlName="PFirstName" placeholder="Enter First Name">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="Mname" class="form-label">Middle Name</label>
+                      <input class="form-control" type="text" formControlName="PMiddleName" placeholder="Enter Middle Name">
+                    </div>
+                    <div class="col-md-2">
+                      <label for="Mname" class="form-label">Extn. Name</label>
+                      <input class="form-control" type="text" formControlName="PExtName" placeholder="Enter Extn Name">
                     </div>
                   </div>
+                  <div class="row">
+                    <div class="col-md-1">
+                      <label for="age" class="form-label">Age</label>
+                      <input class="form-control" type="number" formControlName="Age">
+                    </div>
+                    <div class="col-md-2">
+                      <label for="bPalce" class="form-label">Birth Place</label>
+                      <input type="text" class="form-control" formControlName="Birthplace" placeholder="Enter Birth Place">
+                    </div>
+                    <div class="col-md-2">
+                      <label for="sex" class="form-label">Sex</label>
+                      <select formControlName="sex" class="select2 form-select">
+                        <option value="" selected disabled>Select</option>
+                        <option value="1">Male</option>
+                        <option value="0">Female</option>
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <label for="civilStatusId" class="form-label">Civil Status</label>
+                      <select formControlName="CivilStatusId" class="select2 form-select">
+                        <option value="" disabled selected>Select</option>
+                        <option *ngFor="let x of civilStatus" [value]="x.civ_ID">{{x.civ_Name}}</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label" for="phoneNumber">Contact Number</label>
+                      <div class="input-group input-group-merge">
+                        <input type="text" formControlName="phoneNumber" class="form-control" placeholder="09xx xxx xxxx" maxlength="11">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label for="mun" class="form-label">Municipality</label>
+                      <select class="select2 form-select" formControlName="citymunCode" (change)="onMunicipalityChange($event)">
+                        <option value="" disabled selected>Select</option>
+                        <option *ngFor="let x of citymun" [value]="x.citymunCode">{{x.citymunDesc}}</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="brgy" class="form-label">Barangay</label>
+                      <select class="select2 form-select" formControlName="brgyCode" (change)="onBarangayChange($event)">
+                        <option value="" disabled selected>Select</option>
+                        <option *ngFor="let x of brgy" [value]="x.brgyCode">{{x.brgyDesc}}</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="prkCode" class="form-label">Purok</label>
+                      <select class="select2 form-select" formControlName="PrkCode">
+                        <option value="" disabled selected>Select</option>
+                        <option *ngFor="let x of prk" [value]="x.prkCode">{{x.prkDesc}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <label for="nickname" class="form-label">Nickname</label>
+                      <input type="text" class="form-control" formControlName="PNickName" placeholder="Enter nickname">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="nationalityId" class="form-label">Nationality</label>
+                      <select class="select2 form-select" formControlName="NationalityId">
+                        <option value="" selected disabled>Select</option>
+                        <option *ngFor="let x of nationality" [value]="x.citi_ID">{{x.city_Description}}</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <label for="religionId" class="form-label">Religion</label>
+                      <select class="select2 form-select" formControlName="ReligionId">
+                        <option value="" disabled selected>Select</option>
+                        <option *ngFor="let x of religion" [value]="x.recNo">{{x.religionDesc}}</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <label for="Occupation" class="form-label">Occupation</label>
+                      <input type="text" class="form-control" formControlName="Occupation" placeholder="Enter Occupation">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <label for="educationalId" class="form-label">Educational Attainment</label>
+                      <select class="select2 form-select" formControlName="EducationalId">
+                        <option value="" disabled selected>Select</option>
+                        <option *ngFor="let x of educationalAttainment" [value]="x.edu_ID">{{x.edu_Name}}</option>
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <label for="schoolLastAttended" class="form-label">Sch. Last Attended</label>
+                      <input class="form-control" type="date" formControlName="SchoolLastAttended">
+                    </div>
+                    <div class="col-md-2">
+                      <label for="yearGraduated" class="form-label">Yr. Graduated</label>
+                      <input type="number" class="form-control" formControlName="YearGraduated" placeholder="Enter Year">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="income" class="form-label">Income</label>
+                      <input class="form-control" type="number" formControlName="Income" placeholder="Enter Amount">
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="mt-6">
+                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                  </div>
                 </div>
-                <div class="row">
-                  <!-- <div class="col-md-3">
-                    <label for="prov" class="form-label">Province</label>
-                    <select class="select2 form-select" id="prov" name="prov" >
-                      <option value="" disabled selected>Select</option>
-                      <option  *ngFor="let x of citymun" value="{{x.citymunCode}}">{{x.citymunDesc}}</option>
-                    </select>
-                  </div> -->
-                  <div class="col-md-4">
-                    <label for="mun" class="form-label">Municipality</label>
-                    <select class="select2 form-select" id="mun" name="mun" (change)="onMunicipalityChange($event)">
-                      <option value="" disabled selected>Select</option>
-                      <option  *ngFor="let x of citymun" value="{{x.citymunCode}}">{{x.citymunDesc}}</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <label for="brgy" class="form-label">Barangay</label>
-                    <select  class="select2 form-select" id="brgy" name="brgy" (change)="onBarangayChange($event)">
-                      <option value="" disabled selected>Select</option>
-                      <option  *ngFor="let x of brgy" value="{{x.brgyCode}}">{{x.brgyDesc}}</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <label for="mun" class="form-label">Purok</label>
-                    <select class="select2 form-select" id="prk" name="prk" >
-                      <option value="" disabled selected>Select</option>
-                      <option  *ngFor="let x of prk" value="{{x.prkCode}}">{{x.prkDesc}}</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-3">
-                    <label for="nickname" class="form-label">Nickname</label>
-                    <input type="text" class="form-control" id="nickname" name="nickname" placeholder=" Enter nickname">
-                  </div>
-                  <div class="col-md-3">
-                    <label for="national" class="form-label">Nationality</label>
-                    <select class="select2 form-select" id="national" name="national" >
-                      <option value="" selected disabled>Select</option>
-                      <option *ngFor="let x of nationality" value="{{x.citi_ID}}">{{x.city_Description}}</option>
+              </form>
+            </div>
+            <!-- /Account -->
+          </div>
+      <!-- School Data -->
+          <div class="card mb-5">
+            <div class="card-header">
+              <h4 class="card-header-title">Educational Attainment</h4>
+            </div>
 
-                    </select>
-                  </div>
-                  <div class="col-md-3">
-                    <label for="religion" class="form-label">Religion</label>
-                    <select class="select2 form-select" id="religion" name="religion" >
-                      <option value="" disabled selected>Select</option>
-                      <option  *ngFor="let x of religion" value="{{x.recNo}}">{{x.religionDesc}}</option>
-                    </select>
-                  </div>
-                  <div class="col-md-3">
-                    <label for="Occupation" class="form-label">Occupation</label>
-                    <input type="text" class="form-control" id="Occupation" name="Occupation" placeholder=" Enter Occupation">
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-3">
-                    <label for="national" class="form-label">Educational Attainment</label>
-                    <select class="select2 form-select" id="national" name="national" >
-                      <option value="" disabled selected>Select</option>
-                      <option  *ngFor="let x of educationalAttainment" value="{{x.edu_ID}}">{{x.edu_Name}}</option>
-                    </select>
+            <div class="card-body pt-4">
+              <form id="SchoolForm">
+                <div class="row g-4">
+                     <div class="row">
+                  <div class="col-md-9">
+                    <label for="lname" class="form-label">Elementary School</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
                   </div>
                   <div class="col-md-2">
                     <label for="bdate" class="form-label">Sch. Last Attended</label>
                     <input class="form-control" type="date" name="bdate" id="bdate">
                   </div>
+                  <div class="col-md-12">
+                    <label for="lname" class="form-label">School Address</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-9">
+                    <label for="lname" class="form-label">High School</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
                   <div class="col-md-2">
-                    <label for="yrGrad" class="form-label">Yr. Graduated</label>
-                    <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter Year">
+                    <label for="bdate" class="form-label">Sch. Last Attended</label>
+                    <input class="form-control" type="date" name="bdate" id="bdate">
                   </div>
+                  <div class="col-md-12">
+                    <label for="lname" class="form-label">School Address</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-9">
+                    <label for="lname" class="form-label">College</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-2">
+                    <label for="bdate" class="form-label">Sch. Last Attended</label>
+                    <input class="form-control" type="date" name="bdate" id="bdate">
+                  </div>
+                  <div class="col-md-12">
+                    <label for="lname" class="form-label">School Address</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                </div>
 
-                  <div class="col-md-3">
-                    <label for="amount" class="form-label">Amount</label>
-                    <input class="form-control" type="number" name="amount" id="amount" placeholder="Enter Amount">
-                  </div>
-                  </div>
                 </div>
                 <hr>
                 <div class="mt-6">
@@ -178,9 +231,263 @@
             </div>
             <!-- /Account -->
           </div>
-      <!-- School Data -->
-          
-       
+          <!-- Parent Data -->
+          <div class="card mb-5">
+            <div class="card-header">
+              <h4 class="card-header-title">Parent</h4>
+            </div>
+
+            <div class="card-body pt-4">
+              <form id="ParentForm">
+                <div class="row g-4">
+                     <div class="row">
+                  <div class="col-md-6">
+                    <label for="lname" class="form-label">Father</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-6">
+                    <label for="lname" class="form-label">Mother</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="lname" class="form-label">Address</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-6">
+                    <label for="bdate" class="form-label">Address</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4">
+                    <label for="lname" class="form-label">Education</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-2">
+                    <label for="language" class="form-label">Living Arrangement</label>
+                    <select id="language" class="select2 form-select">
+                      <option value="" disabled selected>Select</option>
+                      <option  *ngFor="let x of civilStatus" value="{{x.civ_ID}}">{{x.civ_Name}}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="bdate" class="form-label">Education</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-2">
+                    <label for="language" class="form-label">Living Arrangement</label>
+                    <select id="language" class="select2 form-select">
+                      <option value="" disabled selected>Select</option>
+                      <option  *ngFor="let x of civilStatus" value="{{x.civ_ID}}">{{x.civ_Name}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4">
+                    <label for="lname" class="form-label">Occupation</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-2">
+                    <label for="bdate" class="form-label">Income</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-4">
+                    <label for="lname" class="form-label">Occupation</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-2">
+                    <label for="bdate" class="form-label">Income</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                </div>
+                </div>
+                <hr>
+                <div class="mt-6">
+                  <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                  <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                </div>
+              </form>
+            </div>
+            <!-- /Account -->
+          </div>
+          <div class="card mb-5">
+            <div class="card-header">
+              <h4 class="card-header-title">Spouse</h4>
+            </div>
+
+            <div class="card-body pt-4">
+              <form id="SpouseForm">
+                <div class="row g-4">
+                     <div class="row">
+                  <div class="col-md-8">
+                    <label for="lname" class="form-label">Spouse Name</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-3">
+                    <label for="lname" class="form-label">Nickname</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-1">
+                    <label for="lname" class="form-label">Age</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Age" >
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <label for="lname" class="form-label">Address</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4">
+                    <label for="lname" class="form-label">Occupation</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-8">
+                    <label for="bdate" class="form-label">Employer</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-8">
+                    <label for="lname" class="form-label">Educational Attainment</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-2">
+                    <label for="bdate" class="form-label">Income</label>
+                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  </div>
+                  <div class="col-md-2">
+                    <label for="language" class="form-label">Living Arrangement</label>
+                    <select id="language" class="select2 form-select">
+                      <option value="" disabled selected>Select</option>
+                      <option  *ngFor="let x of civilStatus" value="{{x.civ_ID}}">{{x.civ_Name}}</option>
+                    </select>
+                  </div>
+                </div>
+
+                </div>
+                <hr>
+                <div class="mt-6">
+                  <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                  <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                </div>
+              </form>
+            </div>
+            <!-- /Account -->
+          </div>
+          <div class="card mb-5">
+            <div class="card-header">
+              <h4 class="card-header-title">Siblings</h4>
+            </div>
+
+            <div class="card-body pt-4">
+              <form id="SiblingsForm">
+                <div class="row g-4">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-bordered" id="siblingsTable">
+                        <thead>
+                          <tr>
+                            <th>Siblings Name</th>
+                            <th>Age</th>
+                            <th>Sex</th>
+                            <th>Civil<br>Status</th>
+                            <th>Occupation</th>
+                            <th>Educational<br>Attainment</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let sibling of siblings">
+                            <td><input class="form-control" type="text" [(ngModel)]="sibling.name" name="siblingName" placeholder="Enter Last Name" required></td>
+                            <td style="width: 8%;"><input class="form-control" type="text" [(ngModel)]="sibling.age" name="siblingAge" placeholder="Age" required></td>
+                            <td style="width: 10%;"><select class="select2 form-select" [(ngModel)]="sibling.sex" name="siblingSex">
+                              <option value="">Select</option>
+                              <option value="1">Male</option>
+                              <option value="0">Female</option>
+                            </select></td>
+                            <td style="width: 10%;"><select class="select2 form-select" [(ngModel)]="sibling.civilStatus" name="siblingCivilStatus">
+                              <option value="">Select</option>
+                              <option value="1">Single</option>
+                              <option value="2">Married</option>
+                              <option value="3">Divorced</option>
+                              <option value="4">Widowed</option>
+                            </select></td>
+                            <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="sibling.occupation" name="siblingOccupation" placeholder="Enter Occupation" required></td>
+                            <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="sibling.education" name="siblingEducation" placeholder="Enter Educational Attainment" required></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <br>
+                      <button type="button" class="btn btn-secondary" (click)="siblingsaddRow()">Add Row</button>
+                    </div>
+                  </div>
+                </div>
+                <hr>
+                <div class="mt-6">
+                  <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                  <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                </div>
+              </form>
+            </div>
+        </div>
+        <div class="card mb-5">
+          <div class="card-header">
+            <h4 class="card-header-title">Children</h4>
+          </div>
+
+          <div class="card-body pt-4">
+            <form id="ChildForm">
+              <div class="row g-4">
+                <div class="row">
+                  <div class="col-md-12">
+                    <table class="table table-bordered" id="ChildrensTable">
+                      <thead>
+                        <tr>
+                          <th>Childrens Name</th>
+                          <th>Age</th>
+                          <th>Sex</th>
+                          <th>Civil<br>Status</th>
+                          <th>Occupation</th>
+                          <th>Educational<br>Attainment</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let children of childrens">
+                          <td><input class="form-control" type="text" [(ngModel)]="children.name" name="childrenName" placeholder="Enter Last Name" required></td>
+                          <td style="width: 8%;"><input class="form-control" type="text" [(ngModel)]="children.age" name="childrenAge" placeholder="Age" required></td>
+                          <td style="width: 10%;"><select class="select2 form-select" [(ngModel)]="children.sex" name="childrenSex">
+                            <option value="">Select</option>
+                            <option value="1">Male</option>
+                            <option value="0">Female</option>
+                          </select></td>
+                          <td style="width: 10%;"><select class="select2 form-select" [(ngModel)]="children.civilStatus" name="childrenCivilStatus">
+                            <option value="">Select</option>
+                            <option value="1">Single</option>
+                            <option value="2">Married</option>
+                            <option value="3">Divorced</option>
+                            <option value="4">Widowed</option>
+                          </select></td>
+                          <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="children.occupation" name="childrenOccupation" placeholder="Enter Occupation" required></td>
+                          <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="children.education" name="childrenEducation" placeholder="Enter Educational Attainment" required></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <br>
+                    <button type="button" class="btn btn-secondary" (click)="childrensaddRow()">Add Row</button>
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <div class="mt-6">
+                <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+              </div>
+            </form>
+          </div>
+      </div>
       <div class="card mb-5">
         <div class="card-header">
           <h4 class="card-header-title">Employment Record</h4>
@@ -473,335 +780,6 @@
     </form>
   </div>
 </div>
-    </div>
-    <div class="tab-pane fade active hide" id="EducationalAttain" role="tabpanel">
-      <form>
-        <div class="card mb-5">
-          <div class="card-header">
-            <h4 class="card-header-title">Educational Attainment</h4>
-          </div>
-
-          <div class="card-body pt-4">
-            <form id="SchoolForm">
-              <div class="row g-4">
-                   <div class="row">
-                <div class="col-md-9">
-                  <label for="lname" class="form-label">Elementary School</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                </div>
-                <div class="col-md-2">
-                  <label for="bdate" class="form-label">Sch. Last Attended</label>
-                  <input class="form-control" type="date" name="bdate" id="bdate">
-                </div>
-                <div class="col-md-12">
-                  <label for="lname" class="form-label">School Address</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-9">
-                  <label for="lname" class="form-label">High School</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                </div>
-                <div class="col-md-2">
-                  <label for="bdate" class="form-label">Sch. Last Attended</label>
-                  <input class="form-control" type="date" name="bdate" id="bdate">
-                </div>
-                <div class="col-md-12">
-                  <label for="lname" class="form-label">School Address</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-9">
-                  <label for="lname" class="form-label">College</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                </div>
-                <div class="col-md-2">
-                  <label for="bdate" class="form-label">Sch. Last Attended</label>
-                  <input class="form-control" type="date" name="bdate" id="bdate">
-                </div>
-                <div class="col-md-12">
-                  <label for="lname" class="form-label">School Address</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                </div>
-                <div class="col-md-12">
-                  <label for="lname" class="form-label">Course</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                </div>
-              </div>
-
-              </div>
-              <hr>
-              <div class="mt-6">
-                <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-                <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-              </div>
-            </form>
-          </div>
-          <!-- /Account -->
-        </div>
-       
-      </form>
-    </div>
-    
-    <div class="tab-pane fade active hide" id="FamHistory" role="tabpanel">
-          <form>
-            <div class="card mb-5">
-                <div class="card-header">
-                  <h4 class="card-header-title">Parent</h4>
-                </div>
-                <div class="card-body pt-4">
-                <div class="row g-4">
-                     <div class="row">
-                  <div class="col-md-6">
-                    <label for="lname" class="form-label">Father</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-6">
-                    <label for="lname" class="form-label">Mother</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-6">
-                    <label for="lname" class="form-label">Address</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-6">
-                    <label for="bdate" class="form-label">Address</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-4">
-                    <label for="lname" class="form-label">Education</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-2">
-                    <label for="language" class="form-label">Living Arrangement</label>
-                    <select id="language" class="select2 form-select">
-                      <option value="" disabled selected>Select</option>
-                      <option  *ngFor="let x of civilStatus" value="{{x.civ_ID}}">{{x.civ_Name}}</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <label for="bdate" class="form-label">Education</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-2">
-                    <label for="language" class="form-label">Living Arrangement</label>
-                    <select id="language" class="select2 form-select">
-                      <option value="" disabled selected>Select</option>
-                      <option  *ngFor="let x of civilStatus" value="{{x.civ_ID}}">{{x.civ_Name}}</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-4">
-                    <label for="lname" class="form-label">Occupation</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-2">
-                    <label for="bdate" class="form-label">Income</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-4">
-                    <label for="lname" class="form-label">Occupation</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-2">
-                    <label for="bdate" class="form-label">Income</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                </div>
-                </div>
-              </div>
-                <hr>
-                <div class="mt-6">
-                  <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-                  <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-                </div>
-            </div>
-        </form>
-         
-          <div class="card mb-5">
-            <div class="card-header">
-              <h4 class="card-header-title">Spouse</h4>
-            </div>
-
-            <div class="card-body pt-4">
-              <form id="SpouseForm">
-                <div class="row g-4">
-                     <div class="row">
-                  <div class="col-md-8">
-                    <label for="lname" class="form-label">Spouse Name</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-3">
-                    <label for="lname" class="form-label">Nickname</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-1">
-                    <label for="lname" class="form-label">Age</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Age" >
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-12">
-                    <label for="lname" class="form-label">Address</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-4">
-                    <label for="lname" class="form-label">Occupation</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-8">
-                    <label for="bdate" class="form-label">Employer</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-8">
-                    <label for="lname" class="form-label">Educational Attainment</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-2">
-                    <label for="bdate" class="form-label">Income</label>
-                    <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
-                  </div>
-                  <div class="col-md-2">
-                    <label for="language" class="form-label">Living Arrangement</label>
-                    <select id="language" class="select2 form-select">
-                      <option value="" disabled selected>Select</option>
-                      <option  *ngFor="let x of civilStatus" value="{{x.civ_ID}}">{{x.civ_Name}}</option>
-                    </select>
-                  </div>
-                </div>
-
-                </div>
-                <hr>
-                <div class="mt-6">
-                  <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-                  <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-                </div>
-              </form>
-            </div>
-            <!-- /Account -->
-          </div>
-          <div class="card mb-5">
-            <div class="card-header">
-              <h4 class="card-header-title">Siblings</h4>
-            </div>
-
-            <div class="card-body pt-4">
-              <form id="SiblingsForm">
-                <div class="row g-4">
-                  <div class="row">
-                    <div class="col-md-12">
-                      <table class="table table-bordered" id="siblingsTable">
-                        <thead>
-                          <tr>
-                            <th>Siblings Name</th>
-                            <th>Age</th>
-                            <th>Sex</th>
-                            <th>Civil<br>Status</th>
-                            <th>Occupation</th>
-                            <th>Educational<br>Attainment</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr *ngFor="let sibling of siblings">
-                            <td><input class="form-control" type="text" [(ngModel)]="sibling.name" name="siblingName" placeholder="Enter Last Name" required></td>
-                            <td style="width: 8%;"><input class="form-control" type="text" [(ngModel)]="sibling.age" name="siblingAge" placeholder="Age" required></td>
-                            <td style="width: 10%;"><select class="select2 form-select" [(ngModel)]="sibling.sex" name="siblingSex">
-                              <option value="">Select</option>
-                              <option value="1">Male</option>
-                              <option value="0">Female</option>
-                            </select></td>
-                            <td style="width: 10%;"><select class="select2 form-select" [(ngModel)]="sibling.civilStatus" name="siblingCivilStatus">
-                              <option value="">Select</option>
-                              <option value="1">Single</option>
-                              <option value="2">Married</option>
-                              <option value="3">Divorced</option>
-                              <option value="4">Widowed</option>
-                            </select></td>
-                            <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="sibling.occupation" name="siblingOccupation" placeholder="Enter Occupation" required></td>
-                            <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="sibling.education" name="siblingEducation" placeholder="Enter Educational Attainment" required></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <br>
-                      <button type="button" class="btn btn-secondary" (click)="siblingsaddRow()">Add Row</button>
-                    </div>
-                  </div>
-                </div>
-                <hr>
-                <div class="mt-6">
-                  <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-                  <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-                </div>
-              </form>
-            </div>
-        </div>
-        <div class="card mb-5">
-          <div class="card-header">
-            <h4 class="card-header-title">Children</h4>
-          </div>
-
-          <div class="card-body pt-4">
-            <form id="ChildForm">
-              <div class="row g-4">
-                <div class="row">
-                  <div class="col-md-12">
-                    <table class="table table-bordered" id="ChildrensTable">
-                      <thead>
-                        <tr>
-                          <th>Childrens Name</th>
-                          <th>Age</th>
-                          <th>Sex</th>
-                          <th>Civil<br>Status</th>
-                          <th>Occupation</th>
-                          <th>Educational<br>Attainment</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr *ngFor="let children of childrens">
-                          <td><input class="form-control" type="text" [(ngModel)]="children.name" name="childrenName" placeholder="Enter Last Name" required></td>
-                          <td style="width: 8%;"><input class="form-control" type="text" [(ngModel)]="children.age" name="childrenAge" placeholder="Age" required></td>
-                          <td style="width: 10%;"><select class="select2 form-select" [(ngModel)]="children.sex" name="childrenSex">
-                            <option value="">Select</option>
-                            <option value="1">Male</option>
-                            <option value="0">Female</option>
-                          </select></td>
-                          <td style="width: 10%;"><select class="select2 form-select" [(ngModel)]="children.civilStatus" name="childrenCivilStatus">
-                            <option value="">Select</option>
-                            <option value="1">Single</option>
-                            <option value="2">Married</option>
-                            <option value="3">Divorced</option>
-                            <option value="4">Widowed</option>
-                          </select></td>
-                          <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="children.occupation" name="childrenOccupation" placeholder="Enter Occupation" required></td>
-                          <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="children.education" name="childrenEducation" placeholder="Enter Educational Attainment" required></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <br>
-                    <button type="button" class="btn btn-secondary" (click)="childrensaddRow()">Add Row</button>
-                  </div>
-                </div>
-              </div>
-              <hr>
-              <div class="mt-6">
-                <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-                <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-              </div>
-            </form>
-          </div>
-      </div>
-        
     </div>
  </div>
     </div>
