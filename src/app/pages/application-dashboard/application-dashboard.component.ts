@@ -110,24 +110,24 @@ patientCode: string = '';
       let uuid = 'DDNPQR-';
       for (let i = 0; i < 12; i++) {
         const randomIndex = Math.floor(Math.random() * chars.length);
-       uuid += chars[randomIndex];
-       this.patientCode = uuid;
+        uuid += chars[randomIndex];
       }
-      return uuid
-
+      return uuid;  // Ensure this function only returns the generated UUID
     }
     this.patientForm = this.fb.group({
 
-      PatientCode: [customUUID(), Validators.required] ,
+      PatientCode: [customUUID(), Validators.required],
       PFirstName: ['', Validators.required],
       PMiddleName: ['',],
       PLastName: ['', Validators.required],
       PExtName: ['',],
       PNickName: ['', Validators.required],
-      Age: [  '', Validators.required ],
+      Age: ['', Validators.required ],
       sex: ['' , Validators.required],
+      CitymunCode: ['',],
+      BrgyCode: ['',],
       PrkCode: ['', Validators.required],
-      phoneNumber: ['', [Validators.required, Validators.pattern('^09[0-9]{9}$')]],
+      phoneNumber: ['', Validators.required, Validators.pattern('^09[0-9]{9}$')],
       Birthplace: ['', Validators.required],
       NationalityId: ['', Validators.required],
       ReligionId: ['', Validators.required],
@@ -138,7 +138,7 @@ patientCode: string = '';
       Occupation: ['', Validators.required],
       Income: ['', Validators.required],
       AdmittingStaffId: [this.userInfo.id,Validators.required],
-      CaseNo: ['12', Validators.required],
+      CaseNo: [12, Validators.required],
       ReferrefBy: [this.userInfo.name, Validators.required],
 
     });
@@ -151,12 +151,11 @@ patientCode: string = '';
         ...this.patientForm.value,
          sex: this.patientForm.value.sex === '0' ? false : true
       };
-
+      console.log(patientFormData);
       this.service.postPatientData(patientFormData).subscribe({
         next: (response) => {
           console.log('User registered successfully:', response);
           alert('User registered successfully!');
-
         },
         error: (err) => {
           console.error('API Error:', err);
