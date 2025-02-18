@@ -15,7 +15,8 @@ export class ApplicationDashboardComponent {
   patientForm!: FormGroup;
 
 
-
+  admissionType: any = [];
+  selectedAdmissionType: any[]= [];
   citymun: any = [];
   brgy: any = [];
   prk: any = [];
@@ -45,6 +46,17 @@ patientCode: string = '';
     this.service.getDrugEffect().subscribe({
       next: (response) => {
         this.drugEffects = (response as any[]).map((effect) => ({
+          ...effect,
+          selected: false,
+        }));
+      },
+      error: (error) => {
+        console.error('Error:', error);
+      },
+    });
+    this.service.getAdmissionType().subscribe({
+      next: (response) => {
+        this.admissionType = (response as any[]).map((effect) => ({
           ...effect,
           selected: false,
         }));
@@ -118,28 +130,29 @@ patientCode: string = '';
     }
     this.patientForm = this.fb.group({
 
-      PatientCode: [customUUID(), Validators.required] ,
-      PFirstName: ['', Validators.required],
-      PMiddleName: ['',],
-      PLastName: ['', Validators.required],
-      PExtName: ['',],
-      PNickName: ['', Validators.required],
-      Age: [  '', Validators.required ],
+      
+      patientCode: [customUUID(), Validators.required] ,
+      pFirstName: ['', Validators.required],
+      pMiddleName: ['',],
+      pLastName: ['', Validators.required],
+      pExtName: ['',],
+      pNickName: ['', Validators.required],
       sex: ['' , Validators.required],
-      PrkCode: ['', Validators.required],
+      birthdate: ['', Validators.required],
+      prkCode: ['', Validators.required],
       phoneNumber: ['', [Validators.required, Validators.pattern('^09[0-9]{9}$')]],
-      Birthplace: ['', Validators.required],
-      NationalityId: ['', Validators.required],
-      ReligionId: ['', Validators.required],
-      CivilStatusId: ['', Validators.required],
-      EducationalId: ['', Validators.required],
-      SchoolLastAttended: ['', Validators.required],
-      YearGraduated: ['', Validators.required],
-      Occupation: ['', Validators.required],
-      Income: ['', Validators.required],
-      AdmittingStaffId: [this.userInfo.id,Validators.required],
-      CaseNo: ['12', Validators.required],
-      ReferrefBy: [this.userInfo.name, Validators.required],
+      birthplace: ['', Validators.required],
+      nationalityId: ['', Validators.required],
+      religionId: ['', Validators.required],
+      civilStatusId: ['', Validators.required],
+      educationalId: ['', Validators.required],
+      schoolLastAttended: ['', Validators.required],
+      yearGraduated: ['', Validators.required],
+      occupation: ['', Validators.required],
+      income: ['', Validators.required],
+      admittingStaffId: [this.userInfo.id,Validators.required],
+      caseNo: ['12', Validators.required],
+      referrefBy: [this.userInfo.name, Validators.required],
 
     });
   } //end of ngOnInit
@@ -147,37 +160,38 @@ patientCode: string = '';
 
   onSubmit(): void {
     if (this.patientForm.valid) {
-      const patientFormData = {
-        ...this.patientForm.value,
-         sex: this.patientForm.value.sex === '0' ? false : true
-      };
+        const patientFormData = {
+            ...this.patientForm.value,
+           
+        };
 
-      this.service.postPatientData(patientFormData).subscribe({
-        next: (response) => {
-          console.log('User registered successfully:', response);
-          alert('User registered successfully!');
 
-        },
-        error: (err) => {
-          console.error('API Error:', err);
+        this.service.postPatientData(patientFormData).subscribe({
+            next: (response) => {
+                console.log('User registered successfully:', response);
+                alert('User registered successfully!');
+            },
+            error: (err) => {
+                console.error('API Error:', err);
 
-          if (err.status === 400) {
-            alert('Validation failed. Please check your inputs.');
-          } else if (err.status === 401) {
-            alert('Unauthorized. Please check your permissions.');
-          } else if (err.status === 500) {
-            alert('Server error. Please try again later.');
-          } else {
-            alert('Failed to register user. Please try again.');
-          }
-        }
-      });
+                if (err.status === 400) {
+                    alert('Validation failed. Please check your inputs.');
+                } else if (err.status === 401) {
+                    alert('Unauthorized. Please check your permissions.');
+                } else if (err.status === 500) {
+                    alert('Server error. Please try again later.');
+                } else {
+                    alert('Failed to register user. Please try again.');
+                }
+            }
+        });
     } else {
-      console.warn('Form is invalid!');
-      alert('Please fill in all required fields correctly.');
-   //   this.logValidationErrors(this.patientForm);
+        console.warn('Form submission attempted with invalid data:', this.patientForm.value);
+        alert('Please fill in all required fields correctly.');
+        // this.logValidationErrors(this.patientForm);
     }
-  }
+}
+
 
   // logValidationErrors(group: FormGroup = this.patientForm): void {
   //   Object.keys(group.controls).forEach((key: string) => {
@@ -193,6 +207,23 @@ patientCode: string = '';
   //   });
   // }
 
+  onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
+    const checkbox = event.target as HTMLInputElement;
+    admissionType.selected = checkbox.checked;
+
+    if (checkbox.checked) {
+      this.selectedAdmissionType.push(admissionType);
+    } else {
+      const index = this.selectedAdmissionType.findIndex(
+        (effect) => effect.admissionCode === admissionType.admissionCode
+      );
+      if (index > -1) {
+        this.selectedAdmissionType.splice(index, 1);
+      }
+    }
+
+    console.log('Selected Admission Type:', this.selectedAdmissionType);
+  }
 
   onCheckboxChange(event: Event, drugEffect: any): void {
     const checkbox = event.target as HTMLInputElement;
