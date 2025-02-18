@@ -122,7 +122,7 @@ patientCode: string = '';
       pLastName: ['', Validators.required],
       pExtName: ['',],
       pNickName: ['', Validators.required],
-      age: [  '', Validators.required ],
+      age: [  '19', Validators.required ],
       sex: ['', Validators.required],
       prkCode: ['', Validators.required],
       phoneNumber: ['', [Validators.required, Validators.pattern('^09[0-9]{9}$')]],
