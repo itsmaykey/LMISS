@@ -22,7 +22,7 @@ userData: any = [];
   isUpdateDisabled: boolean = false;
   constructor(private fb: FormBuilder) {
     this.userForm = this.fb.group({
-      
+
       firstName: ['', Validators.required],
       middleName: [''],
       lastName: ['', Validators.required],
@@ -40,10 +40,11 @@ userData: any = [];
     return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
+
   onSubmit(): void {
     if (this.userForm.valid) {
       const formData = { ...this.userForm.value };
-      delete formData.confirmPassword; 
+      delete formData.confirmPassword;
       formData.isActive = true;
       this.service.postRegistration(formData).subscribe({
         next: (response) => {
@@ -54,7 +55,7 @@ userData: any = [];
         },
         error: (err) => {
           console.error('API Error:', err);
-  
+
           if (err.status === 400) {
             alert('Validation failed. Please check your inputs.');
           } else if (err.status === 401) {
@@ -71,7 +72,7 @@ userData: any = [];
       alert('Please fill in all required fields correctly.');
     }
   }
-  
+
 
   onReset() {
     this.userForm.reset();

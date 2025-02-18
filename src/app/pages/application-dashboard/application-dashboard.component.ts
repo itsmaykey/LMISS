@@ -35,6 +35,8 @@ export class ApplicationDashboardComponent {
 
 patientCode: string = '';
   userInfo: any;
+
+
   ngOnInit(): void {
     this.userInfo = this.authService.getUserInfo();
     console.log(this.userInfo);
@@ -116,40 +118,45 @@ patientCode: string = '';
     }
     this.patientForm = this.fb.group({
 
-      patientCode: [customUUID(), Validators.required] ,
-      pFirstName: ['', Validators.required],
-      pMiddleName: ['',],
-      pLastName: ['', Validators.required],
-      pExtName: ['',],
-      pNickName: ['', Validators.required],
-      age: [  '', Validators.required ],
-      sex: ['', Validators.required],
-      prkCode: ['', Validators.required],
+      PatientCode: [customUUID(), Validators.required] ,
+      PFirstName: ['', Validators.required],
+      PMiddleName: ['',],
+      PLastName: ['', Validators.required],
+      PExtName: ['',],
+      PNickName: ['', Validators.required],
+      Age: [  '', Validators.required ],
+      sex: ['' , Validators.required],
+      PrkCode: ['', Validators.required],
       phoneNumber: ['', [Validators.required, Validators.pattern('^09[0-9]{9}$')]],
-      birthplace: ['', Validators.required],
-      nationalityId: ['', Validators.required],
-      religionId: ['', Validators.required],
-      civilStatusId: ['', Validators.required],
-      educationalId: ['', Validators.required],
-      schoolLastAttended: ['', Validators.required],
-      yearGraduated: ['', Validators.required],
-      occupation: ['', Validators.required],
-      income: ['', Validators.required],
-      admittingStaffId: [this.userInfo.id,Validators.required],
-      caseNo: ['12', Validators.required],
-      referrefBy: [this.userInfo.id, Validators.required],
+      Birthplace: ['', Validators.required],
+      NationalityId: ['', Validators.required],
+      ReligionId: ['', Validators.required],
+      CivilStatusId: ['', Validators.required],
+      EducationalId: ['', Validators.required],
+      SchoolLastAttended: ['', Validators.required],
+      YearGraduated: ['', Validators.required],
+      Occupation: ['', Validators.required],
+      Income: ['', Validators.required],
+      AdmittingStaffId: [this.userInfo.id,Validators.required],
+      CaseNo: ['12', Validators.required],
+      ReferrefBy: [this.userInfo.name, Validators.required],
 
     });
   } //end of ngOnInit
 
+
   onSubmit(): void {
     if (this.patientForm.valid) {
-      const patientFormData = { ...this.patientForm.value };
-      console.log(this.patientForm.value);
+      const patientFormData = {
+        ...this.patientForm.value,
+         sex: this.patientForm.value.sex === '0' ? false : true
+      };
+
       this.service.postPatientData(patientFormData).subscribe({
         next: (response) => {
-         console.log('Patient successfully Saved: ', response);
-         alert('Patient successfully Saved!');
+          console.log('User registered successfully:', response);
+          alert('User registered successfully!');
+
         },
         error: (err) => {
           console.error('API Error:', err);
@@ -161,30 +168,30 @@ patientCode: string = '';
           } else if (err.status === 500) {
             alert('Server error. Please try again later.');
           } else {
-            alert('Failed to submit Patient. Please try again.');
+            alert('Failed to register user. Please try again.');
           }
         }
       });
+    } else {
+      console.warn('Form is invalid!');
+      alert('Please fill in all required fields correctly.');
+   //   this.logValidationErrors(this.patientForm);
     }
-    else {
-      console.log('Form is invalid');
-      this.logValidationErrors(this.patientForm);
-    }
+  }
 
-  }
-  logValidationErrors(group: FormGroup = this.patientForm): void {
-    Object.keys(group.controls).forEach((key: string) => {
-      const control = group.get(key);
-      if (control instanceof FormGroup) {
-        this.logValidationErrors(control);
-      } else {
-        if (control && control.invalid) {
-          console.log(`Control ${key} is invalid`);
-          console.log(control.errors);
-        }
-      }
-    });
-  }
+  // logValidationErrors(group: FormGroup = this.patientForm): void {
+  //   Object.keys(group.controls).forEach((key: string) => {
+  //     const control = group.get(key);
+  //     if (control instanceof FormGroup) {
+  //       this.logValidationErrors(control);
+  //     } else {
+  //       if (control && control.invalid) {
+  //         console.log(`Control ${key} is invalid`);
+  //         console.log(control.errors);
+  //       }
+  //     }
+  //   });
+  // }
 
 
   onCheckboxChange(event: Event, drugEffect: any): void {

@@ -45,29 +45,29 @@
                   <div class="row">
                     <div class="col-md-3">
                       <label for="lname" class="form-label">Last Name</label>
-                      <input class="form-control" type="text" formControlName="pLastName" placeholder="Enter Last Name">
+                      <input class="form-control" type="text" formControlName="PLastName" placeholder="Enter Last Name">
                     </div>
                     <div class="col-md-4">
                       <label for="fName" class="form-label">First Name</label>
-                      <input class="form-control" type="text" formControlName="pFirstName" placeholder="Enter First Name">
+                      <input class="form-control" type="text" formControlName="PFirstName" placeholder="Enter First Name">
                     </div>
                     <div class="col-md-3">
                       <label for="Mname" class="form-label">Middle Name</label>
-                      <input class="form-control" type="text" formControlName="pMiddleName" placeholder="Enter Middle Name">
+                      <input class="form-control" type="text" formControlName="PMiddleName" placeholder="Enter Middle Name">
                     </div>
                     <div class="col-md-2">
                       <label for="Mname" class="form-label">Extn. Name</label>
-                      <input class="form-control" type="text" formControlName="pExtName" placeholder="Enter Extn Name">
+                      <input class="form-control" type="text" formControlName="PExtName" placeholder="Enter Extn Name">
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-md-1">
                       <label for="age" class="form-label">Age</label>
-                      <input class="form-control" type="text" formControlName="age">
+                      <input class="form-control" type="number" formControlName="Age">
                     </div>
                     <div class="col-md-2">
                       <label for="bPalce" class="form-label">Birth Place</label>
-                      <input type="text" class="form-control" formControlName="birthplace" placeholder="Enter Birth Place">
+                      <input type="text" class="form-control" formControlName="Birthplace" placeholder="Enter Birth Place">
                     </div>
                     <div class="col-md-2">
                       <label for="sex" class="form-label">Sex</label>
@@ -79,7 +79,7 @@
                     </div>
                     <div class="col-md-2">
                       <label for="civilStatusId" class="form-label">Civil Status</label>
-                      <select formControlName="civilStatusId" class="select2 form-select">
+                      <select formControlName="CivilStatusId" class="select2 form-select">
                         <option value="" disabled selected>Select</option>
                         <option *ngFor="let x of civilStatus" [value]="x.civ_ID">{{x.civ_Name}}</option>
                       </select>
@@ -108,7 +108,7 @@
                     </div>
                     <div class="col-md-4">
                       <label for="prkCode" class="form-label">Purok</label>
-                      <select class="select2 form-select" formControlName="prkCode">
+                      <select class="select2 form-select" formControlName="PrkCode">
                         <option value="" disabled selected>Select</option>
                         <option *ngFor="let x of prk" [value]="x.prkCode">{{x.prkDesc}}</option>
                       </select>
@@ -117,46 +117,46 @@
                   <div class="row">
                     <div class="col-md-3">
                       <label for="nickname" class="form-label">Nickname</label>
-                      <input type="text" class="form-control" formControlName="pNickName" placeholder="Enter nickname">
+                      <input type="text" class="form-control" formControlName="PNickName" placeholder="Enter nickname">
                     </div>
                     <div class="col-md-3">
                       <label for="nationalityId" class="form-label">Nationality</label>
-                      <select class="select2 form-select" formControlName="nationalityId">
+                      <select class="select2 form-select" formControlName="NationalityId">
                         <option value="" selected disabled>Select</option>
                         <option *ngFor="let x of nationality" [value]="x.citi_ID">{{x.city_Description}}</option>
                       </select>
                     </div>
                     <div class="col-md-3">
                       <label for="religionId" class="form-label">Religion</label>
-                      <select class="select2 form-select" formControlName="religionId">
+                      <select class="select2 form-select" formControlName="ReligionId">
                         <option value="" disabled selected>Select</option>
                         <option *ngFor="let x of religion" [value]="x.recNo">{{x.religionDesc}}</option>
                       </select>
                     </div>
                     <div class="col-md-3">
                       <label for="Occupation" class="form-label">Occupation</label>
-                      <input type="text" class="form-control" formControlName="occupation" placeholder="Enter Occupation">
+                      <input type="text" class="form-control" formControlName="Occupation" placeholder="Enter Occupation">
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-md-3">
                       <label for="educationalId" class="form-label">Educational Attainment</label>
-                      <select class="select2 form-select" formControlName="educationalId">
+                      <select class="select2 form-select" formControlName="EducationalId">
                         <option value="" disabled selected>Select</option>
                         <option *ngFor="let x of educationalAttainment" [value]="x.edu_ID">{{x.edu_Name}}</option>
                       </select>
                     </div>
                     <div class="col-md-2">
                       <label for="schoolLastAttended" class="form-label">Sch. Last Attended</label>
-                      <input class="form-control" type="date" formControlName="schoolLastAttended">
+                      <input class="form-control" type="date" formControlName="SchoolLastAttended">
                     </div>
                     <div class="col-md-2">
                       <label for="yearGraduated" class="form-label">Yr. Graduated</label>
-                      <input type="text" class="form-control" formControlName="yearGraduated" placeholder="Enter Year">
+                      <input type="number" class="form-control" formControlName="YearGraduated" placeholder="Enter Year">
                     </div>
                     <div class="col-md-3">
                       <label for="income" class="form-label">Income</label>
-                      <input class="form-control" type="number" formControlName="income" placeholder="Enter Amount">
+                      <input class="form-control" type="number" formControlName="Income" placeholder="Enter Amount">
                     </div>
                   </div>
                   <hr>
