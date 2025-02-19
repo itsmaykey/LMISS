@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ApplicationDashboardService } from './service/application-dashboard.service';
 import { AuthService } from '../../Admin/Auth/AuthService';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-application-dashboard',
@@ -30,7 +30,7 @@ export class ApplicationDashboardComponent {
   onChangeBarangay: string = '';
 
 
-  constructor(private authService: AuthService, private fb: FormBuilder) {}
+  constructor(private authService: AuthService, private fb: FormBuilder, private router: Router) {}
   service = inject(ApplicationDashboardService);
   selectedDrugEffects: any[] = [];
 
@@ -140,7 +140,7 @@ patientCode: string = '';
       sex: ['' , Validators.required],
       birthdate: ['', Validators.required],
       prkCode: ['', Validators.required],
-      phoneNumber: ['', [Validators.required, Validators.pattern('^09[0-9]{9}$')]],
+      phoneNumber:['', Validators.required],
       birthplace: ['', Validators.required],
       nationalityId: ['', Validators.required],
       religionId: ['', Validators.required],
@@ -160,11 +160,9 @@ patientCode: string = '';
 
   onSubmit(): void {
     if (this.patientForm.valid) {
-        const patientFormData = {
-            ...this.patientForm.value,
-           
-        };
-
+        const patientFormData = 
+            this.patientForm.value
+            this.patientCode = this.patientForm.value.PatientCode
 
         this.service.postPatientData(patientFormData).subscribe({
             next: (response) => {
@@ -343,5 +341,43 @@ patientCode: string = '';
       cr: '',
       tms: '',
     });
+  }
+  goToSubstanceHisto(): void {
+    const subHistoTab = document.querySelector('[data-bs-target="#SubstanceHisto"]');
+    if (subHistoTab) {
+      const tabInstance = new (window as any).bootstrap.Tab(subHistoTab);
+      tabInstance.show();
+    }
+  }
+  goToEducational(): void {
+    const subEducTab = document.querySelector('[data-bs-target="#EducationalAttain"]');
+    if (subEducTab) {
+      const EductabInstance = new (window as any).bootstrap.Tab(subEducTab);
+      EductabInstance.show();
+    }
+  }
+  goToFamHisto(): void {
+    const subFamHisto = document.querySelector('[data-bs-target="#FamHistory"]');
+    if (subFamHisto) {
+      const FamtabInstance = new (window as any).bootstrap.Tab(subFamHisto);
+      FamtabInstance.show();
+    }
+  }
+  goToEmploy(): void {
+    const subEmploy = document.querySelector('[data-bs-target="#EmployHisto"]');
+    if (subEmploy) {
+      const EmploytabInstance = new (window as any).bootstrap.Tab(subEmploy);
+      EmploytabInstance.show();
+    }
+  }
+  gotoAppHisto(): void {
+    const subAppHisto = document.querySelector('[data-bs-target="#ApplicationHisto"]');
+    if (subAppHisto) {
+      const ApptabInstance = new (window as any).bootstrap.Tab(subAppHisto);
+      ApptabInstance.show();
+    }
+  }
+  goToPatientDashboard() {
+    this.router.navigate(['/patientDashboard']); 
   }
 }

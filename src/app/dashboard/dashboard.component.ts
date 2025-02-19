@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild, } from '@angular/core';
 import { NgxScannerQrcodeComponent, ScannerQRCodeResult } from 'ngx-scanner-qrcode';
 import { AuthService } from '../Admin/Auth/AuthService';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,14 +16,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild(NgxScannerQrcodeComponent) scanner: NgxScannerQrcodeComponent | undefined;
 
   userInfo: any;
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
    // console.log('Dashboard initialized');
     this.userInfo = this.authService.getUserInfo();
     //console.log('User Info:', this.userInfo);
   }
-
+  goToAppDashboard() {
+    this.router.navigate(['/applicationDashboard']); 
+  }
   ngOnDestroy(): void {
     if (this.scanner && this.isCameraActive) {
       this.scanner.stop();

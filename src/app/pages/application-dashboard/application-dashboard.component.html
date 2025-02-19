@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-
-
 <div class="row">
         <div class="col-md-12">
           <div class="nav-align-bottom">
@@ -22,7 +19,7 @@
             </li>
             <li class="nav-item">
               <a class="nav-link" data-bs-toggle="tab" data-bs-target="#EmployHisto" role="tab" aria-selected="false">
-                  <i class="bx bx-sm bx-group me-1"></i> Employment History
+                  <i class="bx bx-sm bx-briefcase me-1"></i> Employment History
               </a>
           </li>
           <li class="nav-item">
@@ -32,28 +29,22 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" data-bs-toggle="tab" data-bs-target="#ApplicationHisto" role="tab" aria-selected="false">
-              <i class="bx bx-sm bx-capsule me-1"></i> Application History
+            <i class="bx bx-sm bx-task me-1"></i> Application
           </a>
-      </li>
+        </li>
+        
             </ul>
           </div>
           <div class="tab-content custom-tab-content">
-            <div class="tab-pane fade show active" id="Account" role="tabpanel">
+            <div class="tab-pane fade active show" id="Account" role="tabpanel">
           <!-- //Basic Data -->
           <div class="card mb-5">
             <!-- Account -->
-            <div class="card-body">
-              <div class="d-flex align-items-start align-items-sm-center gap-6 pb-4 border-bottom">
-                <img src="../assets/img/avatars/1.png" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar">
-                <div class="button-wrapper" style="margin-left: 10px;">
-                  <label for="upload" class="btn btn-primary me-3 mb-4" tabindex="0">
-                    <span class="d-none d-sm-block"></span>
-                    <i class="bx bx-upload d-block d-sm-none"></i>
-                    <input type="file" id="upload" class="account-file-input" hidden="" accept="image/png, image/jpeg">
-                  </label>
-                </div>
-              </div>
+            <div class="card-header">
+              <h4 class="card-header-title">Personal Info</h4>
+              <hr>
             </div>
+            
             <div class="card-body pt-4">
               <form [formGroup]="patientForm" (ngSubmit)="onSubmit()">
                 <div class="row g-4">
@@ -89,8 +80,8 @@
                       <label for="sex" class="form-label">Sex</label>
                       <select formControlName="sex" class="select2 form-select">
                         <option value="" selected disabled>Select</option>
-                        <option value="1">Male</option>
-                        <option value="0">Female</option>
+                        <option value=1>Male</option>
+                        <option value=0>Female</option>
                       </select>
                     </div>
                     <div class="col-md-2">
@@ -180,18 +171,26 @@
                     <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
                     <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                   </div>
+
                 </div>
               </form>
+              <div class="card-footer text-end">
+                <button type="button" class="btn btn-secondary text-white me-2" (click)="goToEducational()">
+                    Next
+                </button>
+            </div>
             </div>
             <!-- /Account -->
           </div>
     </div>
-    <div class="tab-pane fade active hide" id="EducationalAttain" role="tabpanel">
-      <form >
+    <div class="tab-pane fade hide" id="EducationalAttain" role="tabpanel">
         <div class="card mb-5">
           <div class="card-header">
             <h4 class="card-header-title">Educational Attainment</h4>
+            <hr>
           </div>
+      <form >
+
           <div class="card-body pt-4">
               <div class="row g-4">
                    <div class="row">
@@ -244,15 +243,22 @@
                 <button type="reset" class="btn btn-outline-secondary">Cancel</button>
               </div>
           </div>
-          <!-- /Account -->
-        </div>
+         
+       
         
       </form>
+      <div class="card-footer text-end">
+        <button type="button" class="btn btn-secondary text-white me-2" (click)="goToFamHisto()">
+            Next
+        </button>
     </div>
-    <div class="tab-pane fade active hide" id="FamHistory" role="tabpanel">
+  </div>
+    </div>
+    <div class="tab-pane fade  hide" id="FamHistory" role="tabpanel">
         <div class="card mb-5">
           <div class="card-header">
             <h4 class="card-header-title">Parent</h4>
+            <hr>
           </div>
           <div class="card-body pt-4">
               <div class="row g-4">
@@ -497,12 +503,17 @@
             </div>
         </div>
     </div>
-        
+    <div class="card-footer text-end">
+      <button type="button" class="btn btn-secondary text-white me-2" (click)="goToEmploy()">
+          Next
+      </button>
+  </div>
     </div>
-    <div class="tab-pane fade active hide" id="EmployHisto" role="tabpanel">
+    <div class="tab-pane fade hide" id="EmployHisto" role="tabpanel">
         <div class="card">
           <div class="card-header">
             <h4 class="card-header-title">Employment Record</h4>
+            <hr>
           </div>
           <div class="card-body">
             <div class="row">
@@ -536,12 +547,18 @@
               <button type="reset" class="btn btn-outline-secondary">Cancel</button>
             </div>
           </div>
+           <div class="card-footer text-end">
+           <button type="button" class="btn btn-secondary text-white me-2" (click)="goToSubstanceHisto()">
+           Next
+          </button>
+      </div>
         </div>
     </div>
-    <div class="tab-pane fade active hide" id="SubstanceHisto" role="tabpanel">
+    <div class="tab-pane fade hide" id="SubstanceHisto" role="tabpanel">
         <div class="card mb-5">
           <div class="card-header">
             <h4 class="card-header-title">Drug History</h4>
+            <hr>
           </div>
     
           <div class="card-body pt-4">
@@ -683,6 +700,7 @@
             <button type="reset" class="btn btn-outline-secondary">Cancel</button>
           </div>
         </form>
+       
       </div>
     </div>
     <div class="card mb-5">
@@ -755,55 +773,118 @@
         </form>
       </div>
     </div>
-     
+    <div class="card-footer text-end">
+      <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoAppHisto()">
+      Next
+     </button>
+ </div>
     </div>
-    <div class="tab-pane fade active hide" id="ApplicationHisto" role="tabpanel">
-      <div class="card mb-5">
-        <div class="card-header">
-          <h4 class="card-header-title">Staff's Assessment</h4>
-        </div>
-        <div class="card-body pt-4">
-          <form id="AssessmentForm">
-            <div class="row g-4">
-              <div class="row">
-                <div class="row">
-                  <div *ngFor="let x of admissionType" class="form-check mb-0 ms-2 col-md-2">
-                    <input class="form-check-input" type="checkbox" [value]="x.admissionCode" (change)="onAdmissionTypeCheckboxChange($event, x)">
-                    {{ x.admissionDesc }}
+    <div class="tab-pane fade hide" id="ApplicationHisto" role="tabpanel">
+      <div class="row">
+        
+        <!-- Left Side: Staff's Assessment Card -->
+        <div class="col-md-7">
+          <div class="card mb-5">
+            <div class="card-header">
+              <h4 class="card-header-title">Staff's Assessment</h4>
+              <hr>
+            </div>
+            <div class="card-body pt-4">
+              <form id="AssessmentForm">
+                <div class="row g-4">
+                  <div class="row">
+                    <div class="row">
+                      <div *ngFor="let x of admissionType" style="font-size: 10px;" class="form-check mb-0 ms-2 col-md-2">
+                        <input class="form-check-input" type="checkbox" [value]="x.admissionCode" 
+                          (change)="onAdmissionTypeCheckboxChange($event, x)">
+                        {{ x.admissionDesc }}
+                      </div>
+                    </div>
+    
+                    <div class="col-md-12">
+                      <label for="yrGrad" class="form-label">Assessment</label>
+                      <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder="Enter">
+                    </div>
+    
+                    <div class="col-md-12">
+                      <label for="yrGrad" class="form-label">Plan</label>
+                      <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder="Enter">
+                    </div>
+    
+                    <div class="divider text-end">
+                      <div style="text-decoration: underline;">Prepared By:</div>
+                    </div>
+                    <div class="divider text-end">
+                      <div>{{ userInfo.name }}</div>
+                    </div>
+    
                   </div>
                 </div>
-                <div class="col-md-12">
-                    <label for="yrGrad" class="form-label">Assessment</label>
-                    <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter">
+                <hr>
+                <div class="mt-6">
+                  <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                  <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                 </div>
-      
-                <div class="col-md-12">
-                  <label for="yrGrad" class="form-label">Plan</label>
-                  <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter">
-              </div>
-      
-              <div class="divider text-end">
-                <div class="" style="text-decoration: underline;">Prepared By:</div>
-              </div>
-              <div class="divider text-end">
-                <div class="">{{userInfo.name}}</div>
-              </div>
-              <!-- <div class="col-md-3">
-                <label for="yrGrad" class="form-label">Prepared by</label>
-                <span type="text" class="form-control" disabled id="yrGrad" name="yrGrad"  >{{userInfo.name}}</span>
-            </div> -->
-      
-              </div>
+              </form>
             </div>
-            <hr>
-            <div class="mt-6">
-              <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-              <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-            </div>
-          </form>
+          </div>
         </div>
+    
+        <!-- Right Side: New Card -->
+        <div class="col-md-5">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-header-title">Application History</h4>
+            </div>
+            <div class="card-body" style="height: 400px; overflow-y: auto;">
+              <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                <table class="table table-bordered table-striped table-hover">
+                  <thead class="table-dark text-center">
+                    <tr >
+                      <th style="width: 5%;">#</th>
+                      <th style="width: 50%;">Date</th>
+                      <th style="width: 20%;">Type</th>
+                      <th style="width: 20%;">Status</th>
+                      <th style="width: 5%;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="text-center">1</td>
+                      <td>2024-01-19</td>
+                      <td>Inpatient</td>
+                      <td>Completed</td>
+                      <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-primary text-white" title="View Details" (click)="goToPatientDashboard()">
+                          <i class="bx bx-show"></i> <!-- Eye Icon -->
+                        </button>
+                      </td>
+                    </tr>
+                   
+                    <tr>
+                      <td class="text-center">2</td>
+                      <td>2024-06-10</td>
+                      <td>Oupatient</td>
+                      <td>Incomplete</td>
+                      <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-primary text-white" title="View Details" (click)="goToPatientDashboard()">
+                          <i class="bx bx-show"></i> <!-- Eye Icon -->
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        
+        
+    
       </div>
-  </div>
+    </div>
+    
  </div>
     </div>
 </div>

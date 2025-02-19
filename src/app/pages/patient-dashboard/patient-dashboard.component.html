@@ -6,7 +6,8 @@
         <div class="card-body pt-12">
           <div class="user-avatar-section">
             <div class=" d-flex align-items-center flex-column">
-              <img class="img-fluid rounded mb-4" src="../../assets/img/avatars/1.png" height="120" width="120" alt="User avatar">
+              <i class="bx bx-user-circle d-block w-px-100 h-px-100 text-primary" style="font-size: 100px;"></i>
+
               <div class="user-info text-center pb-2">
                 <h5>Violet Mendoza</h5>
                 <span class="badge bg-label-secondary">Status: Inpatient</span>
@@ -16,11 +17,10 @@
           <div class="info-container">
           
             <div class="d-flex justify-content-center pb-4">
-              <a class="btn btn-primary me-4" data-bs-toggle="modal">Edit</a>
-              <button class="btn btn-primary" (click)="navigateToDashboard()">Application</button>
+              <button class="btn btn-secondary text-white" (click)="navigateToDashboard()">Edit Profile</button>
               </div>
           </div>
-          <h6 class="border-top">Application Summary</h6>
+          <h6 class="border-top">Attendance Summary</h6>
           <div class="col-lg-12">
             <div class="card h-100 border-emphasis">
             <div class="card shadow-none"> 
@@ -31,18 +31,14 @@
                                   <table class="datatables-ajax table table-bordered dataTable" id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info" style="width: 100%;">
                                       <thead>
                                           <tr>
-                                              <th>#</th>
-                                              <th>Appl. date</th>
+                                              <th>Date</th>
                                               <th>Status</th>
-                                              <th>Action</th>
                                           </tr>
                                       </thead>
                                       <tbody>
                                         <tr>
-                                          <th scope="row">1</th>
-                                          <td>----</td>
-                                          <td>----</td>
-                                          <td>----</td>
+                                          <td>12-12-2024</td>
+                                          <td>Time-in</td>
                                         </tr>
                                       </tbody>
                                       <tfoot></tfoot>
