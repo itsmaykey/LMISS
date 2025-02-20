@@ -13,7 +13,13 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import { UserRegComponent } from './Admin/user-Registration/user-reg.component';
 import { ApplicationDashboardComponent } from './pages/application-dashboard/application-dashboard.component';
+import { RouterModule, Routes } from '@angular/router';
 
+const routes: Routes = [
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'application/:patientCode', component: ApplicationDashboardComponent }, // Dynamic route for patientCode
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' } // Optional: redirect to dashboard
+];
 @NgModule({
   declarations: [
     AppComponent,
@@ -28,6 +34,7 @@ import { ApplicationDashboardComponent } from './pages/application-dashboard/app
   ],
   imports: [
     BrowserModule,
+    RouterModule.forRoot(routes),
     AppRoutingModule,
     NgxScannerQrcodeModule,
     FormsModule,

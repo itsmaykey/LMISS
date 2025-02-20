@@ -4,16 +4,19 @@ import { AuthService } from '../Admin/Auth/AuthService';
 import { DashboardServiceService } from './dashboard-service/dashboard-service.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  service = inject(DashboardServiceService);
+
   isModalVisible = false;
   scannedData: string = '';
   isCameraActive: boolean = false;
-  service = inject(DashboardServiceService);
 
   patients: any[] = [];
   filteredSearchNames: any[] = [];
@@ -21,23 +24,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild(NgxScannerQrcodeComponent) scanner: NgxScannerQrcodeComponent | undefined;
 
   userInfo: any;
-  router: any;
-  constructor(private authService: AuthService,private sanitizer: DomSanitizer) { }
+  
+
+  constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
    // console.log('Dashboard initialized');
     this.userInfo = this.authService.getUserInfo();
-    //console.log('User Info:', this.userInfo);
+    //console.log('User Info:', this.userInfo);`
     this.patientNames();
-  }
-  goToAppDashboard() {
-    this.router.navigate(['/applicationDashboard']); 
-  }
-  ngOnDestroy(): void {
-    if (this.scanner && this.isCameraActive) {
-      this.scanner.stop();
-    }
-    
   }
   patientNames(): void {
     this.service.getPatients().subscribe((response: any) => {
@@ -45,7 +40,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.filteredSearchNames = []; // Start with an empty table
     });
   }
-
   FilteredSearchNames(): void {
     if (!this.searchText || this.searchText.trim() === '') {
       this.filteredSearchNames = []; // Show nothing when search is empty
@@ -60,6 +54,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
       )
     );
   }
+  goToAppDashboard() {
+    this.router.navigate(['/applicationDashboard']); 
+  }
+  goToSelectedApp(patientCode: string): void {
+    if (!this.router) {
+      console.error('Router is undefined!'); // Debugging check
+      return;
+    }
+
+    this.router.navigate(['/application', patientCode]);
+  }
+  ngOnDestroy(): void {
+    if (this.scanner && this.isCameraActive) {
+      this.scanner.stop();
+    }
+  }
+
   public handle(action: NgxScannerQrcodeComponent, fn: string): void {
     const validMethods = ['start', 'stop'];
 
@@ -119,6 +130,5 @@ export class DashboardComponent implements OnInit, OnDestroy {
       );
     }
   }
-  
 }
 

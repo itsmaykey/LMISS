@@ -35,8 +35,9 @@
               "src/favicon.ico",
               "src/assets/wasm",
               {
-                "glob": "**/*",
-                "input": "public"
+                "glob": "**/*.wasm",
+                "input": "src/assets/wasm",
+                "output": "/assets/wasm"
               }
             ],
             "styles": [

@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ApplicationDashboardService } from './service/application-dashboard.service';
 import { AuthService } from '../../Admin/Auth/AuthService';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-application-dashboard',
@@ -28,20 +28,26 @@ export class ApplicationDashboardComponent {
   educationalAttainment: any = [];
   onChangeCitymunCode: string = '';
   onChangeBarangay: string = '';
+  patientCode: string | null = null;
 
+  
 
-  constructor(private authService: AuthService, private fb: FormBuilder, private router: Router) {}
+  constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute, private router: Router) {}
   service = inject(ApplicationDashboardService);
   selectedDrugEffects: any[] = [];
 
-patientCode: string = '';
   userInfo: any;
 
 
   ngOnInit(): void {
     this.userInfo = this.authService.getUserInfo();
     console.log(this.userInfo);
+    this.patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
 
+    // Show an alert only in ApplicationComponent
+    if (this.patientCode) {
+      alert(`Selected Patient Code: ${this.patientCode}`);
+    }
     //Educational Attainment
     this.service.getDrugEffect().subscribe({
       next: (response) => {
@@ -155,7 +161,7 @@ patientCode: string = '';
       referrefBy: [this.userInfo.name, Validators.required],
 
     });
-  } //end of ngOnInit
+  } 
 
 
   onSubmit(): void {
@@ -380,4 +386,9 @@ patientCode: string = '';
   goToPatientDashboard() {
     this.router.navigate(['/patientDashboard']); 
   }
+  goToSelectedApp(patientCode: string): void {
+    this.router.navigate(['/application', patientCode]).then(() => {
+      alert(`Selected Patient Code: ${patientCode}`);
+    });
+}
 }

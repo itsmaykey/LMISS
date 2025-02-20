@@ -11,6 +11,7 @@ import { AuthGuard } from './Admin/Auth/AuthGuard';
 import { LoginGuard } from './Admin/Auth/LoginGuard';
 const routes: Routes = [
 
+  { path: 'application/:patientCode', component: ApplicationDashboardComponent }, // Accept dynamic patientCode
 
 
       {

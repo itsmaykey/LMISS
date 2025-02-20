@@ -19,3 +19,23 @@
     box-shadow: 0 4px 8px rgb(183, 183, 185); /* Subtle shadow for emphasis */
     transition: box-shadow 0.3s ease, transform 0.3s ease;
   }
+button.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    font-weight: 500;
+  }
+  
+  button.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+  sdf
+  button.btn-outline-secondary {
+    border-color: #ced4da;
+    color: #6c757d;
+  }
+  
+  button.btn-outline-secondary:hover {
+    background-color: #e9ecef;
+    border-color: #d6d6d6;
+  }
