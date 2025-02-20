@@ -40,7 +40,7 @@ const routes: Routes = [
     component:PatientDashboardComponent
   },
   {
-    path:'applicationDashboard',
+    path:'application',
     component:ApplicationDashboardComponent
   }
  ]

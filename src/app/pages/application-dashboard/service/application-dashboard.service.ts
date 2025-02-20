@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-
 import { environment } from '../../../Environments/environment.prod';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
+import {catchError, Observable, throwError,  } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +40,6 @@ constructor(private http: HttpClient) { }
   getAdmissionType(){
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/GetrefAdmissionType`);
   }
-
 
   //Post
   postPatientData(data: any) {
