@@ -3,47 +3,41 @@ import { NgxScannerQrcodeComponent, ScannerQRCodeResult } from 'ngx-scanner-qrco
 import { AuthService } from '../Admin/Auth/AuthService';
 import { DashboardServiceService } from './dashboard-service/dashboard-service.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  service = inject(DashboardServiceService);
-
   isModalVisible = false;
   scannedData: string = '';
   isCameraActive: boolean = false;
+  service = inject(DashboardServiceService);
 
   patients: any[] = [];
   filteredSearchNames: any[] = [];
   searchText: string = '';
-
   @ViewChild(NgxScannerQrcodeComponent) scanner: NgxScannerQrcodeComponent | undefined;
 
   userInfo: any;
-
+  router: any;
   constructor(private authService: AuthService,private sanitizer: DomSanitizer) { }
 
-
-
   ngOnInit(): void {
-
-    this.patientNames();
-    // this.service.getPatients().subscribe({
-    //   next: (response) => {
-    //     this.patients = response;
-    //     console.log('patients', this.patients);
-    //   },
-    //   error: (error) => {
-    //     console.error('Error:', error);
-    //   },
-    // });
-
-
    // console.log('Dashboard initialized');
     this.userInfo = this.authService.getUserInfo();
     //console.log('User Info:', this.userInfo);
+    this.patientNames();
+  }
+  goToAppDashboard() {
+    this.router.navigate(['/applicationDashboard']); 
+  }
+  ngOnDestroy(): void {
+    if (this.scanner && this.isCameraActive) {
+      this.scanner.stop();
+    }
+    
   }
   patientNames(): void {
     this.service.getPatients().subscribe((response: any) => {
@@ -66,33 +60,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       )
     );
   }
-//  filteredSearchNames: any[] = [];
-//   patientNames(): void{
-//     this.service.getPatients().subscribe((response: any) => {
-//       this.patients = response.map((owner: any) => {
-//         return {
-//           ...owner,
-//         };
-//       });
-//       this.filteredSearchNames = this.patients;
-//     });
-//   }
-//   FilteredSearchNames() {
-
-//     this.filteredSearchNames = this.patients.filter(Response => {
-//       return Object.values(Response).some(value => {
-//         return value != null && value.toString().toLowerCase().includes(this.searchText.toLowerCase());
-//       });
-//     });
-//   }
-
-
-  ngOnDestroy(): void {
-    if (this.scanner && this.isCameraActive) {
-      this.scanner.stop();
-    }
-  }
-
   public handle(action: NgxScannerQrcodeComponent, fn: string): void {
     const validMethods = ['start', 'stop'];
 
@@ -152,5 +119,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       );
     }
   }
+  
 }
 
