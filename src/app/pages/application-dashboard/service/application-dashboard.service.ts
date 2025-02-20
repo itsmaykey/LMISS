@@ -37,6 +37,9 @@ constructor(private http: HttpClient) { }
   getDrugEffect(){
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/GetrefDrugEffect`);
   }
+  getAdmissionType(){
+    return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/GetrefAdmissionType`);
+  }
 
   //Post
   postPatientData(data: any) {

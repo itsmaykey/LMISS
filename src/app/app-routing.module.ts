@@ -40,7 +40,7 @@ const routes: Routes = [
     component:PatientDashboardComponent
   },
   {
-    path:'yawas',
+    path:'application',
     component:ApplicationDashboardComponent
   }
  ]

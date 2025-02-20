@@ -1,28 +1,91 @@
-import { Component, OnDestroy, OnInit, ViewChild, } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild, } from '@angular/core';
 import { NgxScannerQrcodeComponent, ScannerQRCodeResult } from 'ngx-scanner-qrcode';
 import { AuthService } from '../Admin/Auth/AuthService';
-
-
+import { DashboardServiceService } from './dashboard-service/dashboard-service.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  service = inject(DashboardServiceService);
+
   isModalVisible = false;
   scannedData: string = '';
   isCameraActive: boolean = false;
 
+  patients: any[] = [];
+  filteredSearchNames: any[] = [];
+  searchText: string = '';
+
   @ViewChild(NgxScannerQrcodeComponent) scanner: NgxScannerQrcodeComponent | undefined;
 
   userInfo: any;
-  constructor(private authService: AuthService) { }
+
+  constructor(private authService: AuthService,private sanitizer: DomSanitizer) { }
+
+
 
   ngOnInit(): void {
+
+    this.patientNames();
+    // this.service.getPatients().subscribe({
+    //   next: (response) => {
+    //     this.patients = response;
+    //     console.log('patients', this.patients);
+    //   },
+    //   error: (error) => {
+    //     console.error('Error:', error);
+    //   },
+    // });
+
+
    // console.log('Dashboard initialized');
     this.userInfo = this.authService.getUserInfo();
     //console.log('User Info:', this.userInfo);
   }
+  patientNames(): void {
+    this.service.getPatients().subscribe((response: any) => {
+      this.patients = response.map((owner: any) => ({ ...owner }));
+      this.filteredSearchNames = []; // Start with an empty table
+    });
+  }
+
+  FilteredSearchNames(): void {
+    if (!this.searchText || this.searchText.trim() === '') {
+      this.filteredSearchNames = []; // Show nothing when search is empty
+      return;
+    }
+
+    const search = this.searchText.toLowerCase().trim();
+
+    this.filteredSearchNames = this.patients.filter(patient =>
+      Object.values(patient).some(value =>
+        value != null && value.toString().toLowerCase().includes(search)
+      )
+    );
+  }
+//  filteredSearchNames: any[] = [];
+//   patientNames(): void{
+//     this.service.getPatients().subscribe((response: any) => {
+//       this.patients = response.map((owner: any) => {
+//         return {
+//           ...owner,
+//         };
+//       });
+//       this.filteredSearchNames = this.patients;
+//     });
+//   }
+//   FilteredSearchNames() {
+
+//     this.filteredSearchNames = this.patients.filter(Response => {
+//       return Object.values(Response).some(value => {
+//         return value != null && value.toString().toLowerCase().includes(this.searchText.toLowerCase());
+//       });
+//     });
+//   }
+
 
   ngOnDestroy(): void {
     if (this.scanner && this.isCameraActive) {

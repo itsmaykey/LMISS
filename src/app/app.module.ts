@@ -13,6 +13,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import { UserRegComponent } from './Admin/user-Registration/user-reg.component';
 import { ApplicationDashboardComponent } from './pages/application-dashboard/application-dashboard.component';
+
 @NgModule({
   declarations: [
     AppComponent,

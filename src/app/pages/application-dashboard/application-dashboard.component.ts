@@ -23,6 +23,7 @@ export class ApplicationDashboardComponent {
   civilStatus: any = [];
   religion: any = [];
   drugEffects: any = [];
+  admissionType: any = [];
 
   educationalAttainment: any = [];
   onChangeCitymunCode: string = '';
@@ -32,8 +33,9 @@ export class ApplicationDashboardComponent {
   constructor(private authService: AuthService, private fb: FormBuilder) {}
   service = inject(ApplicationDashboardService);
   selectedDrugEffects: any[] = [];
+  selectedAdmissionType: any[]= [];
 
-patientCode: string = '';
+  patientCode: string = '';
   userInfo: any;
 
 
@@ -41,7 +43,19 @@ patientCode: string = '';
     this.userInfo = this.authService.getUserInfo();
     console.log(this.userInfo);
 
-    //Educational Attainment
+    //AdmissionType
+    this.service.getAdmissionType().subscribe({
+      next: (response) => {
+        this.admissionType = (response as any[]).map((effect) => ({
+          ...effect,
+          selected: false,
+        }));
+      },
+      error: (error) => {
+        console.error('Error:', error);
+      },
+    });
+    //Drug Effect
     this.service.getDrugEffect().subscribe({
       next: (response) => {
         this.drugEffects = (response as any[]).map((effect) => ({
@@ -113,7 +127,10 @@ patientCode: string = '';
         uuid += chars[randomIndex];
       }
       return uuid;  // Ensure this function only returns the generated UUID
+
     }
+
+
     this.patientForm = this.fb.group({
 
       PatientCode: [customUUID(), Validators.required],
@@ -122,12 +139,10 @@ patientCode: string = '';
       PLastName: ['', Validators.required],
       PExtName: ['',],
       PNickName: ['', Validators.required],
-      Age: ['', Validators.required ],
+      birthDate: ['', Validators.required],
       sex: ['' , Validators.required],
-      CitymunCode: ['',],
-      BrgyCode: ['',],
       PrkCode: ['', Validators.required],
-      phoneNumber: ['', Validators.required, Validators.pattern('^09[0-9]{9}$')],
+      PhoneNumber: ['', [Validators.required, Validators.pattern('^09[0-9]{9}$')]],
       Birthplace: ['', Validators.required],
       NationalityId: ['', Validators.required],
       ReligionId: ['', Validators.required],
@@ -137,9 +152,9 @@ patientCode: string = '';
       YearGraduated: ['', Validators.required],
       Occupation: ['', Validators.required],
       Income: ['', Validators.required],
-      AdmittingStaffId: [this.userInfo.id,Validators.required],
-      CaseNo: [12, Validators.required],
-      ReferrefBy: [this.userInfo.name, Validators.required],
+      AdmittingStaffId: [this.userInfo.id ,Validators.required],
+      CaseNo: ['12', Validators.required],
+      ReferrefBy: [this.userInfo.name , Validators.required],
 
     });
   } //end of ngOnInit
@@ -147,11 +162,10 @@ patientCode: string = '';
 
   onSubmit(): void {
     if (this.patientForm.valid) {
-      const patientFormData = {
-        ...this.patientForm.value,
-         sex: this.patientForm.value.sex === '0' ? false : true
-      };
+      const patientFormData = this.patientForm.value
+
       console.log(patientFormData);
+      this.patientCode = this.patientForm.value.PatientCode;
       this.service.postPatientData(patientFormData).subscribe({
         next: (response) => {
           console.log('User registered successfully:', response);
@@ -174,26 +188,43 @@ patientCode: string = '';
     } else {
       console.warn('Form is invalid!');
       alert('Please fill in all required fields correctly.');
-   //   this.logValidationErrors(this.patientForm);
+      this.logValidationErrors(this.patientForm);
     }
   }
 
-  // logValidationErrors(group: FormGroup = this.patientForm): void {
-  //   Object.keys(group.controls).forEach((key: string) => {
-  //     const control = group.get(key);
-  //     if (control instanceof FormGroup) {
-  //       this.logValidationErrors(control);
-  //     } else {
-  //       if (control && control.invalid) {
-  //         console.log(`Control ${key} is invalid`);
-  //         console.log(control.errors);
-  //       }
-  //     }
-  //   });
-  // }
+  logValidationErrors(group: FormGroup = this.patientForm): void {
+    Object.keys(group.controls).forEach((key: string) => {
+      const control = group.get(key);
+      if (control instanceof FormGroup) {
+        this.logValidationErrors(control);
+      } else {
+        if (control && control.invalid) {
+          console.log(`Control ${key} is invalid`);
+          console.log(control.errors);
+        }
+      }
+    });
+  }
 
+  onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
+    const checkbox = event.target as HTMLInputElement;
+    admissionType.selected = checkbox.checked;
 
-  onCheckboxChange(event: Event, drugEffect: any): void {
+    if (checkbox.checked) {
+      this.selectedAdmissionType.push(admissionType);
+    } else {
+      const index = this.selectedAdmissionType.findIndex(
+        (effect) => effect.admissionCode === admissionType.admissionCode
+      );
+      if (index > -1) {
+        this.selectedAdmissionType.splice(index, 1);
+      }
+    }
+
+    console.log('Selected Admission Type:', this.selectedAdmissionType);
+  }
+
+  onDrugEffectCheckboxChange(event: Event, drugEffect: any): void {
     const checkbox = event.target as HTMLInputElement;
     drugEffect.selected = checkbox.checked;
 
