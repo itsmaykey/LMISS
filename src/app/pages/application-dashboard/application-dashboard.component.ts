@@ -30,17 +30,8 @@ export class ApplicationDashboardComponent {
   educationalAttainment: any = [];
   onChangeCitymunCode: string = '';
   onChangeBarangay: string = '';
-  patientCode: string | null = null;
 
-<<<<<<< HEAD
-  
 
-  constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute, private router: Router) {}
-  service = inject(ApplicationDashboardService);
-  selectedDrugEffects: any[] = [];
-
-  userInfo: any;
-=======
   selectedDrugEffects: any[] = [];
 
   patientCode: string = '';
@@ -57,23 +48,15 @@ export class ApplicationDashboardComponent {
   service = inject(ApplicationDashboardService);
 
 
->>>>>>> application-Dashboard-Forms
 
 
   ngOnInit(): void {
     this.userInfo = this.authService.getUserInfo();
     console.log(this.userInfo);
-    this.patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
 
-<<<<<<< HEAD
-    // Show an alert only in ApplicationComponent
-    if (this.patientCode) {
-      alert(`Selected Patient Code: ${this.patientCode}`);
-    }
-=======
+
     this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
 
->>>>>>> application-Dashboard-Forms
     //Educational Attainment
     this.service.getDrugEffect().subscribe({
       next: (response) => {
@@ -163,10 +146,6 @@ export class ApplicationDashboardComponent {
     // this.patientForm = this.fb.group({
 
 
-<<<<<<< HEAD
-    });
-  } 
-=======
     //   patientCode: [customUUID(), Validators.required] ,
     //   pFirstName: ['', Validators.required],
     //   pMiddleName: ['',],
@@ -198,7 +177,6 @@ export class ApplicationDashboardComponent {
     //     const patientFormData =
     //         this.patientForm.value
     //         this.patientCode = this.patientForm.value.PatientCode
->>>>>>> application-Dashboard-Forms
 
     //     this.service.postPatientData(patientFormData).subscribe({
     //         next: (response) => {

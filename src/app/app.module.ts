@@ -14,6 +14,7 @@ import {CommonModule} from '@angular/common';
 import { UserRegComponent } from './Admin/user-Registration/user-reg.component';
 import { ApplicationDashboardComponent } from './pages/application-dashboard/application-dashboard.component';
 import { RouterModule, Routes } from '@angular/router';
+import { LoaderComponent } from './layout/loader/loader.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
@@ -28,7 +29,8 @@ const routes: Routes = [
     DashboardComponent,
     LoginComponent,
     UserRegComponent,
-    ApplicationDashboardComponent
+    ApplicationDashboardComponent,
+    LoaderComponent
 
 
   ],
