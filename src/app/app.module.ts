@@ -21,6 +21,7 @@ const routes: Routes = [
   { path: 'application/:patientCode', component: ApplicationDashboardComponent }, // Dynamic route for patientCode
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' } // Optional: redirect to dashboard
 ];
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -37,6 +38,7 @@ const routes: Routes = [
   imports: [
     BrowserModule,
     RouterModule.forRoot(routes),
+
     AppRoutingModule,
     NgxScannerQrcodeModule,
     FormsModule,
@@ -45,6 +47,7 @@ const routes: Routes = [
     CommonModule
 
   ],
+  exports: [RouterModule],
   providers: [],
   bootstrap: [AppComponent]
 })
