@@ -55,7 +55,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     );
   }
   goToAppDashboard() {
-    this.router.navigate(['/applicationDashboard']); 
+    this.router.navigate(['/application']); 
   }
   goToSelectedApp(patientCode: string): void {
     if (!this.router) {
