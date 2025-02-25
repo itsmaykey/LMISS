@@ -14,17 +14,22 @@ export class LoginComponent  {
  constructor(private service: LoginService, private router: Router, private authService: AuthService) { }
 username: string = '';
 password: string = '';
-
+isLoading = false;
 
 onLogin() {
   if (!this.username || !this.password) {
     alert('Username and Password are required.');
     return;
   }
-
+  this.isLoading = true;
+  setTimeout(() => {
+    this.isLoading = false; // Hide loader after 3 seconds
+  }, 3000);
   //console.log(this.username, this.password);
   this.service.PostLogin(this.username, this.password).subscribe({
+
     next: (response) => {
+
      // console.log('Response:', response);
       if (response.status === 200 && response.body?.token) {
         const expiresIn = response.body.expiresIn || 3600; // Assuming the response contains expiresIn in seconds

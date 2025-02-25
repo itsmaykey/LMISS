@@ -11,7 +11,7 @@ import { AuthGuard } from './Admin/Auth/AuthGuard';
 import { LoginGuard } from './Admin/Auth/LoginGuard';
 const routes: Routes = [
 
-  { path: 'application/:patientCode', component: ApplicationDashboardComponent }, // Accept dynamic patientCode
+
 
 
       {
@@ -27,6 +27,7 @@ const routes: Routes = [
  component:MainLayoutComponent,
  canActivate: [AuthGuard],
  children: [
+  { path: 'application/:patientCode', component: ApplicationDashboardComponent }, // Accept dynamic patientCode
   {
     path:'dashboard',
     component:DashboardComponent,
@@ -49,8 +50,15 @@ const routes: Routes = [
 
 ];
 
+
+
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports:
+  [
+    RouterModule.forRoot(routes),
+
+
+  ],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

@@ -1,3 +1,5 @@
+
+import { PatientFormService } from './../../pages/application-dashboard/ScriptForms/patient-form.service';
 import { Component, inject, OnInit } from '@angular/core';
 import { ApplicationDashboardService } from './service/application-dashboard.service';
 import { AuthService } from '../../Admin/Auth/AuthService';
@@ -28,26 +30,33 @@ export class ApplicationDashboardComponent {
   educationalAttainment: any = [];
   onChangeCitymunCode: string = '';
   onChangeBarangay: string = '';
-  patientCode: string | null = null;
 
-  
 
-  constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute, private router: Router) {}
-  service = inject(ApplicationDashboardService);
   selectedDrugEffects: any[] = [];
 
-  userInfo: any;
+  patientCode: string = '';
+    userInfo: any;
+  PatientFormService: any;
+
+  constructor(
+      private authService: AuthService,
+      private fb: FormBuilder,
+      private router: Router,
+      private patientFormService: PatientFormService,) {}
+
+
+  service = inject(ApplicationDashboardService);
+
+
 
 
   ngOnInit(): void {
     this.userInfo = this.authService.getUserInfo();
     console.log(this.userInfo);
-    this.patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
 
-    // Show an alert only in ApplicationComponent
-    if (this.patientCode) {
-      alert(`Selected Patient Code: ${this.patientCode}`);
-    }
+
+    this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+
     //Educational Attainment
     this.service.getDrugEffect().subscribe({
       next: (response) => {
@@ -134,82 +143,66 @@ export class ApplicationDashboardComponent {
       return uuid
 
     }
-    this.patientForm = this.fb.group({
-
-      
-      patientCode: [customUUID(), Validators.required] ,
-      pFirstName: ['', Validators.required],
-      pMiddleName: ['',],
-      pLastName: ['', Validators.required],
-      pExtName: ['',],
-      pNickName: ['', Validators.required],
-      sex: ['' , Validators.required],
-      birthdate: ['', Validators.required],
-      prkCode: ['', Validators.required],
-      phoneNumber:['', Validators.required],
-      birthplace: ['', Validators.required],
-      nationalityId: ['', Validators.required],
-      religionId: ['', Validators.required],
-      civilStatusId: ['', Validators.required],
-      educationalId: ['', Validators.required],
-      schoolLastAttended: ['', Validators.required],
-      yearGraduated: ['', Validators.required],
-      occupation: ['', Validators.required],
-      income: ['', Validators.required],
-      admittingStaffId: [this.userInfo.id,Validators.required],
-      caseNo: ['12', Validators.required],
-      referrefBy: [this.userInfo.name, Validators.required],
-
-    });
-  } 
+    // this.patientForm = this.fb.group({
 
 
-  onSubmit(): void {
-    if (this.patientForm.valid) {
-        const patientFormData = 
-            this.patientForm.value
-            this.patientCode = this.patientForm.value.PatientCode
+    //   patientCode: [customUUID(), Validators.required] ,
+    //   pFirstName: ['', Validators.required],
+    //   pMiddleName: ['',],
+    //   pLastName: ['', Validators.required],
+    //   pExtName: ['',],
+    //   pNickName: ['', Validators.required],
+    //   sex: ['' , Validators.required],
+    //   birthdate: ['', Validators.required],
+    //   prkCode: ['', Validators.required],
+    //   phoneNumber:['', Validators.required],
+    //   birthplace: ['', Validators.required],
+    //   nationalityId: ['', Validators.required],
+    //   religionId: ['', Validators.required],
+    //   civilStatusId: ['', Validators.required],
+    //   educationalId: ['', Validators.required],
+    //   schoolLastAttended: ['', Validators.required],
+    //   yearGraduated: ['', Validators.required],
+    //   occupation: ['', Validators.required],
+    //   income: ['', Validators.required],
+    //   admittingStaffId: [this.userInfo.id,Validators.required],
+    //   caseNo: ['12', Validators.required],
+    //   referrefBy: [this.userInfo.name, Validators.required],
 
-        this.service.postPatientData(patientFormData).subscribe({
-            next: (response) => {
-                console.log('User registered successfully:', response);
-                alert('User registered successfully!');
-            },
-            error: (err) => {
-                console.error('API Error:', err);
+    // });
+  } //end of ngOnInit
+  patientFormSubmit(): void {
+    this.patientFormService.submitPatientForm(this.patientForm);
+    // if (this.patientForm.valid) {
+    //     const patientFormData =
+    //         this.patientForm.value
+    //         this.patientCode = this.patientForm.value.PatientCode
 
-                if (err.status === 400) {
-                    alert('Validation failed. Please check your inputs.');
-                } else if (err.status === 401) {
-                    alert('Unauthorized. Please check your permissions.');
-                } else if (err.status === 500) {
-                    alert('Server error. Please try again later.');
-                } else {
-                    alert('Failed to register user. Please try again.');
-                }
-            }
-        });
-    } else {
-        console.warn('Form submission attempted with invalid data:', this.patientForm.value);
-        alert('Please fill in all required fields correctly.');
-        // this.logValidationErrors(this.patientForm);
-    }
+    //     this.service.postPatientData(patientFormData).subscribe({
+    //         next: (response) => {
+    //             console.log('User registered successfully:', response);
+    //             alert('User registered successfully!');
+    //         },
+    //         error: (err) => {
+    //             console.error('API Error:', err);
+
+    //             if (err.status === 400) {
+    //                 alert('Validation failed. Please check your inputs.');
+    //             } else if (err.status === 401) {
+    //                 alert('Unauthorized. Please check your permissions.');
+    //             } else if (err.status === 500) {
+    //                 alert('Server error. Please try again later.');
+    //             } else {
+    //                 alert('Failed to register user. Please try again.');
+    //             }
+    //         }
+    //     });
+    // } else {
+    //     console.warn('Form submission attempted with invalid data:', this.patientForm.value);
+    //     alert('Please fill in all required fields correctly.');
+    //     // this.logValidationErrors(this.patientForm);
+    // }
 }
-
-
-  // logValidationErrors(group: FormGroup = this.patientForm): void {
-  //   Object.keys(group.controls).forEach((key: string) => {
-  //     const control = group.get(key);
-  //     if (control instanceof FormGroup) {
-  //       this.logValidationErrors(control);
-  //     } else {
-  //       if (control && control.invalid) {
-  //         console.log(`Control ${key} is invalid`);
-  //         console.log(control.errors);
-  //       }
-  //     }
-  //   });
-  // }
 
   onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
     const checkbox = event.target as HTMLInputElement;
@@ -384,7 +377,7 @@ export class ApplicationDashboardComponent {
     }
   }
   goToPatientDashboard() {
-    this.router.navigate(['/patientDashboard']); 
+    this.router.navigate(['/patientDashboard']);
   }
   goToSelectedApp(patientCode: string): void {
     this.router.navigate(['/application', patientCode]).then(() => {

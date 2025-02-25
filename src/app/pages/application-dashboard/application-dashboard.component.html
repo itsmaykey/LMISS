@@ -1,4 +1,4 @@
-<div class="row">        
+<div class="row">
   <div class="col-md-12">
           <div class="nav-align-bottom">
             <ul class="nav nav-pills flex-column flex-md-row custom-nav">
@@ -32,7 +32,7 @@
             <i class="bx bx-sm bx-task me-1"></i> Application
           </a>
         </li>
-        
+
             </ul>
           </div>
           <div class="tab-content custom-tab-content">
@@ -44,9 +44,9 @@
               <h4 class="card-header-title">Personal Info</h4>
               <hr>
             </div>
-            
+
             <div class="card-body pt-4">
-              <form [formGroup]="patientForm" (ngSubmit)="onSubmit()">
+              <form [formGroup]="patientForm" (ngSubmit)="patientFormSubmit()">
                 <div class="row g-4">
                   <div class="row">
                     <div class="col-md-3">
@@ -71,7 +71,7 @@
                       <label for="birthdate" class="form-label">BirthDate</label>
                       <input type="date" class="form-control" formControlName="birthdate" placeholder="Enter Birthdate">
                     </div>
-                   
+
                     <div class="col-md-2">
                       <label for="bPalce" class="form-label">Birth Place</label>
                       <input type="text" class="form-control" formControlName="birthplace" placeholder="Enter Birth Place">
@@ -178,7 +178,7 @@
                 <button type="button" class="btn btn-secondary text-white me-2" (click)="goToEducational()">
                     Next
                 </button>
-                
+
             </div>
             </div>
             <!-- /Account -->
@@ -244,9 +244,9 @@
                 <button type="reset" class="btn btn-outline-secondary">Cancel</button>
               </div>
           </div>
-         
-       
-        
+
+
+
       </form>
       <div class="card-footer text-end">
         <button type="button" class="btn btn-secondary text-white me-2" (click)="goToFamHisto()">
@@ -561,7 +561,7 @@
             <h4 class="card-header-title">Drug History</h4>
             <hr>
           </div>
-    
+
           <div class="card-body pt-4">
             <form id="DrugHistoryForm">
               <div class="row g-4">
@@ -599,7 +599,7 @@
               </div>
             </form>
           </div>
-    
+
       </div>
       <div class="card mb-5">
         <div class="card-header">
@@ -612,12 +612,12 @@
                 <div class="col-md-12">
                     <label for="yrGrad" class="form-label">Reason for using Drugs?</label>
                     <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter">
-    
+
                 </div>
                 <div class="col-md-12">
                   <label for="yrGrad" class="form-label">How do you support your vices?</label>
                   <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter">
-    
+
               </div>
               </div>
             </div>
@@ -633,7 +633,7 @@
       <div class="card-header">
         <h4 class="card-header-title">Drug Effects</h4>
       </div>
-    
+
       <div class="card-body pt-4">
         <form id="drugEffectForm">
           <div class="row g-4">
@@ -649,7 +649,7 @@
                 <div class="col-md-12">
                   <label for="yrGrad" class="form-label">Other bad effects/Experience</label>
                   <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter">
-    
+
               </div>
               </div>
             </div>
@@ -666,7 +666,7 @@
       <div class="card-header">
         <h4 class="card-header-title">Rehabilitation Record</h4>
       </div>
-    
+
       <div class="card-body pt-4">
         <form id="PrevRehabForm">
           <div class="row g-4">
@@ -678,7 +678,7 @@
                       <th>Period</th>
                       <th>Rehabilitation Center</th>
                       <th>What Happened? explain</th>
-    
+
                     </tr>
                   </thead>
                   <tbody>
@@ -686,7 +686,7 @@
                       <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="prevRehab.pr" name="prevRehabPr" placeholder="Enter Last Name" required></td>
                       <td style="width: 25%;"><input class="form-control" type="text" [(ngModel)]="prevRehab.rc" name="prevRehabRc" placeholder="Age" required></td>
                       <td style="width: 60%;"><input class="form-control" type="text" [(ngModel)]="prevRehab.whe" name="prevRehabWhe" placeholder="Enter Occupation" required></td>
-    
+
                     </tr>
                   </tbody>
                 </table>
@@ -701,7 +701,7 @@
             <button type="reset" class="btn btn-outline-secondary">Cancel</button>
           </div>
         </form>
-       
+
       </div>
     </div>
     <div class="card mb-5">
@@ -716,7 +716,7 @@
                   <label for="yrGrad" class="form-label">Personal Health History</label>
                   <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter">
               </div>
-    
+
             </div>
           </div>
           <hr>
@@ -731,7 +731,7 @@
       <div class="card-header">
         <h4 class="card-header-title">Family Health Record</h4>
       </div>
-    
+
       <div class="card-body pt-4">
         <form id="FamHealthHistoryForm">
           <div class="row g-4">
@@ -782,7 +782,7 @@
     </div>
     <div class="tab-pane fade hide" id="ApplicationHisto" role="tabpanel">
       <div class="row">
-        
+
         <!-- Left Side: Staff's Assessment Card -->
         <div class="col-md-7">
           <div class="card mb-5">
@@ -796,17 +796,17 @@
                   <div class="row">
                     <div class="row">
                       <div *ngFor="let x of admissionType" style="font-size: 10px;" class="form-check mb-0 ms-2 col-md-2">
-                        <input class="form-check-input" type="checkbox" [value]="x.admissionCode" 
+                        <input class="form-check-input" type="checkbox" [value]="x.admissionCode"
                           (change)="onAdmissionTypeCheckboxChange($event, x)">
                         {{ x.admissionDesc }}
                       </div>
                     </div>
-    
+
                     <div class="col-md-12">
                       <label for="yrGrad" class="form-label">Assessment</label>
                       <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder="Enter">
                     </div>
-    
+
                     <div class="col-md-12">
                       <label for="yrGrad" class="form-label">Plan</label>
                       <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder="Enter">
@@ -821,7 +821,7 @@
                     <div class="divider text-end">
                       <div>{{ userInfo.name }}</div>
                     </div>
-    
+
                   </div>
                 </div>
                 <hr>
@@ -833,7 +833,7 @@
             </div>
           </div>
         </div>
-    
+
         <!-- Right Side: New Card -->
         <div class="col-md-5">
           <div class="card">
@@ -864,7 +864,7 @@
                         </button>
                       </td>
                     </tr>
-                   
+
                     <tr>
                       <td class="text-center">2</td>
                       <td>2024-06-10</td>
@@ -880,36 +880,22 @@
                 </table>
               </div>
             </div>
-            
+
           </div>
         </div>
-        
-        
-    
+
+
+
       </div>
     </div>
-    
+
  </div>
     </div>
-        <div class="col-md-12">
-            <label for="yrGrad" class="form-label">Plan</label>
-            <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter">
-        </div>
 
-        <div class="divider text-end">
-          <div class="" style="text-decoration: underline;">Prepared By:</div>
-        </div>
-        <div class="divider text-end">
-          <div class="">{{userInfo.name}}</div>
-        </div>
-      
-      <hr>
-      <div class="mt-6">
-        <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-        <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-      </div>
+
+
     </div>
- 
+
 
 
 

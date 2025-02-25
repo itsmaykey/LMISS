@@ -14,6 +14,8 @@ import { Router } from '@angular/router';
 export class DashboardComponent implements OnInit, OnDestroy {
   service = inject(DashboardServiceService);
 
+  isLoading = false;
+
   isModalVisible = false;
   scannedData: string = '';
   isCameraActive: boolean = false;
@@ -24,7 +26,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild(NgxScannerQrcodeComponent) scanner: NgxScannerQrcodeComponent | undefined;
 
   userInfo: any;
-  
+
 
   constructor(private authService: AuthService, private router: Router) { }
 
@@ -55,14 +57,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     );
   }
   goToAppDashboard() {
-    this.router.navigate(['/application']); 
+    this.router.navigate(['/applicationDashboard']);
   }
   goToSelectedApp(patientCode: string): void {
     if (!this.router) {
       console.error('Router is undefined!'); // Debugging check
       return;
     }
-
+this.isLoading = true;
+  setTimeout(() => {
+    this.isLoading = false; // Hide loader after 3 seconds
+  }, 3000);
     this.router.navigate(['/application', patientCode]);
   }
   ngOnDestroy(): void {
