@@ -46,134 +46,141 @@
             </div>
 
             <div class="card-body pt-4">
-              <form [formGroup]="patientForm" (ngSubmit)="patientFormSubmit()">
-                <div class="row g-4">
-                  <div class="row">
-                    <div class="col-md-3">
-                      <label for="lname" class="form-label">Last Name</label>
-                      <input class="form-control" type="text" formControlName="pLastName" placeholder="Enter Last Name">
-                    </div>
-                    <div class="col-md-4">
-                      <label for="fName" class="form-label">First Name</label>
-                      <input class="form-control" type="text" formControlName="pFirstName" placeholder="Enter First Name">
-                    </div>
-                    <div class="col-md-3">
-                      <label for="Mname" class="form-label">Middle Name</label>
-                      <input class="form-control" type="text" formControlName="pMiddleName" placeholder="Enter Middle Name">
-                    </div>
-                    <div class="col-md-2">
-                      <label for="Mname" class="form-label">Extn. Name</label>
-                      <input class="form-control" type="text" formControlName="pExtName" placeholder="Enter Extn Name">
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-2">
-                      <label for="birthdate" class="form-label">BirthDate</label>
-                      <input type="date" class="form-control" formControlName="birthdate" placeholder="Enter Birthdate">
-                    </div>
-
-                    <div class="col-md-2">
-                      <label for="bPalce" class="form-label">Birth Place</label>
-                      <input type="text" class="form-control" formControlName="birthplace" placeholder="Enter Birth Place">
-                    </div>
-                    <div class="col-md-2">
-                      <label for="sex" class="form-label">Sex</label>
-                      <select formControlName="sex" class="select2 form-select">
-                        <option value="" selected disabled>Select</option>
-                        <option value=1>Male</option>
-                        <option value=0>Female</option>
-                      </select>
-                    </div>
-                    <div class="col-md-2">
-                      <label for="civilStatusId" class="form-label">Civil Status</label>
-                      <select formControlName="civilStatusId" class="select2 form-select">
-                        <option value="" disabled selected>Select</option>
-                        <option *ngFor="let x of civilStatus" [value]="x.civ_ID">{{x.civ_Name}}</option>
-                      </select>
-                    </div>
-                    <div class="col-md-3">
-                      <label class="form-label" for="phoneNumber">Contact Number</label>
-                      <div class="input-group input-group-merge">
-                        <input type="text" formControlName="phoneNumber" class="form-control" placeholder="09xx xxx xxxx" maxlength="11">
+              <div *ngIf="patientForm" >
+                <form [formGroup]="patientForm"  (ngSubmit)="patientFormSubmit()">
+                  <div class="row g-4">
+                    <div class="row">
+                      <div class="col-md-3" hidden>
+                        <label for="lname" class="form-label">Patient Code</label>
+                        <input class="form-control" type="text" formControlName="patientCode" placeholder="Enter Last Name">
+                      </div>
+                      <div class="col-md-3">
+                        <label for="lname" class="form-label">Last Name</label>
+                        <input class="form-control" type="text" formControlName="pLastName" placeholder="Enter Last Name">
+                      </div>
+                      <div class="col-md-4">
+                        <label for="fName" class="form-label">First Name</label>
+                        <input class="form-control" type="text" formControlName="pFirstName" placeholder="Enter First Name">
+                      </div>
+                      <div class="col-md-3">
+                        <label for="Mname" class="form-label">Middle Name</label>
+                        <input class="form-control" type="text" formControlName="pMiddleName" placeholder="Enter Middle Name">
+                      </div>
+                      <div class="col-md-2">
+                        <label for="Mname" class="form-label">Extn. Name</label>
+                        <input class="form-control" type="text" formControlName="pExtName" placeholder="Enter Extn Name">
                       </div>
                     </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4">
-                      <label for="mun" class="form-label">Municipality</label>
-                      <select class="select2 form-select" formControlName="citymunCode" (change)="onMunicipalityChange($event)">
-                        <option value="" disabled selected>Select</option>
-                        <option *ngFor="let x of citymun" [value]="x.citymunCode">{{x.citymunDesc}}</option>
-                      </select>
-                    </div>
-                    <div class="col-md-4">
-                      <label for="brgy" class="form-label">Barangay</label>
-                      <select class="select2 form-select" formControlName="brgyCode" (change)="onBarangayChange($event)">
-                        <option value="" disabled selected>Select</option>
-                        <option *ngFor="let x of brgy" [value]="x.brgyCode">{{x.brgyDesc}}</option>
-                      </select>
-                    </div>
-                    <div class="col-md-4">
-                      <label for="prkCode" class="form-label">Purok</label>
-                      <select class="select2 form-select" formControlName="prkCode">
-                        <option value="" disabled selected>Select</option>
-                        <option *ngFor="let x of prk" [value]="x.prkCode">{{x.prkDesc}}</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-3">
-                      <label for="nickname" class="form-label">Nickname</label>
-                      <input type="text" class="form-control" formControlName="pNickName" placeholder="Enter nickname">
-                    </div>
-                    <div class="col-md-3">
-                      <label for="nationalityId" class="form-label">Nationality</label>
-                      <select class="select2 form-select" formControlName="nationalityId">
-                        <option value="" selected disabled>Select</option>
-                        <option *ngFor="let x of nationality" [value]="x.citi_ID">{{x.city_Description}}</option>
-                      </select>
-                    </div>
-                    <div class="col-md-3">
-                      <label for="religionId" class="form-label">Religion</label>
-                      <select class="select2 form-select" formControlName="religionId">
-                        <option value="" disabled selected>Select</option>
-                        <option *ngFor="let x of religion" [value]="x.recNo">{{x.religionDesc}}</option>
-                      </select>
-                    </div>
-                    <div class="col-md-3">
-                      <label for="Occupation" class="form-label">Occupation</label>
-                      <input type="text" class="form-control" formControlName="occupation" placeholder="Enter Occupation">
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-3">
-                      <label for="educationalId" class="form-label">Educational Attainment</label>
-                      <select class="select2 form-select" formControlName="educationalId">
-                        <option value="" disabled selected>Select</option>
-                        <option *ngFor="let x of educationalAttainment" [value]="x.edu_ID">{{x.edu_Name}}</option>
-                      </select>
-                    </div>
-                    <div class="col-md-2">
-                      <label for="schoolLastAttended" class="form-label">Sch. Last Attended</label>
-                      <input class="form-control" type="date" formControlName="schoolLastAttended">
-                    </div>
-                    <div class="col-md-2">
-                      <label for="yearGraduated" class="form-label">Yr. Graduated</label>
-                      <input type="number" class="form-control" formControlName="yearGraduated" placeholder="Enter Year">
-                    </div>
-                    <div class="col-md-3">
-                      <label for="income" class="form-label">Income</label>
-                      <input class="form-control" type="number" formControlName="income" placeholder="Enter Amount">
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="mt-6">
-                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-                  </div>
+                    <div class="row">
+                      <div class="col-md-2">
+                        <label for="birthdate" class="form-label">BirthDate</label>
+                        <input type="date" class="form-control" formControlName="birthdate" placeholder="Enter Birthdate">
+                      </div>
 
-                </div>
-              </form>
+                      <div class="col-md-2">
+                        <label for="bPalce" class="form-label">Birth Place</label>
+                        <input type="text" class="form-control" formControlName="birthplace" placeholder="Enter Birth Place">
+                      </div>
+                      <div class="col-md-2">
+                        <label for="sex" class="form-label">Sex</label>
+                        <select formControlName="sex" class="select2 form-select">
+                          <option value="" selected disabled>Select</option>
+                          <option value=1>Male</option>
+                          <option value=0>Female</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2">
+                        <label for="civilStatusId" class="form-label">Civil Status</label>
+                        <select formControlName="civilStatusId" class="select2 form-select">
+                          <option value="" disabled selected>Select</option>
+                          <option *ngFor="let x of civilStatus" [value]="x.civ_ID">{{x.civ_Name}}</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="form-label" for="phoneNumber">Contact Number</label>
+                        <div class="input-group input-group-merge">
+                          <input type="text" formControlName="phoneNumber" class="form-control" placeholder="09xx xxx xxxx" maxlength="11">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <label for="mun" class="form-label">Municipality</label>
+                        <select class="select2 form-select" formControlName="citymunCode"  (change)="onMunicipalityChange($event)">
+                          <option value="" disabled selected>Select</option>
+                          <option *ngFor="let x of citymun" [value]="x.citymunCode">{{x.citymunDesc}}</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="brgy" class="form-label">Barangay</label>
+                        <select class="select2 form-select" formControlName="brgyCode" (change)="onBarangayChange($event)">
+                          <option value="" disabled selected>Select</option>
+                          <option *ngFor="let x of brgy" [value]="x.brgyCode">{{x.brgyDesc}}</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="prkCode" class="form-label">Purok</label>
+                        <select class="select2 form-select" formControlName="prkCode">
+                          <option value="" disabled selected>Select</option>
+                          <option *ngFor="let x of prk" [value]="x.prkCode">{{x.prkDesc}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-3">
+                        <label for="nickname" class="form-label">Nickname</label>
+                        <input type="text" class="form-control" formControlName="pNickName" placeholder="Enter nickname">
+                      </div>
+                      <div class="col-md-3">
+                        <label for="nationalityId" class="form-label">Nationality</label>
+                        <select class="select2 form-select" formControlName="nationalityId">
+                          <option value="" selected disabled>Select</option>
+                          <option *ngFor="let x of nationality" [value]="x.citi_ID">{{x.city_Description}}</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
+                        <label for="religionId" class="form-label">Religion</label>
+                        <select class="select2 form-select" formControlName="religionId">
+                          <option value="" disabled selected>Select</option>
+                          <option *ngFor="let x of religion" [value]="x.recNo">{{x.religionDesc}}</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
+                        <label for="Occupation" class="form-label">Occupation</label>
+                        <input type="text" class="form-control" formControlName="occupation" placeholder="Enter Occupation">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-3">
+                        <label for="educationalId" class="form-label">Educational Attainment</label>
+                        <select class="select2 form-select" formControlName="educationalId">
+                          <option value="" disabled selected>Select</option>
+                          <option *ngFor="let x of educationalAttainment" [value]="x.edu_ID">{{x.edu_Name}}</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2">
+                        <label for="schoolLastAttended" class="form-label">Sch. Last Attended</label>
+                        <input class="form-control" type="date" formControlName="schoolLastAttended">
+                      </div>
+                      <div class="col-md-2">
+                        <label for="yearGraduated" class="form-label">Yr. Graduated</label>
+                        <input type="number" class="form-control" formControlName="yearGraduated" placeholder="Enter Year">
+                      </div>
+                      <div class="col-md-3">
+                        <label for="income" class="form-label">Income</label>
+                        <input class="form-control" type="number" formControlName="income" placeholder="Enter Amount">
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="mt-6">
+                      <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                      <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                    </div>
+
+                  </div>
+                </form>
+              </div>
+
               <div class="card-footer text-end">
                 <button type="button" class="btn btn-secondary text-white me-2" (click)="goToEducational()">
                     Next

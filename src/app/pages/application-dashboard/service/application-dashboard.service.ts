@@ -46,6 +46,10 @@ constructor(private http: HttpClient) { }
     return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientData`, data);
   }
 
+//forExistedPatient
+  getExistedPatientData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}`);
+  }
   // postPatientData(data: any): Observable<any> {
   //   return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientData`, data)
   //     .pipe(

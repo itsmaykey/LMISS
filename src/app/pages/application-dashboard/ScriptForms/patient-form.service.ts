@@ -1,15 +1,52 @@
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApplicationDashboardService } from '../service/application-dashboard.service';
+import { OnInit } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PatientFormService {
-  constructor(private fb: FormBuilder, private dashboardService: ApplicationDashboardService) {}
 
-  createPatientForm(userInfo: any): FormGroup {
+ existed: any;
+  constructor(
+      private fb: FormBuilder,
+      private dashboardService: ApplicationDashboardService,
+      private route: ActivatedRoute,) {}
+
+
+  ngOninit(): void {
+
+ this.route.paramMap.subscribe((params) => {
+   const patientCode = params.get('patientCode');
+   if (patientCode) {
+     this.existed = this.dashboardService.getExistedPatientData(patientCode);
+     console.log('ExistedPatient:', this.existed);
+   }
+ });
+
+
+  //   this.route.paramMap.subscribe((params) => {
+  //     const patientCode = params.get('patientCode');
+  //     if (patientCode) {
+  //       console.log('Selected Patient Code:', patientCode);
+  //       // this.service.getExistedPatientData(patientCode).subscribe({
+  //       //   next: (response) => {
+  //       //     this.ExistedPatient = response;
+  //       //     console.log('ExistedPatient:', this.ExistedPatient);
+  //       //   },
+  //       //   error: (error) => {
+  //       //     console.error('Error:', error);
+  //       //   },
+  //       // });
+  //       }
+  //     });
+   }
+
+
+   createPatientForm(userInfo: any, existingPatientData: any = {}): FormGroup {
     const customUUID = (): string => {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
       let uuid = 'DDNPQR-';
@@ -21,25 +58,27 @@ export class PatientFormService {
     };
 
     return this.fb.group({
-      patientCode: [customUUID(), Validators.required],
-      pFirstName: ['', Validators.required],
-      pMiddleName: [''],
-      pLastName: ['', Validators.required],
-      pExtName: [''],
-      pNickName: ['', Validators.required],
-      sex: ['', Validators.required],
-      birthdate: ['', Validators.required],
-      prkCode: ['', Validators.required],
-      phoneNumber: ['', Validators.required],
-      birthplace: ['', Validators.required],
-      nationalityId: ['', Validators.required],
-      religionId: ['', Validators.required],
-      civilStatusId: ['', Validators.required],
-      educationalId: ['', Validators.required],
-      schoolLastAttended: ['', Validators.required],
-      yearGraduated: ['', Validators.required],
-      occupation: ['', Validators.required],
-      income: ['', Validators.required],
+      patientCode: [existingPatientData.patientCode || customUUID(), Validators.required],
+      pFirstName: [existingPatientData.pFirstName || '', Validators.required],
+      pMiddleName: [existingPatientData.pMiddleName || ''],
+      pLastName: [existingPatientData.pLastName || '', Validators.required],
+      pExtName: [existingPatientData.pExtName || ''],
+      pNickName: [existingPatientData.pNickName || '', Validators.required],
+      sex: [existingPatientData.sex || '', Validators.required],
+      birthdate: [existingPatientData.birthdate || '', Validators.required],
+      citymunCode: [existingPatientData.citymunCode || '', ],
+      brgyCode: [existingPatientData.brgyCode || '', ],
+      prkCode: [existingPatientData.prkCode || '', Validators.required],
+      phoneNumber: [existingPatientData.phoneNumber || '', Validators.required],
+      birthplace: [existingPatientData.birthplace || '', Validators.required],
+      nationalityId: [existingPatientData.nationalityId || '', Validators.required],
+      religionId: [existingPatientData.religionId || '', Validators.required],
+      civilStatusId: [existingPatientData.civilStatusId || '', Validators.required],
+      educationalId: [existingPatientData.educationalId || '', Validators.required],
+      schoolLastAttended: [existingPatientData.schoolLastAttended || '', Validators.required],
+      yearGraduated: [existingPatientData.yearGraduated || '', Validators.required],
+      occupation: [existingPatientData.occupation || '', Validators.required],
+      income: [existingPatientData.income || '', Validators.required],
       admittingStaffId: [userInfo.id, Validators.required],
       caseNo: ['12', Validators.required],
       referrefBy: [userInfo.name, Validators.required],

@@ -15,7 +15,8 @@ export class ApplicationDashboardComponent {
 
 
   patientForm!: FormGroup;
-
+  ExistedPatient: any = [];
+  userInfo: any;
 
   admissionType: any = [];
   selectedAdmissionType: any[]= [];
@@ -30,34 +31,82 @@ export class ApplicationDashboardComponent {
   educationalAttainment: any = [];
   onChangeCitymunCode: string = '';
   onChangeBarangay: string = '';
-
-
   selectedDrugEffects: any[] = [];
 
-  patientCode: string = '';
-    userInfo: any;
-  PatientFormService: any;
+
+ExistedcitymunCode = '';
+ExistedbrgyCode = '';
 
   constructor(
-      private authService: AuthService,
-      private fb: FormBuilder,
-      private router: Router,
-      private patientFormService: PatientFormService,) {}
-
-
-  service = inject(ApplicationDashboardService);
+    private authService: AuthService,
+    private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
+    private patientFormService: PatientFormService,
+    private service: ApplicationDashboardService) {}
 
 
 
 
   ngOnInit(): void {
+
     this.userInfo = this.authService.getUserInfo();
-    console.log(this.userInfo);
 
 
-    this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+    this.route.paramMap.subscribe((params) => {
+      const patientCode = params.get('patientCode');
+      if (patientCode) {
+        //console.log('Selected Patient Code:', patientCode);
+        this.service.getExistedPatientData(patientCode).subscribe({
+          next: (response) => {
+            this.ExistedPatient = response;
+           // console.log('ExistedPatient:', this.ExistedPatient[0].citymunCode);
+            if (this.ExistedPatient.length > 0) {
+              this.patientForm = this.patientFormService.createPatientForm(this.userInfo, this.ExistedPatient[0]);
+              this.ExistedcitymunCode = this.ExistedPatient.citymunCode;
 
-    //Educational Attainment
+              this.service.getBrgy(this.ExistedPatient[0].citymunCode).subscribe({
+                next: (response) => {
+                  this.brgy = response;
+               //   console.log('brgy:', this.brgy);
+                },
+                error: (error) => {
+                  console.error('Error:', error);
+                },
+              });
+
+              this.service.getprk(this.ExistedPatient[0].brgyCode).subscribe({
+                next: (response) => {
+                  this.prk = response;
+                  //console.log('brgy:', this.prk);
+                },
+                error: (error) => {
+                  console.error('Error:', error);
+                },
+              });
+
+            } else {
+              this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+            }
+          },
+          error: (error) => {
+            console.error('Error:', error);
+            this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+          },
+        });
+      } else {
+        this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+      }
+    });
+
+
+
+
+    this.fetchAdditionalData();
+
+  } //end of ngOnInit
+
+  fetchAdditionalData(): void {
     this.service.getDrugEffect().subscribe({
       next: (response) => {
         this.drugEffects = (response as any[]).map((effect) => ({
@@ -69,6 +118,7 @@ export class ApplicationDashboardComponent {
         console.error('Error:', error);
       },
     });
+
     this.service.getAdmissionType().subscribe({
       next: (response) => {
         this.admissionType = (response as any[]).map((effect) => ({
@@ -81,127 +131,54 @@ export class ApplicationDashboardComponent {
       },
     });
 
-    //Educational Attainment
     this.service.getEducationalAttainment().subscribe({
       next: (response) => {
         this.educationalAttainment = response;
-        console.log('Educational Attainment:', this.educationalAttainment);
       },
       error: (error) => {
         console.error('Error:', error);
       },
     });
-    //Religion
+
     this.service.getReligion().subscribe({
       next: (response) => {
         this.religion = response;
-        console.log('Religion:', this.religion);
       },
       error: (error) => {
         console.error('Error:', error);
       },
     });
-    //Civil Status
+
     this.service.getCivilStats().subscribe({
       next: (response) => {
         this.civilStatus = response;
-        console.log('Civil Status:', this.civilStatus);
       },
       error: (error) => {
         console.error('Error:', error);
       },
     });
-    //Nationality
+
     this.service.getNationality().subscribe({
       next: (response) => {
         this.nationality = response;
-        console.log('Nationality:', this.nationality);
       },
       error: (error) => {
         console.error('Error:', error);
       },
     });
-    //Citymun
+
     this.service.getCitymun().subscribe({
       next: (response) => {
         this.citymun = response;
-        console.log('citymun:', this.citymun);
       },
       error: (error) => {
         console.error('Error:', error);
       },
     });
-
-    const customUUID = (): string => {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let uuid = 'DDNPQR-';
-      for (let i = 0; i < 12; i++) {
-        const randomIndex = Math.floor(Math.random() * chars.length);
-       uuid += chars[randomIndex];
-       this.patientCode = uuid;
-      }
-      return uuid
-
-    }
-    // this.patientForm = this.fb.group({
-
-
-    //   patientCode: [customUUID(), Validators.required] ,
-    //   pFirstName: ['', Validators.required],
-    //   pMiddleName: ['',],
-    //   pLastName: ['', Validators.required],
-    //   pExtName: ['',],
-    //   pNickName: ['', Validators.required],
-    //   sex: ['' , Validators.required],
-    //   birthdate: ['', Validators.required],
-    //   prkCode: ['', Validators.required],
-    //   phoneNumber:['', Validators.required],
-    //   birthplace: ['', Validators.required],
-    //   nationalityId: ['', Validators.required],
-    //   religionId: ['', Validators.required],
-    //   civilStatusId: ['', Validators.required],
-    //   educationalId: ['', Validators.required],
-    //   schoolLastAttended: ['', Validators.required],
-    //   yearGraduated: ['', Validators.required],
-    //   occupation: ['', Validators.required],
-    //   income: ['', Validators.required],
-    //   admittingStaffId: [this.userInfo.id,Validators.required],
-    //   caseNo: ['12', Validators.required],
-    //   referrefBy: [this.userInfo.name, Validators.required],
-
-    // });
-  } //end of ngOnInit
+  }
   patientFormSubmit(): void {
     this.patientFormService.submitPatientForm(this.patientForm);
-    // if (this.patientForm.valid) {
-    //     const patientFormData =
-    //         this.patientForm.value
-    //         this.patientCode = this.patientForm.value.PatientCode
 
-    //     this.service.postPatientData(patientFormData).subscribe({
-    //         next: (response) => {
-    //             console.log('User registered successfully:', response);
-    //             alert('User registered successfully!');
-    //         },
-    //         error: (err) => {
-    //             console.error('API Error:', err);
-
-    //             if (err.status === 400) {
-    //                 alert('Validation failed. Please check your inputs.');
-    //             } else if (err.status === 401) {
-    //                 alert('Unauthorized. Please check your permissions.');
-    //             } else if (err.status === 500) {
-    //                 alert('Server error. Please try again later.');
-    //             } else {
-    //                 alert('Failed to register user. Please try again.');
-    //             }
-    //         }
-    //     });
-    // } else {
-    //     console.warn('Form submission attempted with invalid data:', this.patientForm.value);
-    //     alert('Please fill in all required fields correctly.');
-    //     // this.logValidationErrors(this.patientForm);
-    // }
 }
 
   onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
@@ -241,6 +218,18 @@ export class ApplicationDashboardComponent {
   }
 
   onMunicipalityChange(event: Event): void {
+    if(this.ExistedPatient.length > 0){
+      this.onChangeCitymunCode = this.ExistedPatient[0].citymunCode;
+      this.service.getBrgy(this.onChangeCitymunCode).subscribe({
+        next: (response) => {
+          this.brgy = response;
+          console.log('brgy:', this.brgy);
+        },
+        error: (error) => {
+          console.error('Error:', error);
+        },
+      });
+    }
     const selectElement = event.target as HTMLSelectElement;
     this.onChangeCitymunCode = selectElement.value;
     console.log('Municipality changed to:', selectElement.value);
@@ -255,6 +244,18 @@ export class ApplicationDashboardComponent {
     });
   } //end of onMunicipalityChange
   onBarangayChange(event: Event): void {
+    if(this.ExistedPatient.length > 0){
+      this.onChangeBarangay = this.ExistedPatient[0].brgyCode;
+      this.service.getprk(this.onChangeBarangay).subscribe({
+        next: (response) => {
+          this.prk = response;
+          console.log('prk:', this.prk);
+        },
+        error: (error) => {
+          console.error('Error:', error);
+        },
+      });
+    }
     const selectElement = event.target as HTMLSelectElement;
     this.onChangeBarangay = selectElement.value;
 
@@ -385,3 +386,5 @@ export class ApplicationDashboardComponent {
     });
 }
 }
+
+
