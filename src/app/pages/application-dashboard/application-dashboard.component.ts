@@ -5,6 +5,8 @@ import { ApplicationDashboardService } from './service/application-dashboard.ser
 import { AuthService } from '../../Admin/Auth/AuthService';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SchoolFormService } from './ScriptForms/school-form.service';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-application-dashboard',
@@ -15,7 +17,11 @@ export class ApplicationDashboardComponent {
 
 
   patientForm!: FormGroup;
+  patientSchoolForm!: FormGroup;
+
   ExistedPatient: any = [];
+  ExistedPatientSchool: any = [];
+
   userInfo: any;
 
   admissionType: any = [];
@@ -34,16 +40,16 @@ export class ApplicationDashboardComponent {
   selectedDrugEffects: any[] = [];
 
 
-ExistedcitymunCode = '';
-ExistedbrgyCode = '';
+
+ExistedPatientCode = '';
 
   constructor(
     private authService: AuthService,
-    private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
     private patientFormService: PatientFormService,
-    private service: ApplicationDashboardService) {}
+    private service: ApplicationDashboardService,
+    private schoolFormService:SchoolFormService) {}
 
 
 
@@ -53,59 +59,91 @@ ExistedbrgyCode = '';
     this.userInfo = this.authService.getUserInfo();
 
 
-    this.route.paramMap.subscribe((params) => {
-      const patientCode = params.get('patientCode');
-      if (patientCode) {
-        //console.log('Selected Patient Code:', patientCode);
-        this.service.getExistedPatientData(patientCode).subscribe({
-          next: (response) => {
-            this.ExistedPatient = response;
-           // console.log('ExistedPatient:', this.ExistedPatient[0].citymunCode);
-            if (this.ExistedPatient.length > 0) {
-              this.patientForm = this.patientFormService.createPatientForm(this.userInfo, this.ExistedPatient[0]);
-              this.ExistedcitymunCode = this.ExistedPatient.citymunCode;
-
-              this.service.getBrgy(this.ExistedPatient[0].citymunCode).subscribe({
-                next: (response) => {
-                  this.brgy = response;
-               //   console.log('brgy:', this.brgy);
-                },
-                error: (error) => {
-                  console.error('Error:', error);
-                },
-              });
-
-              this.service.getprk(this.ExistedPatient[0].brgyCode).subscribe({
-                next: (response) => {
-                  this.prk = response;
-                  //console.log('brgy:', this.prk);
-                },
-                error: (error) => {
-                  console.error('Error:', error);
-                },
-              });
-
-            } else {
-              this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
-            }
-          },
-          error: (error) => {
-            console.error('Error:', error);
-            this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
-          },
-        });
-      } else {
-        this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
-      }
-    });
-
-
+   this.ChckExisted();
 
 
     this.fetchAdditionalData();
 
   } //end of ngOnInit
 
+ChckExisted(): void {
+  this.route.paramMap.subscribe((params) => {
+    const patientCode = params.get('patientCode');
+    if (patientCode) {
+      //console.log('Selected Patient Code:', patientCode);
+      this.ExistedPatientCode = patientCode;
+
+    this.ExistedPatientData(patientCode);
+    this.ExistedPatientSchoolData(patientCode);
+    } else {
+      this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+      this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientCode);
+    }
+  });
+}
+ExistedPatientData(patientCode: string): void {
+  this.service.getExistedPatientData(patientCode).subscribe({
+    next: (response) => {
+      this.ExistedPatient = response;
+     console.log('ExistedPatient:', this.ExistedPatient);
+      if (this.ExistedPatient.length > 0) {
+        const formattedBirthDate = formatDate(this.ExistedPatient[0].birthdate, 'yyyy-dd-MM', 'en');
+        this.ExistedPatient[0].birthdate = formattedBirthDate;
+        this.patientForm = this.patientFormService.createPatientForm(this.userInfo, this.ExistedPatient[0]);
+
+        this.service.getBrgy(this.ExistedPatient[0].citymunCode).subscribe({
+          next: (response) => {
+            this.brgy = response;
+         //   console.log('brgy:', this.brgy);
+          },
+          error: (error) => {
+            console.error('Error:', error);
+          },
+        });
+        this.service.getprk(this.ExistedPatient[0].brgyCode).subscribe({
+          next: (response) => {
+            this.prk = response;
+            //console.log('brgy:', this.prk);
+          },
+          error: (error) => {
+            console.error('Error:', error);
+          },
+        });
+
+      } else {
+        this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+      }
+    },
+    error: (error) => {
+      console.error('Error:', error);
+      this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+    },
+  });
+}
+ExistedPatientSchoolData(patientCode: string): void {
+     //getExistedPatientSchoolData
+     this.service.getExistedPatientSchoolData(patientCode).subscribe({
+      next: (response) => {
+        this.ExistedPatientSchool = response;
+        console.log('ExistedPatientSchool:', this.ExistedPatientSchool);
+        if (this.ExistedPatientSchool.length > 0) {
+          const formattedDateElemYear = formatDate(this.ExistedPatientSchool[0].patientElementaryYear, 'yyyy-MM-dd', 'en');
+          const formattedDateHighSchoolYear = formatDate(this.ExistedPatientSchool[0].patientHighSchoolYear, 'yyyy-MM-dd', 'en');
+          this.ExistedPatientSchool[0].patientElementaryYear = formattedDateElemYear;
+          this.ExistedPatientSchool[0].patientHighSchoolYear = formattedDateHighSchoolYear;
+          this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientCode, this.ExistedPatientSchool[0]);
+        }
+        else {
+          this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientCode);
+        }
+      },
+      error: (error) => {
+        console.error('Error:', error);
+        this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientSchool[0]);
+      },
+
+    });
+}
   fetchAdditionalData(): void {
     this.service.getDrugEffect().subscribe({
       next: (response) => {
@@ -176,9 +214,12 @@ ExistedbrgyCode = '';
       },
     });
   }
+///FORMS SUBMIT
   patientFormSubmit(): void {
     this.patientFormService.submitPatientForm(this.patientForm);
-
+}
+patientSchoolFormSubmit(): void {
+  this.schoolFormService.submitPatientSchoolForm(this.patientSchoolForm);
 }
 
   onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
