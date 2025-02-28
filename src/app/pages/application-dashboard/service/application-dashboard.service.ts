@@ -45,7 +45,17 @@ constructor(private http: HttpClient) { }
   postPatientData(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientData`, data);
   }
+  postPatientSchoolData(data: any) {
+    return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSchoolData`, data);
+  }
 
+//forExistedPatient
+  getExistedPatientData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}`);
+  }
+  getExistedPatientSchoolData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientSchool?patientCode=${patientCode}`);
+  }
   // postPatientData(data: any): Observable<any> {
   //   return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientData`, data)
   //     .pipe(
