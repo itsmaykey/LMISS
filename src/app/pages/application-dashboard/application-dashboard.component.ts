@@ -6,6 +6,7 @@ import { AuthService } from '../../Admin/Auth/AuthService';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SchoolFormService } from './ScriptForms/school-form.service';
+import { PatientParentFormService } from './ScriptForms/patient-parent-form.service';
 import { formatDate } from '@angular/common';
 
 @Component({
@@ -15,7 +16,7 @@ import { formatDate } from '@angular/common';
 })
 export class ApplicationDashboardComponent {
 
-
+  patientParentForm!: FormGroup;
   patientForm!: FormGroup;
   patientSchoolForm!: FormGroup;
 
@@ -48,6 +49,7 @@ ExistedPatientCode = '';
     private router: Router,
     private route: ActivatedRoute,
     private patientFormService: PatientFormService,
+    private patientParentFormService: PatientParentFormService,
     private service: ApplicationDashboardService,
     private schoolFormService:SchoolFormService) {}
 
@@ -87,10 +89,14 @@ ExistedPatientData(patientCode: string): void {
       this.ExistedPatient = response;
      console.log('ExistedPatient:', this.ExistedPatient);
       if (this.ExistedPatient.length > 0) {
-        const formattedBirthDate = formatDate(this.ExistedPatient[0].birthdate, 'yyyy-dd-MM', 'en');
-        this.ExistedPatient[0].birthdate = formattedBirthDate;
+        const birthDateValue = new Date(this.ExistedPatient[0].birthdate);
+        if (!isNaN(birthDateValue.getTime())) {
+          this.ExistedPatient[0].birthdate = birthDateValue.toISOString().split('T')[0]; 
+        } else {
+          console.error('Invalid birthdate format:', this.ExistedPatient[0].birthdate);
+        }
+        
         this.patientForm = this.patientFormService.createPatientForm(this.userInfo, this.ExistedPatient[0]);
-
         this.service.getBrgy(this.ExistedPatient[0].citymunCode).subscribe({
           next: (response) => {
             this.brgy = response;
@@ -215,9 +221,12 @@ ExistedPatientSchoolData(patientCode: string): void {
     });
   }
 ///FORMS SUBMIT
-  patientFormSubmit(): void {
-    this.patientFormService.submitPatientForm(this.patientForm);
+patientFormSubmit(): void {
+  this.patientFormService.submitPatientForm(this.patientForm);
 }
+patientParentFormSubmit(): void {
+  this.patientParentFormService.submitPatientParentForm(this.patientParentForm);
+} 
 patientSchoolFormSubmit(): void {
   this.schoolFormService.submitPatientSchoolForm(this.patientSchoolForm);
 }
@@ -259,59 +268,49 @@ patientSchoolFormSubmit(): void {
   }
 
   onMunicipalityChange(event: Event): void {
-    if(this.ExistedPatient.length > 0){
-      this.onChangeCitymunCode = this.ExistedPatient[0].citymunCode;
-      this.service.getBrgy(this.onChangeCitymunCode).subscribe({
-        next: (response) => {
-          this.brgy = response;
-          console.log('brgy:', this.brgy);
-        },
-        error: (error) => {
-          console.error('Error:', error);
-        },
-      });
-    }
     const selectElement = event.target as HTMLSelectElement;
     this.onChangeCitymunCode = selectElement.value;
-    console.log('Municipality changed to:', selectElement.value);
+    
+    console.log('Municipality changed to:', this.onChangeCitymunCode);
+  
+    // Check if existing patient data should be used
+    if (this.ExistedPatient.length > 0 && this.ExistedPatient[0].citymunCode) {
+      this.onChangeCitymunCode = this.ExistedPatient[0].citymunCode;
+    }
+  
+    // Fetch barangays based on the selected municipality
     this.service.getBrgy(this.onChangeCitymunCode).subscribe({
       next: (response) => {
         this.brgy = response;
-        console.log('brgy:', this.brgy);
+        console.log('Barangays:', this.brgy);
       },
       error: (error) => {
-        console.error('Error:', error);
+        console.error('Error fetching barangays:', error);
       },
     });
-  } //end of onMunicipalityChange
+  } 
+  
   onBarangayChange(event: Event): void {
-    if(this.ExistedPatient.length > 0){
-      this.onChangeBarangay = this.ExistedPatient[0].brgyCode;
-      this.service.getprk(this.onChangeBarangay).subscribe({
-        next: (response) => {
-          this.prk = response;
-          console.log('prk:', this.prk);
-        },
-        error: (error) => {
-          console.error('Error:', error);
-        },
-      });
-    }
     const selectElement = event.target as HTMLSelectElement;
     this.onChangeBarangay = selectElement.value;
-
-    console.log('Brgy changed to:', selectElement.value);
-
+  
+    console.log('Barangay changed to:', this.onChangeBarangay);
+  
+    if (this.ExistedPatient.length > 0 && this.ExistedPatient[0].brgyCode) {
+      this.onChangeBarangay = this.ExistedPatient[0].brgyCode;
+    }
+  
     this.service.getprk(this.onChangeBarangay).subscribe({
       next: (response) => {
         this.prk = response;
-        console.log('prk:', this.prk);
+        console.log('Puroks:', this.prk);
       },
       error: (error) => {
-        console.error('Error:', error);
+        console.error('Error fetching puroks:', error);
       },
     });
-  } //end of onBarangayChange
+  } 
+  
 
   siblings: any[] = [
     {

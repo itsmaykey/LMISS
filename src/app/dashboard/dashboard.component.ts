@@ -15,7 +15,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   service = inject(DashboardServiceService);
 
   isLoading = false;
-
   isModalVisible = false;
   scannedData: string = '';
   isCameraActive: boolean = false;
@@ -31,20 +30,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
   constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-   // console.log('Dashboard initialized');
     this.userInfo = this.authService.getUserInfo();
-    //console.log('User Info:', this.userInfo);`
     this.patientNames();
   }
   patientNames(): void {
     this.service.getPatients().subscribe((response: any) => {
       this.patients = response.map((owner: any) => ({ ...owner }));
-      this.filteredSearchNames = []; // Start with an empty table
+      this.filteredSearchNames = []; 
     });
   }
   FilteredSearchNames(): void {
     if (!this.searchText || this.searchText.trim() === '') {
-      this.filteredSearchNames = []; // Show nothing when search is empty
+      this.filteredSearchNames = []; 
       return;
     }
 
@@ -57,7 +54,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     );
   }
   goToAppDashboard() {
-    this.router.navigate(['/applicationDashboard']);
+    this.router.navigate(['/application']);
   }
   goToSelectedApp(patientCode: string): void {
     if (!this.router) {
