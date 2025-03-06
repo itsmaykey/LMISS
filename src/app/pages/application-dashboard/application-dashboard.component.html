@@ -268,44 +268,48 @@
     </div>
   </div>
     </div>
-    <div class="tab-pane fade  hide" id="FamHistory" role="tabpanel">
+    <div class="tab-pane fade" id="FamHistory" role="tabpanel">
       <div class="nav-align-top nav-tabs-shadow mb-6">
         <ul class="nav nav-tabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-home" aria-controls="navs-top-home" aria-selected="true">
+          <li class="nav-item active show" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#navsParent" role="tab" aria-selected="false">
               Parent
             </button>
           </li>
           <li class="nav-item" role="presentation">
-            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-profile" aria-controls="navs-top-profile" aria-selected="false" tabindex="-1">
+            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navSpouse" aria-controls="navs-top-profile" aria-selected="false" tabindex="-1">
               Spouse
             </button>
           </li>
           <li class="nav-item" role="presentation">
-            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-messages" aria-controls="navs-top-messages" aria-selected="false" tabindex="-1">
+            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navSiblings" aria-controls="navs-top-messages" aria-selected="false" tabindex="-1">
               Siblings
             </button>
           </li>
           <li class="nav-item" role="presentation">
-            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-Children" aria-controls="navs-top-Children" aria-selected="false" tabindex="-1">
+            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navChild" aria-controls="navs-top-Children" aria-selected="false" tabindex="-1">
               Children
             </button>
           </li>
         </ul>
         <div class="tab-content">
-          <div class="tab-pane fade active show" id="navs-top-home" role="tabpanel">
+          <div class="tab-pane fade active show" id="navsParent" role="tabpanel">
+            <div *ngIf="patientParentForm" >
               <form [formGroup]="patientParentForm" (ngSubmit)="patientParentFormSubmit()">
-          
             <div class="card-body pt-4">
               <div class="row g-4">
                 <div class="row">
+                  <div class="col-md-3" hidden>
+                    <label for="lname" class="form-label">Patient Code</label>
+                    <input class="form-control" type="text" formControlName="patientCode">
+                  </div>
                   <div class="col-md-6">
                     <label for="fatherName" class="form-label">Father</label>
-                    <input class="form-control" type="text" id="fatherName" formControlName="fatherName" placeholder="Enter Full Name">
+                    <input class="form-control" type="text" formControlName="fatherName" placeholder="Enter Full Name">
                   </div>
                   <div class="col-md-6">
                     <label for="motherName" class="form-label">Mother</label>
-                    <input class="form-control" type="text" id="motherName" formControlName="motherName" placeholder="Enter Full Name">
+                    <input class="form-control" type="text"formControlName="motherName" placeholder="Enter Full Name">
                   </div>
                 </div>
         
@@ -363,11 +367,7 @@
                     <input class="form-control" type="text" id="motherIncome" formControlName="motherIncome" placeholder="Enter Income">
                   </div>
                 </div>
-                <div class="card-footer text-end">
-                  <button type="button" class="btn btn-secondary text-white me-2" (click)="goToEmploy()">
-                      Next
-                  </button>
-              </div>
+               
               </div>
         
               <hr>
@@ -375,54 +375,62 @@
                 <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
                 <button type="reset" class="btn btn-outline-secondary">Cancel</button>
               </div>
+              <div class="card-footer text-end">
+                <button type="button" class="btn btn-secondary text-white me-2" (click)="goToSpouse()">
+                    Next
+                </button>
             </div>
+            </div>
+            
               </form>
           </div>
-          <div class="tab-pane fade" id="navs-top-profile" role="tabpanel">
+        </div>
+
+          <div class="tab-pane fade" id="navSpouse" role="tabpanel">
             <div class="card-body pt-4">
               <div class="row g-4">
                    <div class="row">
                 <div class="col-md-8">
                   <label for="lname" class="form-label">Spouse Name</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  <input class="form-control" type="text" name="lname" formControlName="spouseName" id="lname" placeholder="Enter Full Name" >
                 </div>
                 <div class="col-md-3">
-                  <label for="lname" class="form-label">Nickname</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  <label for="Nick" class="form-label">Nickname</label>
+                  <input class="form-control" type="text" name="Nick" formControlName="spouseNickName" id="Nick" placeholder="Enter Nick Name" >
                 </div>
                 <div class="col-md-1">
-                  <label for="lname" class="form-label">Age</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Age" >
+                  <label for="Age" class="form-label">Age</label>
+                  <input class="form-control" type="text" name="Age" formControlName="spouseAge" id="Age" placeholder="Age" >
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-12">
-                  <label for="lname" class="form-label">Address</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  <label for="Address" class="form-label">Address</label>
+                  <input class="form-control" type="text" name="Address" formControlName="spouseAddress" id="Address" placeholder="Enter Address" >
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-4">
-                  <label for="lname" class="form-label">Occupation</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  <label for="Occupation" class="form-label">Occupation</label>
+                  <input class="form-control" type="text" name="Occupation" formControlName="spouseOccupation" id="Occupation" placeholder="Enter Occupation" >
                 </div>
                 <div class="col-md-8">
-                  <label for="bdate" class="form-label">Employer</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  <label for="Employer" class="form-label">Employer</label>
+                  <input class="form-control" type="text" name="Employer" formControlName="spouseEmployer" id="Employer" placeholder="Enter Employer" >
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-8">
-                  <label for="lname" class="form-label">Educational Attainment</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  <label for="Attainment" class="form-label">Educational Attainment</label>
+                  <input class="form-control" type="text" name="Attainment" formControlName="" id="Attainment" placeholder="Enter Educational Attainment" >
                 </div>
                 <div class="col-md-2">
-                  <label for="bdate" class="form-label">Income</label>
-                  <input class="form-control" type="text" name="lname" id="lname" placeholder="Enter Last Name" >
+                  <label for="Income" class="form-label">Income</label>
+                  <input class="form-control" type="text" name="Income" formControlName="spouseIncome" id="Income" placeholder="Enter Income" >
                 </div>
                 <div class="col-md-2">
                   <label for="language" class="form-label">Living Arrangement</label>
-                  <select id="language" class="select2 form-select">
+                  <select id="language" class="select2 form-select" formControlName="spouseLivingArrangement">
                     <option value="" disabled selected>Select</option>
                     <option  *ngFor="let x of civilStatus" value="{{x.civ_ID}}">{{x.civ_Name}}</option>
                   </select>
@@ -435,9 +443,14 @@
                 <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
                 <button type="reset" class="btn btn-outline-secondary">Cancel</button>
               </div>
+              <div class="card-footer text-end">
+                <button type="button" class="btn btn-secondary text-white me-2" (click)="goToSibs()">
+                    Next
+                </button>
+            </div>
           </div>
           </div>
-          <div class="tab-pane fade" id="navs-top-messages" role="tabpanel">
+          <div class="tab-pane fade" id="navSiblings" role="tabpanel">
             <div class="card-body pt-4">
               <div class="row g-4">
                 <div class="row">
@@ -484,9 +497,14 @@
                 <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
                 <button type="reset" class="btn btn-outline-secondary">Cancel</button>
               </div>
+              <div class="card-footer text-end">
+                <button type="button" class="btn btn-secondary text-white me-2" (click)="goToChild()">
+                    Next
+                </button>
+            </div>
           </div>
           </div>
-          <div class="tab-pane fade" id="navs-top-Children" role="tabpanel">
+          <div class="tab-pane fade" id="navChild" role="tabpanel">
             <div class="card-body pt-4">
               <div class="row g-4">
                 <div class="row">
@@ -533,16 +551,16 @@
                 <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
                 <button type="reset" class="btn btn-outline-secondary">Cancel</button>
               </div>
+              <div class="card-footer text-end">
+                <button type="button" class="btn btn-secondary text-white me-2" (click)="goToEmploy()">
+                    Next
+                </button>
+            </div>
           </div>
           </div>
-        </div>
       </div>
-
       </div>
-   
     </div>
-
-
     <div class="tab-pane fade hide" id="EmployHisto" role="tabpanel">
         <div class="card">
           <div class="card-header">
@@ -921,10 +939,7 @@
 
       </div>
     </div>
-
     </div>
-
-
     </div>
 
 

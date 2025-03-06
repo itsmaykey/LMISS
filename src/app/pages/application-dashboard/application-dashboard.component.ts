@@ -22,7 +22,7 @@ export class ApplicationDashboardComponent {
 
   ExistedPatient: any = [];
   ExistedPatientSchool: any = [];
-
+  ExistedPatientParent:any = [];
   userInfo: any;
 
   admissionType: any = [];
@@ -51,7 +51,9 @@ ExistedPatientCode = '';
     private patientFormService: PatientFormService,
     private patientParentFormService: PatientParentFormService,
     private service: ApplicationDashboardService,
-    private schoolFormService:SchoolFormService) {}
+    private schoolFormService:SchoolFormService
+  
+  ) {}
 
 
 
@@ -77,9 +79,11 @@ ChckExisted(): void {
 
     this.ExistedPatientData(patientCode);
     this.ExistedPatientSchoolData(patientCode);
+    this.ExistedPatientParentData(patientCode);
     } else {
       this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
       this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientCode);
+      this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode);
     }
   });
 }
@@ -149,6 +153,27 @@ ExistedPatientSchoolData(patientCode: string): void {
       },
 
     });
+}
+ExistedPatientParentData(patientCode: string): void {
+  //getExistedPatientSchoolData
+  this.service.getExistedPatientParentData(patientCode).subscribe({
+   next: (response) => {
+     this.ExistedPatientParent = response;
+     console.log('ExistedPatientParent:', this.ExistedPatientParent);
+     if (this.ExistedPatientParent.length > 0) {
+      
+       this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode, this.ExistedPatientParent[0]);
+     }
+     else {
+       this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode);
+     }
+   },
+   error: (error) => {
+     console.error('Error:', error);
+     this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientParent[0]);
+   },
+
+ });
 }
   fetchAdditionalData(): void {
     this.service.getDrugEffect().subscribe({
@@ -401,6 +426,27 @@ patientSchoolFormSubmit(): void {
     if (subFamHisto) {
       const FamtabInstance = new (window as any).bootstrap.Tab(subFamHisto);
       FamtabInstance.show();
+    }
+  }
+  goToChild(): void {
+    const subChild = document.querySelector('[data-bs-target="#navChild"]');
+    if (subChild) {
+      const ChildtabInstance = new (window as any).bootstrap.Tab(subChild);
+      ChildtabInstance.show();
+    }
+  }
+  goToSibs(): void {
+    const subSibs = document.querySelector('[data-bs-target="#navSiblings"]');
+    if (subSibs) {
+      const SibstabInstance = new (window as any).bootstrap.Tab(subSibs);
+      SibstabInstance.show();
+    }
+  }
+  goToSpouse(): void {
+    const subSpouse = document.querySelector('[data-bs-target="#navSpouse"]');
+    if (subSpouse) {
+      const SpousetabInstance = new (window as any).bootstrap.Tab(subSpouse);
+      SpousetabInstance.show();
     }
   }
   goToEmploy(): void {

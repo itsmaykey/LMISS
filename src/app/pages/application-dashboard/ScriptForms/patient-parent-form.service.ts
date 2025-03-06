@@ -23,7 +23,7 @@ export class PatientParentFormService {
     this.route.paramMap.subscribe((params) => {
       const patientCode = params.get('patientCode');
       if (patientCode) {
-        this.existed = this.applicationdashboardService.getExistedPatientData(patientCode);
+        this.existed = this.applicationdashboardService.getExistedPatientParentData(patientCode);
         console.log('ExistedPatient:', this.existed);
       }
     });
@@ -33,35 +33,41 @@ export class PatientParentFormService {
 
         return this.fb.group({
           patientCode : [ ExistedPatientCode, Validators.required],
-          fatherName: [existingPatientParentData.patientElementarySchool || '', Validators.required],
-          fatherAddress: [existingPatientParentData.patientElementaryYear || '', Validators.required],
-          fatherEducation: [existingPatientParentData.patientElementaryAddress || '', Validators.required],
-          fatherOccupation: [existingPatientParentData.patientHighScool || '', Validators.required],
-          fatherIncome: [existingPatientParentData.patientHighSchoolYear || '' ,Validators.required],
-          fatherStatusId: [existingPatientParentData.patientHighSchoolAddress || '', Validators.required],
+          
+          fatherName: [existingPatientParentData.fatherName || '', Validators.required],
+          fatherAddress: [existingPatientParentData.fatherAddress || '', Validators.required],
+          fatherEducation: [existingPatientParentData.fatherEducation || '', Validators.required],
+          fatherOccupation: [existingPatientParentData.fatherOccupation || '', Validators.required],
+          fatherIncome: [existingPatientParentData.fatherIncome || '' ,Validators.required],
+          fatherStatusId: [existingPatientParentData.fatherStatusId || '', Validators.required],
         
-          motherName: [existingPatientParentData.patientElementarySchool || '', Validators.required],
-          motherAddress: [existingPatientParentData.patientElementaryYear || '', Validators.required],
-          motherEducation: [existingPatientParentData.patientElementaryAddress || '', Validators.required],
-          motherOccupation: [existingPatientParentData.patientHighScool || '', Validators.required],
-          motherIncome: [existingPatientParentData.patientHighSchoolYear || '' ,Validators.required],
-          motherStatusId: [existingPatientParentData.patientHighSchoolAddress || '', Validators.required],
+          motherName: [existingPatientParentData.motherName || '', Validators.required],
+          motherAddress: [existingPatientParentData.motherAddress || '', Validators.required],
+          motherEducation: [existingPatientParentData.motherEducation || '', Validators.required],
+          motherOccupation: [existingPatientParentData.motherOccupation || '', Validators.required],
+          motherIncome: [existingPatientParentData.motherIncome || '' ,Validators.required],
+          motherStatusId: [existingPatientParentData.motherStatusId || '', Validators.required],
         });
       }
-      submitPatientParentForm(patientParentForm: FormGroup): void {
+      submitPatientParentForm(patientParentForm: FormGroup): void { 
         if (patientParentForm.valid) {
-          console.log(patientParentForm.value);
           const patientParentFormData = patientParentForm.value;
+      
+          // Check if fatherName and motherName are empty
+          if (!patientParentFormData.fatherName?.trim() || !patientParentFormData.motherName?.trim()) {
+            alert('Father Name and Mother Name cannot be empty.');
+            return;
+          }
+      
           console.log('Submitting patient school form:', patientParentFormData);
-          this.applicationdashboardService.postPatientSchoolData(patientParentFormData).subscribe({
+          this.applicationdashboardService.postPatientParentData(patientParentFormData).subscribe({
             next: (response) => {
-    
               console.log('Parents Data Saved successfully:', response);
               alert('Parents Data Saved successfully');
             },
             error: (err) => {
               console.error('API Error:', err);
-    
+      
               if (err.status === 400) {
                 alert('Validation failed. Please check your inputs.');
               } else if (err.status === 401) {
@@ -78,4 +84,5 @@ export class PatientParentFormService {
           alert('Please fill in all required fields correctly.');
         }
       }
+      
 }

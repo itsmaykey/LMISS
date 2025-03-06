@@ -202,4 +202,37 @@
   .custom-nav .bx-sm {
     font-size: 16px; /* Reduce icon size slightly */
   }
+  .nav-tabs {
+    border-bottom: 2px solid #4f4f4f; /* Highlight bar under tabs */
+  }
+  
+  .nav-tabs .nav-item {
+    margin-right: 5px; /* Space between tabs */
+  }
+  
+  .nav-tabs .nav-link {
+    color: #007bff; /* Default tab text color */
+    border: none;
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: 0.3s ease-in-out;
+  }
+  
+  .nav-tabs .nav-link:hover {
+    background-color: #f8f9fa; /* Light hover effect */
+    color: #0056b3;
+  }
+  
+  .nav-tabs .nav-link.active {
+    background-color: #007bff; /* Active tab background */
+    color: white;
+    border-radius: 5px;
+  }
+  
+  @media (max-width: 576px) {
+    .nav-tabs .nav-item {
+      width: 100%; /* Stack tabs on small screens */
+      text-align: center;
+    }
+  }
   
