@@ -1,39 +1,37 @@
-
-
 import { PatientFormService } from './ScriptForms/patient-form/patient-form.service';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ApplicationDashboardService } from './service/application-dashboard.service';
 import { AuthService } from '../../Admin/Auth/AuthService';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SchoolFormService } from './ScriptForms/patient-SchoolForm/school-form.service';
 import { PatientParentFormService } from './ScriptForms/patient-ParentForm/patient-parent-form.service';
 import { formatDate } from '@angular/common';
 import { PatientSpouseFormService } from './ScriptForms/patient-SpouseForm/patient-spouse-form.service';
 import { SiblingsFormService } from './ScriptForms/siblings-form.service';
+
 @Component({
   selector: 'app-application-dashboard',
   templateUrl: './application-dashboard.component.html',
   styleUrls: ['./application-dashboard.component.css'],
 })
-export class ApplicationDashboardComponent {
-
+export class ApplicationDashboardComponent implements OnInit {
   patientParentForm!: FormGroup;
   patientForm!: FormGroup;
   patientSchoolForm!: FormGroup;
   patientSpouseForm!: FormGroup;
   patientSiblingsForm!: FormGroup;
-  siblings!: FormArray;
-
+  //siblings!: FormArray;
 
   ExistedPatient: any = [];
   ExistedPatientSchool: any = [];
-  ExistedPatientParent:any = [];
-  ExistedPatientSpouse:any = [];
+  ExistedPatientParent: any = [];
+  ExistedPatientSpouse: any = [];
+  ExistedPatientSibling: any = [];
   userInfo: any;
 
   admissionType: any = [];
-  selectedAdmissionType: any[]= [];
+  selectedAdmissionType: any[] = [];
   citymun: any = [];
   brgy: any = [];
   prk: any = [];
@@ -41,15 +39,11 @@ export class ApplicationDashboardComponent {
   civilStatus: any = [];
   religion: any = [];
   drugEffects: any = [];
-
   educationalAttainment: any = [];
   onChangeCitymunCode: string = '';
   onChangeBarangay: string = '';
   selectedDrugEffects: any[] = [];
-
-
-
-ExistedPatientCode = '';
+  ExistedPatientCode = '';
 
   constructor(
     private authService: AuthService,
@@ -58,175 +52,156 @@ ExistedPatientCode = '';
     private patientFormService: PatientFormService,
     private patientParentFormService: PatientParentFormService,
     private service: ApplicationDashboardService,
-    private schoolFormService:SchoolFormService,
-    private patientSpouseFormService:PatientSpouseFormService,
-    private siblingsFormService: SiblingsFormService,
-
+    private schoolFormService: SchoolFormService,
+    private patientSpouseFormService: PatientSpouseFormService,
+    private siblingsFormService: SiblingsFormService
   ) {}
 
-
-
-
   ngOnInit(): void {
-
     this.userInfo = this.authService.getUserInfo();
-
-
-   this.ChckExisted();
-
-
+    this.checkExisted();
     this.fetchAdditionalData();
+  }
 
-  } //end of ngOnInit
-
-ChckExisted(): void {
-  this.route.paramMap.subscribe((params) => {
-    const patientCode = params.get('patientCode');
-    if (patientCode) {
-      //console.log('Selected Patient Code:', patientCode);
-      this.ExistedPatientCode = patientCode;
-
-    this.ExistedPatientData(patientCode);
-    this.ExistedPatientSchoolData(patientCode);
-    this.ExistedPatientParentData(patientCode);
-    this.getExistedPatientSpouseData(patientCode);
-    this.getExistedPatientSiblingData(patientCode);
-    } else {
-      this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
-      this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientCode);
-      this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode);
-      this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode);
-      this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode);
-        this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
-    }
-  });
-}
-ExistedPatientData(patientCode: string): void {
-  this.service.getExistedPatientData(patientCode).subscribe({
-    next: (response) => {
-      this.ExistedPatient = response;
-     console.log('ExistedPatient:', this.ExistedPatient);
-      if (this.ExistedPatient.length > 0) {
-        const birthDateValue = new Date(this.ExistedPatient[0].birthdate);
-        if (!isNaN(birthDateValue.getTime())) {
-          this.ExistedPatient[0].birthdate = birthDateValue.toISOString().split('T')[0];
-        } else {
-          console.error('Invalid birthdate format:', this.ExistedPatient[0].birthdate);
-        }
-
-        this.patientForm = this.patientFormService.createPatientForm(this.userInfo, this.ExistedPatient[0]);
-        this.service.getBrgy(this.ExistedPatient[0].citymunCode).subscribe({
-          next: (response) => {
-            this.brgy = response;
-         //   console.log('brgy:', this.brgy);
-          },
-          error: (error) => {
-            console.error('Error:', error);
-          },
-        });
-        this.service.getprk(this.ExistedPatient[0].brgyCode).subscribe({
-          next: (response) => {
-            this.prk = response;
-            //console.log('brgy:', this.prk);
-          },
-          error: (error) => {
-            console.error('Error:', error);
-          },
-        });
-
+  checkExisted(): void {
+    this.route.paramMap.subscribe((params) => {
+      const patientCode = params.get('patientCode');
+      if (patientCode) {
+        this.ExistedPatientCode = patientCode;
+        this.loadExistedPatientData(patientCode);
       } else {
-        this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+        this.initializeForms();
       }
-    },
-    error: (error) => {
-      console.error('Error:', error);
-      this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
-    },
-  });
-}
-ExistedPatientSchoolData(patientCode: string): void {
-     //getExistedPatientSchoolData
-     this.service.getExistedPatientSchoolData(patientCode).subscribe({
+    });
+  }
+
+  loadExistedPatientData(patientCode: string): void {
+    this.loadExistedPatient(patientCode);
+    this.loadExistedPatientSchoolData(patientCode);
+    this.loadExistedPatientParentData(patientCode);
+    this.loadExistedPatientSpouseData(patientCode);
+    this.loadExistedPatientSiblingsData(patientCode);
+  }
+
+  initializeForms(): void {
+    this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+    this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientCode);
+    this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode);
+    this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode);
+    this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode);
+    // this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
+  }
+
+
+  loadExistedPatient(patientCode: string): void {
+    this.service.getExistedPatientData(patientCode).subscribe({
+      next: (response) => {
+        this.ExistedPatient = response;
+        if (this.ExistedPatient.length > 0) {
+          const birthDateValue = new Date(this.ExistedPatient[0].birthdate);
+          if (!isNaN(birthDateValue.getTime())) {
+            this.ExistedPatient[0].birthdate = birthDateValue.toISOString().split('T')[0];
+          }
+          this.patientForm = this.patientFormService.createPatientForm(this.userInfo, this.ExistedPatient[0]);
+          this.loadBrgyAndPrk(this.ExistedPatient[0].citymunCode, this.ExistedPatient[0].brgyCode);
+        } else {
+          this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+        }
+      },
+      error: () => {
+        this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
+      },
+    });
+  }
+
+  loadBrgyAndPrk(citymunCode: string, brgyCode: string): void {
+    this.service.getBrgy(citymunCode).subscribe({
+      next: (response) => {
+        this.brgy = response;
+      },
+      error: (error) => {
+        console.error('Error:', error);
+      },
+    });
+    this.service.getprk(brgyCode).subscribe({
+      next: (response) => {
+        this.prk = response;
+      },
+      error: (error) => {
+        console.error('Error:', error);
+      },
+    });
+  }
+
+  loadExistedPatientSchoolData(patientCode: string): void {
+    this.service.getExistedPatientSchoolData(patientCode).subscribe({
       next: (response) => {
         this.ExistedPatientSchool = response;
-        console.log('ExistedPatientSchool:', this.ExistedPatientSchool);
         if (this.ExistedPatientSchool.length > 0) {
           const formattedDateElemYear = formatDate(this.ExistedPatientSchool[0].patientElementaryYear, 'yyyy-MM-dd', 'en');
           const formattedDateHighSchoolYear = formatDate(this.ExistedPatientSchool[0].patientHighSchoolYear, 'yyyy-MM-dd', 'en');
           this.ExistedPatientSchool[0].patientElementaryYear = formattedDateElemYear;
           this.ExistedPatientSchool[0].patientHighSchoolYear = formattedDateHighSchoolYear;
           this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientCode, this.ExistedPatientSchool[0]);
-        }
-        else {
+        } else {
           this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientCode);
         }
       },
-      error: (error) => {
-        console.error('Error:', error);
+      error: () => {
         this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientSchool[0]);
       },
-
     });
-}
-ExistedPatientParentData(patientCode: string): void {
-  //getExistedPatientSchoolData
-  this.service.getExistedPatientParentData(patientCode).subscribe({
-   next: (response) => {
-     this.ExistedPatientParent = response;
-     console.log('ExistedPatientParent:', this.ExistedPatientParent);
-     if (this.ExistedPatientParent.length > 0) {
+  }
 
-       this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode, this.ExistedPatientParent[0]);
-     }
-     else {
-       this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode);
-     }
-   },
-   error: (error) => {
-     console.error('Error:', error);
-     this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientParent[0]);
-   },
+  loadExistedPatientParentData(patientCode: string): void {
+    this.service.getExistedPatientParentData(patientCode).subscribe({
+      next: (response) => {
+        this.ExistedPatientParent = response;
+        if (this.ExistedPatientParent.length > 0) {
+          this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode, this.ExistedPatientParent[0]);
+        } else {
+          this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode);
+        }
+      },
+      error: () => {
+        this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientParent[0]);
+      },
+    });
+  }
 
- });
-}
-getExistedPatientSpouseData(patientCode: string): void {
-  //getExistedPatientSpouseData
-  this.service.getExistedPatientSpouseData(patientCode).subscribe({
-   next: (response) => {
-     this.ExistedPatientSpouse = response;
-     console.log('ExistedPatientSpouse:', this.ExistedPatientSpouse);
-     if (this.ExistedPatientSpouse.length > 0) {
+  loadExistedPatientSpouseData(patientCode: string): void {
+    this.service.getExistedPatientSpouseData(patientCode).subscribe({
+      next: (response) => {
+        this.ExistedPatientSpouse = response;
+        if (this.ExistedPatientSpouse.length > 0) {
+          this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode, this.ExistedPatientSpouse[0]);
+        } else {
+          this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode);
+        }
+      },
+      error: () => {
+        this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientSpouse[0]);
+      },
+    });
+  }
 
-       this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode, this.ExistedPatientSpouse[0]);
-     }
-     else {
-       this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode);
-     }
-   },
-   error: (error) => {
-     console.error('Error:', error);
-     this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientSpouse[0]);
-   },
+  loadExistedPatientSiblingsData(patientCode: string): void {
+    this.service.getExistedPatientSiblingData(patientCode).subscribe({
+      next: (response) => {
+        this.ExistedPatientSibling = response;
+        console.log(this.ExistedPatientSibling);
+        if (this.ExistedPatientSibling.length > 0) {
+          this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode, { siblings: this.ExistedPatientSibling });
+        } else {
+          this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode);
+        }
+      },
+      error: () => {
+        this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode);
+      },
+    });
+  }
 
- });
-}
-getExistedPatientSiblingData(patientCode: string): void {
-  this.siblingsFormService.getExistedPatientSiblingData(patientCode).subscribe({
-    next: (response) => {
-      if (response.length > 0) {
-        this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(patientCode, response[0]);
-      } else {
-        this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(patientCode);
-      }
-      this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
-    },
-    error: (error) => {
-      console.error('Error:', error);
-      this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(patientCode);
-      this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
-    },
-  });
-}
   fetchAdditionalData(): void {
     this.service.getDrugEffect().subscribe({
       next: (response) => {
@@ -297,43 +272,51 @@ getExistedPatientSiblingData(patientCode: string): void {
       },
     });
   }
-///FORMS SUBMIT
-patientFormSubmit(): void {
-  this.patientFormService.submitPatientForm(this.patientForm);
-}
-patientParentFormSubmit(): void {
-  this.patientParentFormService.submitPatientParentForm(this.patientParentForm);
-}
-patientSchoolFormSubmit(): void {
-  this.schoolFormService.submitPatientSchoolForm(this.patientSchoolForm);
-}
-patientSpouseFormSubmit(): void {
-  this.patientSpouseFormService.submitPatientSpouseForm(this.patientSpouseForm);
-}
-patientSiblingsFormSubmit(): void {
-  if (this.patientSiblingsForm.valid) {
-    this.siblingsFormService.submitPatientSiblingForm(this.patientSiblingsForm.value).subscribe({
-      next: (response) => {
-        console.log('Patient Sibling Form submitted successfully:', response);
-      },
-      error: (error) => {
-        console.error('Error submitting Patient Sibling Form:', error);
-      }
-    });
-  } else {
-    console.error('Patient Sibling Form is invalid');
+
+  // Form submission methods
+  patientFormSubmit(): void {
+    this.patientFormService.submitPatientForm(this.patientForm);
   }
-}
-siblingsaddRow(): void {
-  this.siblings.push(this.siblingsFormService.createSiblingFormGroup());
-}
 
+  patientParentFormSubmit(): void {
+    this.patientParentFormService.submitPatientParentForm(this.patientParentForm);
+  }
 
+  patientSchoolFormSubmit(): void {
+    this.schoolFormService.submitPatientSchoolForm(this.patientSchoolForm);
+  }
 
+  patientSpouseFormSubmit(): void {
+    this.patientSpouseFormService.submitPatientSpouseForm(this.patientSpouseForm);
+  }
 
+  patientSiblingsFormSubmit(): void {
+    if (this.patientSiblingsForm.valid) {
+      this.siblingsFormService.submitPatientSiblingForm(this.patientSiblingsForm.value).subscribe({
+        next: (response) => {
+          console.log('Patient Sibling Form submitted successfully:', response);
+        },
+        error: (error) => {
+          console.error('Error submitting Patient Sibling Form:', error);
+        },
+      });
+    } else {
+      console.error('Patient Sibling Form is invalid');
+    }
+  }
+  get siblings(): FormArray {
+    return this.patientSiblingsForm.get('siblings') as FormArray;
+  }
 
+  addSibling(): void {
+    this.siblings.push(this.siblingsFormService.createSiblingFormGroup());
+  }
 
+  removeSibling(index: number): void {
+    this.siblings.removeAt(index);
+  }
 
+  // Event handlers
   onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
     const checkbox = event.target as HTMLInputElement;
     admissionType.selected = checkbox.checked;
@@ -376,12 +359,10 @@ siblingsaddRow(): void {
 
     console.log('Municipality changed to:', this.onChangeCitymunCode);
 
-    // Check if existing patient data should be used
     if (this.ExistedPatient.length > 0 && this.ExistedPatient[0].citymunCode) {
       this.onChangeCitymunCode = this.ExistedPatient[0].citymunCode;
     }
 
-    // Fetch barangays based on the selected municipality
     this.service.getBrgy(this.onChangeCitymunCode).subscribe({
       next: (response) => {
         this.brgy = response;
@@ -414,28 +395,56 @@ siblingsaddRow(): void {
     });
   }
 
+  // Navigation methods
+  goToSubstanceHisto(): void {
+    this.showTab('#SubstanceHisto');
+  }
 
-  // siblings: any[] = [
-  //   {
-  //     name: '',
-  //     age: '',
-  //     sex: '',
-  //     civilStatus: '',
-  //     occupation: '',
-  //     education: '',
-  //   },
-  // ];
+  goToEducational(): void {
+    this.showTab('#EducationalAttain');
+  }
 
-  // siblingsaddRow() {
-  //   this.siblings.push({
-  //     name: '',
-  //     age: '',
-  //     sex: '',
-  //     civilStatus: '',
-  //     occupation: '',
-  //     education: '',
-  //   });
-  // }
+  goToFamHisto(): void {
+    this.showTab('#FamHistory');
+  }
+
+  goToChild(): void {
+    this.showTab('#navChild');
+  }
+
+  goToSibs(): void {
+    this.showTab('#navSiblings');
+  }
+
+  goToSpouse(): void {
+    this.showTab('#navSpouse');
+  }
+
+  goToEmploy(): void {
+    this.showTab('#EmployHisto');
+  }
+
+  gotoAppHisto(): void {
+    this.showTab('#ApplicationHisto');
+  }
+
+  goToPatientDashboard(): void {
+    this.router.navigate(['/patientDashboard']);
+  }
+
+  goToSelectedApp(patientCode: string): void {
+    this.router.navigate(['/application', patientCode]).then(() => {
+      alert(`Selected Patient Code: ${patientCode}`);
+    });
+  }
+
+  private showTab(selector: string): void {
+    const tabElement = document.querySelector(`[data-bs-target="${selector}"]`);
+    if (tabElement) {
+      const tabInstance = new (window as any).bootstrap.Tab(tabElement);
+      tabInstance.show();
+    }
+  }
 
   childrens: any[] = [
     {
@@ -485,70 +494,4 @@ siblingsaddRow(): void {
       tms: '',
     });
   }
-  goToSubstanceHisto(): void {
-    const subHistoTab = document.querySelector('[data-bs-target="#SubstanceHisto"]');
-    if (subHistoTab) {
-      const tabInstance = new (window as any).bootstrap.Tab(subHistoTab);
-      tabInstance.show();
-    }
-  }
-  goToEducational(): void {
-    const subEducTab = document.querySelector('[data-bs-target="#EducationalAttain"]');
-    if (subEducTab) {
-      const EductabInstance = new (window as any).bootstrap.Tab(subEducTab);
-      EductabInstance.show();
-    }
-  }
-  goToFamHisto(): void {
-    const subFamHisto = document.querySelector('[data-bs-target="#FamHistory"]');
-    if (subFamHisto) {
-      const FamtabInstance = new (window as any).bootstrap.Tab(subFamHisto);
-      FamtabInstance.show();
-    }
-  }
-  goToChild(): void {
-    const subChild = document.querySelector('[data-bs-target="#navChild"]');
-    if (subChild) {
-      const ChildtabInstance = new (window as any).bootstrap.Tab(subChild);
-      ChildtabInstance.show();
-    }
-  }
-  goToSibs(): void {
-    const subSibs = document.querySelector('[data-bs-target="#navSiblings"]');
-    if (subSibs) {
-      const SibstabInstance = new (window as any).bootstrap.Tab(subSibs);
-      SibstabInstance.show();
-    }
-  }
-  goToSpouse(): void {
-    const subSpouse = document.querySelector('[data-bs-target="#navSpouse"]');
-    if (subSpouse) {
-      const SpousetabInstance = new (window as any).bootstrap.Tab(subSpouse);
-      SpousetabInstance.show();
-    }
-  }
-  goToEmploy(): void {
-    const subEmploy = document.querySelector('[data-bs-target="#EmployHisto"]');
-    if (subEmploy) {
-      const EmploytabInstance = new (window as any).bootstrap.Tab(subEmploy);
-      EmploytabInstance.show();
-    }
-  }
-  gotoAppHisto(): void {
-    const subAppHisto = document.querySelector('[data-bs-target="#ApplicationHisto"]');
-    if (subAppHisto) {
-      const ApptabInstance = new (window as any).bootstrap.Tab(subAppHisto);
-      ApptabInstance.show();
-    }
-  }
-  goToPatientDashboard() {
-    this.router.navigate(['/patientDashboard']);
-  }
-  goToSelectedApp(patientCode: string): void {
-    this.router.navigate(['/application', patientCode]).then(() => {
-      alert(`Selected Patient Code: ${patientCode}`);
-    });
 }
-}
-
-

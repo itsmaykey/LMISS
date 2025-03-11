@@ -50,7 +50,7 @@ export class PatientSpouseFormService {
          if (patientSpouseForm.valid) {
            const patientSpouseFormData = patientSpouseForm.value;
            console.log('Submitting patient school form:', patientSpouseFormData);
-           this.applicationdashboardService.postPatientParentData(patientSpouseFormData).subscribe({
+           this.applicationdashboardService.postPatientSpouseData(patientSpouseFormData).subscribe({
              next: (response) => {
                console.log('Parents Data Saved successfully:', response);
                alert('Parents Data Saved successfully');

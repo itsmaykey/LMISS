@@ -71,9 +71,9 @@ constructor(private http: HttpClient) { }
   getExistedPatientSpouseData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientSpouse?patientCode=${patientCode}`);
   }
-getExistedPatientSiblingData(patientCode: string) {
+  getExistedPatientSiblingData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientSiblings?patientCode=${patientCode}`);
-}
+  }
 
 
   }
