@@ -54,14 +54,10 @@ constructor(private http: HttpClient) { }
   postPatientSpouseData(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSpouseData`, data);
   }
-<<<<<<< HEAD
   postPatientSiblingData(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSiblingData`, data);
     }
 //forExistedPatientDATA
-=======
-//forExistedPatientData
->>>>>>> origin/SpouseBranch
   getExistedPatientData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}`);
   }
