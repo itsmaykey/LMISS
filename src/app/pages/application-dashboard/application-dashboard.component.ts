@@ -1,15 +1,16 @@
 
-import { PatientFormService } from './../../pages/application-dashboard/ScriptForms/patient-form.service';
+
+import { PatientFormService } from './ScriptForms/patient-form/patient-form.service';
 import { Component, inject, OnInit } from '@angular/core';
 import { ApplicationDashboardService } from './service/application-dashboard.service';
 import { AuthService } from '../../Admin/Auth/AuthService';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SchoolFormService } from './ScriptForms/school-form.service';
-import { PatientParentFormService } from './ScriptForms/patient-parent-form.service';
+import { SchoolFormService } from './ScriptForms/patient-SchoolForm/school-form.service';
+import { PatientParentFormService } from './ScriptForms/patient-ParentForm/patient-parent-form.service';
 import { formatDate } from '@angular/common';
-import { PatientSpouseFormService } from './ScriptForms/patient-spouse-form.service';
-
+import { PatientSpouseFormService } from './ScriptForms/patient-SpouseForm/patient-spouse-form.service';
+import { SiblingsFormService } from './ScriptForms/siblings-form.service';
 @Component({
   selector: 'app-application-dashboard',
   templateUrl: './application-dashboard.component.html',
@@ -21,6 +22,9 @@ export class ApplicationDashboardComponent {
   patientForm!: FormGroup;
   patientSchoolForm!: FormGroup;
   patientSpouseForm!: FormGroup;
+  patientSiblingsForm!: FormGroup;
+  siblings!: FormArray;
+
 
   ExistedPatient: any = [];
   ExistedPatientSchool: any = [];
@@ -55,8 +59,9 @@ ExistedPatientCode = '';
     private patientParentFormService: PatientParentFormService,
     private service: ApplicationDashboardService,
     private schoolFormService:SchoolFormService,
-    private patientSpouseFormService:PatientSpouseFormService
-  
+    private patientSpouseFormService:PatientSpouseFormService,
+    private siblingsFormService: SiblingsFormService,
+
   ) {}
 
 
@@ -85,11 +90,14 @@ ChckExisted(): void {
     this.ExistedPatientSchoolData(patientCode);
     this.ExistedPatientParentData(patientCode);
     this.getExistedPatientSpouseData(patientCode);
+    this.getExistedPatientSiblingData(patientCode);
     } else {
       this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
       this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientCode);
       this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode);
       this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode);
+      this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode);
+        this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
     }
   });
 }
@@ -101,11 +109,11 @@ ExistedPatientData(patientCode: string): void {
       if (this.ExistedPatient.length > 0) {
         const birthDateValue = new Date(this.ExistedPatient[0].birthdate);
         if (!isNaN(birthDateValue.getTime())) {
-          this.ExistedPatient[0].birthdate = birthDateValue.toISOString().split('T')[0]; 
+          this.ExistedPatient[0].birthdate = birthDateValue.toISOString().split('T')[0];
         } else {
           console.error('Invalid birthdate format:', this.ExistedPatient[0].birthdate);
         }
-        
+
         this.patientForm = this.patientFormService.createPatientForm(this.userInfo, this.ExistedPatient[0]);
         this.service.getBrgy(this.ExistedPatient[0].citymunCode).subscribe({
           next: (response) => {
@@ -167,7 +175,7 @@ ExistedPatientParentData(patientCode: string): void {
      this.ExistedPatientParent = response;
      console.log('ExistedPatientParent:', this.ExistedPatientParent);
      if (this.ExistedPatientParent.length > 0) {
-      
+
        this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode, this.ExistedPatientParent[0]);
      }
      else {
@@ -188,7 +196,7 @@ getExistedPatientSpouseData(patientCode: string): void {
      this.ExistedPatientSpouse = response;
      console.log('ExistedPatientSpouse:', this.ExistedPatientSpouse);
      if (this.ExistedPatientSpouse.length > 0) {
-      
+
        this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode, this.ExistedPatientSpouse[0]);
      }
      else {
@@ -201,6 +209,23 @@ getExistedPatientSpouseData(patientCode: string): void {
    },
 
  });
+}
+getExistedPatientSiblingData(patientCode: string): void {
+  this.siblingsFormService.getExistedPatientSiblingData(patientCode).subscribe({
+    next: (response) => {
+      if (response.length > 0) {
+        this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(patientCode, response[0]);
+      } else {
+        this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(patientCode);
+      }
+      this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
+    },
+    error: (error) => {
+      console.error('Error:', error);
+      this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(patientCode);
+      this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
+    },
+  });
 }
   fetchAdditionalData(): void {
     this.service.getDrugEffect().subscribe({
@@ -278,13 +303,37 @@ patientFormSubmit(): void {
 }
 patientParentFormSubmit(): void {
   this.patientParentFormService.submitPatientParentForm(this.patientParentForm);
-} 
+}
 patientSchoolFormSubmit(): void {
   this.schoolFormService.submitPatientSchoolForm(this.patientSchoolForm);
 }
 patientSpouseFormSubmit(): void {
   this.patientSpouseFormService.submitPatientSpouseForm(this.patientSpouseForm);
 }
+patientSiblingsFormSubmit(): void {
+  if (this.patientSiblingsForm.valid) {
+    this.siblingsFormService.submitPatientSiblingForm(this.patientSiblingsForm.value).subscribe({
+      next: (response) => {
+        console.log('Patient Sibling Form submitted successfully:', response);
+      },
+      error: (error) => {
+        console.error('Error submitting Patient Sibling Form:', error);
+      }
+    });
+  } else {
+    console.error('Patient Sibling Form is invalid');
+  }
+}
+siblingsaddRow(): void {
+  this.siblings.push(this.siblingsFormService.createSiblingFormGroup());
+}
+
+
+
+
+
+
+
   onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
     const checkbox = event.target as HTMLInputElement;
     admissionType.selected = checkbox.checked;
@@ -324,14 +373,14 @@ patientSpouseFormSubmit(): void {
   onMunicipalityChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     this.onChangeCitymunCode = selectElement.value;
-    
+
     console.log('Municipality changed to:', this.onChangeCitymunCode);
-  
+
     // Check if existing patient data should be used
     if (this.ExistedPatient.length > 0 && this.ExistedPatient[0].citymunCode) {
       this.onChangeCitymunCode = this.ExistedPatient[0].citymunCode;
     }
-  
+
     // Fetch barangays based on the selected municipality
     this.service.getBrgy(this.onChangeCitymunCode).subscribe({
       next: (response) => {
@@ -342,18 +391,18 @@ patientSpouseFormSubmit(): void {
         console.error('Error fetching barangays:', error);
       },
     });
-  } 
-  
+  }
+
   onBarangayChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     this.onChangeBarangay = selectElement.value;
-  
+
     console.log('Barangay changed to:', this.onChangeBarangay);
-  
+
     if (this.ExistedPatient.length > 0 && this.ExistedPatient[0].brgyCode) {
       this.onChangeBarangay = this.ExistedPatient[0].brgyCode;
     }
-  
+
     this.service.getprk(this.onChangeBarangay).subscribe({
       next: (response) => {
         this.prk = response;
@@ -363,30 +412,30 @@ patientSpouseFormSubmit(): void {
         console.error('Error fetching puroks:', error);
       },
     });
-  } 
-  
-
-  siblings: any[] = [
-    {
-      name: '',
-      age: '',
-      sex: '',
-      civilStatus: '',
-      occupation: '',
-      education: '',
-    },
-  ];
-
-  siblingsaddRow() {
-    this.siblings.push({
-      name: '',
-      age: '',
-      sex: '',
-      civilStatus: '',
-      occupation: '',
-      education: '',
-    });
   }
+
+
+  // siblings: any[] = [
+  //   {
+  //     name: '',
+  //     age: '',
+  //     sex: '',
+  //     civilStatus: '',
+  //     occupation: '',
+  //     education: '',
+  //   },
+  // ];
+
+  // siblingsaddRow() {
+  //   this.siblings.push({
+  //     name: '',
+  //     age: '',
+  //     sex: '',
+  //     civilStatus: '',
+  //     occupation: '',
+  //     education: '',
+  //   });
+  // }
 
   childrens: any[] = [
     {

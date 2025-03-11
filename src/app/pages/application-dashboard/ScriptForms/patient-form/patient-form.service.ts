@@ -2,7 +2,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ApplicationDashboardService } from '../service/application-dashboard.service';
+import { ApplicationDashboardService } from '../../service/application-dashboard.service';
 import { OnInit } from '@angular/core';
 
 @Injectable({
