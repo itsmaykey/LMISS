@@ -67,16 +67,7 @@ constructor(private http: HttpClient) { }
   }getExistedPatientSpouseData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientSpouse?patientCode=${patientCode}`);
   }
-  // postPatientData(data: any): Observable<any> {
-  //   return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientData`, data)
-  //     .pipe(
-  //       catchError((error: HttpErrorResponse) => {
-  //         console.error('Error Status:', error.status);
-  //         console.error('Error Message:', error.message);
-  //         console.error('Error Response:', error.error);
-  //         return throwError(error);
-  //       })
-  //     );
+
 
 
 
