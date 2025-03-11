@@ -54,14 +54,10 @@ constructor(private http: HttpClient) { }
   postPatientSpouseData(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSpouseData`, data);
   }
-<<<<<<< HEAD
   postPatientSiblingData(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSiblingData`, data);
-  }
-//forExistedPatient
-=======
+    }
 //forExistedPatientDATA
->>>>>>> origin/postFamilyHistory
   getExistedPatientData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}`);
   }
@@ -71,28 +67,13 @@ constructor(private http: HttpClient) { }
   getExistedPatientParentData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientParent?patientCode=${patientCode}`);
 
-  }getExistedPatientSpouseData(patientCode: string) {
+  }
+  getExistedPatientSpouseData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientSpouse?patientCode=${patientCode}`);
   }
-<<<<<<< HEAD
-  getExistedPatientSiblingData(patientCode: string) {
+getExistedPatientSiblingData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientSiblings?patientCode=${patientCode}`);
-  }
-
-  // postPatientData(data: any): Observable<any> {
-  //   return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientData`, data)
-  //     .pipe(
-  //       catchError((error: HttpErrorResponse) => {
-  //         console.error('Error Status:', error.status);
-  //         console.error('Error Message:', error.message);
-  //         console.error('Error Response:', error.error);
-  //         return throwError(error);
-  //       })
-  //     );
-=======
-
->>>>>>> origin/postFamilyHistory
-
+}
 
 
   }
