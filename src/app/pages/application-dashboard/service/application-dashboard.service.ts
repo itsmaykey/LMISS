@@ -51,6 +51,9 @@ constructor(private http: HttpClient) { }
   postPatientParentData(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientParentData`, data);
   }
+  postPatientSpouseData(data: any) {
+    return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSpouseData`, data);
+  }
 //forExistedPatient
   getExistedPatientData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}`);
@@ -60,6 +63,9 @@ constructor(private http: HttpClient) { }
   }
   getExistedPatientParentData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientParent?patientCode=${patientCode}`);
+    
+  }getExistedPatientSpouseData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientSpouse?patientCode=${patientCode}`);
   }
   // postPatientData(data: any): Observable<any> {
   //   return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientData`, data)

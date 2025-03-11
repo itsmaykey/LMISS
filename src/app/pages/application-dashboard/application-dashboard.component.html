@@ -387,7 +387,13 @@
         </div>
 
           <div class="tab-pane fade" id="navSpouse" role="tabpanel">
+            <div *ngIf="patientSpouseForm" >
+              <form [formGroup]="patientSpouseForm" (ngSubmit)="patientSpouseFormSubmit()">
             <div class="card-body pt-4">
+              <div class="col-md-3" hidden>
+                <label for="lname" class="form-label">Patient Code</label>
+                <input class="form-control" type="text" formControlName="patientCode">
+              </div>
               <div class="row g-4">
                    <div class="row">
                 <div class="col-md-8">
@@ -420,9 +426,12 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-8">
-                  <label for="Attainment" class="form-label">Educational Attainment</label>
-                  <input class="form-control" type="text" name="Attainment" formControlName="" id="Attainment" placeholder="Enter Educational Attainment" >
+                <div class="col-md-3">
+                  <label for="spouseEduID" class="form-label">Educational Attainment</label>
+                  <select class="select2 form-select" formControlName="spouseEduID">
+                    <option value="" disabled selected>Select</option>
+                    <option *ngFor="let x of educationalAttainment" [value]="x.edu_ID">{{x.edu_Name}}</option>
+                  </select>
                 </div>
                 <div class="col-md-2">
                   <label for="Income" class="form-label">Income</label>
@@ -449,6 +458,8 @@
                 </button>
             </div>
           </div>
+      </form>
+        </div>
           </div>
           <div class="tab-pane fade" id="navSiblings" role="tabpanel">
             <div class="card-body pt-4">

@@ -8,6 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SchoolFormService } from './ScriptForms/school-form.service';
 import { PatientParentFormService } from './ScriptForms/patient-parent-form.service';
 import { formatDate } from '@angular/common';
+import { PatientSpouseFormService } from './ScriptForms/patient-spouse-form.service';
 
 @Component({
   selector: 'app-application-dashboard',
@@ -19,10 +20,12 @@ export class ApplicationDashboardComponent {
   patientParentForm!: FormGroup;
   patientForm!: FormGroup;
   patientSchoolForm!: FormGroup;
+  patientSpouseForm!: FormGroup;
 
   ExistedPatient: any = [];
   ExistedPatientSchool: any = [];
   ExistedPatientParent:any = [];
+  ExistedPatientSpouse:any = [];
   userInfo: any;
 
   admissionType: any = [];
@@ -51,7 +54,8 @@ ExistedPatientCode = '';
     private patientFormService: PatientFormService,
     private patientParentFormService: PatientParentFormService,
     private service: ApplicationDashboardService,
-    private schoolFormService:SchoolFormService
+    private schoolFormService:SchoolFormService,
+    private patientSpouseFormService:PatientSpouseFormService
   
   ) {}
 
@@ -80,10 +84,12 @@ ChckExisted(): void {
     this.ExistedPatientData(patientCode);
     this.ExistedPatientSchoolData(patientCode);
     this.ExistedPatientParentData(patientCode);
+    this.getExistedPatientSpouseData(patientCode);
     } else {
       this.patientForm = this.patientFormService.createPatientForm(this.userInfo);
       this.patientSchoolForm = this.schoolFormService.createPatientSchoolForm(this.ExistedPatientCode);
       this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode);
+      this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode);
     }
   });
 }
@@ -175,6 +181,27 @@ ExistedPatientParentData(patientCode: string): void {
 
  });
 }
+getExistedPatientSpouseData(patientCode: string): void {
+  //getExistedPatientSpouseData
+  this.service.getExistedPatientSpouseData(patientCode).subscribe({
+   next: (response) => {
+     this.ExistedPatientSpouse = response;
+     console.log('ExistedPatientSpouse:', this.ExistedPatientSpouse);
+     if (this.ExistedPatientSpouse.length > 0) {
+      
+       this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode, this.ExistedPatientSpouse[0]);
+     }
+     else {
+       this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode);
+     }
+   },
+   error: (error) => {
+     console.error('Error:', error);
+     this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientSpouse[0]);
+   },
+
+ });
+}
   fetchAdditionalData(): void {
     this.service.getDrugEffect().subscribe({
       next: (response) => {
@@ -255,7 +282,9 @@ patientParentFormSubmit(): void {
 patientSchoolFormSubmit(): void {
   this.schoolFormService.submitPatientSchoolForm(this.patientSchoolForm);
 }
-
+patientSpouseFormSubmit(): void {
+  this.patientSpouseFormService.submitPatientSpouseForm(this.patientSpouseForm);
+}
   onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
     const checkbox = event.target as HTMLInputElement;
     admissionType.selected = checkbox.checked;
