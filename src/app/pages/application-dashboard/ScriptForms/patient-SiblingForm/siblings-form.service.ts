@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { ApplicationDashboardService } from '../service/application-dashboard.service';
+import { ApplicationDashboardService } from '../../service/application-dashboard.service';
 
 @Injectable({
   providedIn: 'root'
@@ -28,9 +28,11 @@ export class SiblingsFormService {
       siblingSexId: [siblingData.siblingSexId || '', Validators.required],
       siblingCivilStatusId: [siblingData.siblingCivilStatusId || '', Validators.required],
       siblingOccupation: [siblingData.siblingOccupation || '', Validators.required],
-      siblingEducationAttainment: [siblingData.siblingEducationAttainment || '', Validators.required]
+      siblingEducationAttainment: [siblingData.siblingEducationAttainment || '', Validators.required],
+      siblingCode: [siblingData.siblingCode || '']
     });
   }
+
 
   submitPatientSiblingForm(siblingFormData: any): Observable<any> {
     const formattedData = {
@@ -43,7 +45,7 @@ export class SiblingsFormService {
         siblingCivilStatusId: sibling.siblingCivilStatusId,
         siblingOccupation: sibling.siblingOccupation,
         siblingEducationAttainment: sibling.siblingEducationAttainment,
-        siblingCode: ''
+        siblingCode: sibling.siblingCode === '' ? '' : sibling.siblingCode
       }))
     };
     return this.applicationdashboardService.postPatientSiblingData(formattedData);

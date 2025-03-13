@@ -8,7 +8,7 @@ import { SchoolFormService } from './ScriptForms/patient-SchoolForm/school-form.
 import { PatientParentFormService } from './ScriptForms/patient-ParentForm/patient-parent-form.service';
 import { formatDate } from '@angular/common';
 import { PatientSpouseFormService } from './ScriptForms/patient-SpouseForm/patient-spouse-form.service';
-import { SiblingsFormService } from './ScriptForms/siblings-form.service';
+import { SiblingsFormService } from './ScriptForms/patient-SiblingForm/siblings-form.service';
 
 @Component({
   selector: 'app-application-dashboard',
@@ -291,7 +291,9 @@ export class ApplicationDashboardComponent implements OnInit {
   }
 
   patientSiblingsFormSubmit(): void {
-    if (this.patientSiblingsForm.valid) {
+    console.log(this.patientParentForm.valid);
+    if (this.patientSiblingsForm.value) {
+
       this.siblingsFormService.submitPatientSiblingForm(this.patientSiblingsForm.value).subscribe({
         next: (response) => {
           console.log('Patient Sibling Form submitted successfully:', response);
