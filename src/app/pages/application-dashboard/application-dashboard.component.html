@@ -86,7 +86,7 @@
                         <select formControlName="sex" class="select2 form-select">
                           <option value="" selected disabled>Select</option>
                           <option value=1>Male</option>
-                          <option value=0>Female</option>
+                          <option value=2>Female</option>
                         </select>
                       </div>
                       <div class="col-md-2">
@@ -473,7 +473,7 @@
                         <thead>
                           <tr>
                             <th>Siblings Name</th>
-                            <th>Age</th>
+                            <th>Birthdate</th>
                             <th>Sex</th>
                             <th>Civil<br>Status</th>
                             <th>Occupation</th>
@@ -485,18 +485,15 @@
                           <tr *ngFor="let sibling of siblings.controls; let i = index" [formGroupName]="i">
 
                             <td><input class="form-control" type="text" formControlName="siblingName" placeholder="Enter Last Name" required></td>
-                            <td style="width: 8%;"><input class="form-control" type="text" formControlName="siblingAge" placeholder="Age" required></td>
+                            <td style="width: 8%;"> <input type="date" class="form-control" formControlName="siblingBirthDate" placeholder="Enter Birthdate"></td>
                             <td style="width: 10%;"><select class="select2 form-select" formControlName="siblingSexId">
                               <option value="" selected disabled>Select</option>
-                              <option value="1">Male</option>
-                              <option value="0">Female</option>
+                              <option value=1>Male</option>
+                              <option value=2>Female</option>
                             </select></td>
                             <td style="width: 10%;"><select class="select2 form-select" formControlName="siblingCivilStatusId">
                               <option value="" disabled selected>Select</option>
-                              <option value="1">Single</option>
-                              <option value="2">Married</option>
-                              <option value="3">Divorced</option>
-                              <option value="4">Widowed</option>
+                              <option *ngFor="let x of civilStatus" [value]="x.civ_ID">{{x.civ_Name}}</option>
                             </select></td>
                             <td style="width: 15%;"><input class="form-control" type="text" formControlName="siblingOccupation" placeholder="Enter Occupation" required></td>
                             <td style="width: 15%;"><input class="form-control" type="text" formControlName="siblingEducationAttainment" placeholder="Enter Educational Attainment" required></td>
@@ -525,60 +522,64 @@
           </div>
         </div>
           <div class="tab-pane fade" id="navChild" role="tabpanel">
-            <form>
-              <div class="card-body pt-4">
-                <div class="row g-4">
-                  <div class="row">
-                    <div class="col-md-12">
-                      <table class="table table-bordered" id="ChildrensTable">
-                        <thead>
-                          <tr>
-                            <th>Childrens Name</th>
-                            <th>Age</th>
-                            <th>Sex</th>
-                            <th>Civil<br>Status</th>
-                            <th>Occupation</th>
-                            <th>Educational<br>Attainment</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr *ngFor="let children of childrens">
-                            <td><input class="form-control" type="text" [(ngModel)]="children.name" name="childrenName" placeholder="Enter Last Name" required></td>
-                            <td style="width: 8%;"><input class="form-control" type="text" [(ngModel)]="children.age" name="childrenAge" placeholder="Age" required></td>
-                            <td style="width: 10%;"><select class="select2 form-select" [(ngModel)]="children.sex" name="childrenSex">
-                              <option value="">Select</option>
-                              <option value="1">Male</option>
-                              <option value="0">Female</option>
-                            </select></td>
-                            <td style="width: 10%;"><select class="select2 form-select" [(ngModel)]="children.civilStatus" name="childrenCivilStatus">
-                              <option value="">Select</option>
-                              <option value="1">Single</option>
-                              <option value="2">Married</option>
-                              <option value="3">Divorced</option>
-                              <option value="4">Widowed</option>
-                            </select></td>
-                            <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="children.occupation" name="childrenOccupation" placeholder="Enter Occupation" required></td>
-                            <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="children.education" name="childrenEducation" placeholder="Enter Educational Attainment" required></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <br>
-                      <button type="button" class="btn btn-secondary" (click)="childrensaddRow()">Add Row</button>
+            <div *ngIf="patientChildrenForm" >
+
+              <form [formGroup]="patientChildrenForm" (ngSubmit)="patientChildrenFormSubmit()">
+                <div class="card-body pt-4">
+                  <div class="row g-4">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <table class="table table-bordered" id="ChildrenTable">
+                          <thead>
+                            <tr>
+                              <th>Children Name</th>
+                              <th>Birthdate</th>
+                              <th>Sex</th>
+                              <th>Civil<br>Status</th>
+                              <th>Occupation</th>
+                              <th>Educational<br>Attainment</th>
+                              <th>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody formArrayName="childrens">
+                            <tr *ngFor="let children of childrens.controls; let i = index" [formGroupName]="i">
+
+                              <td><input class="form-control" type="text" formControlName="childName" placeholder="Enter Last Name" required></td>
+                              <td style="width: 8%;"> <input type="date" class="form-control" formControlName="childBirthDate" placeholder="Enter Birthdate"></td>
+                              <td style="width: 10%;"><select class="select2 form-select" formControlName="childSexId">
+                                <option value="" selected disabled>Select</option>
+                                <option value=1>Male</option>
+                                <option value=2>Female</option>
+                              </select></td>
+                              <td style="width: 10%;"><select class="select2 form-select" formControlName="childCivilStatusId">
+                                <option value="" disabled selected>Select</option>
+                                <option *ngFor="let x of civilStatus" [value]="x.civ_ID">{{x.civ_Name}}</option>
+                              </select></td>
+                              <td style="width: 15%;"><input class="form-control" type="text" formControlName="childOccupation" placeholder="Enter Occupation" required></td>
+                              <td style="width: 15%;"><input class="form-control" type="text" formControlName="childEducationAttainment" placeholder="Enter Educational Attainment" required></td>
+                              <td hidden style="width: 15%;"><input class="form-control" type="text" formControlName="childrenCode" ></td>
+                              <td><button type="button" class="btn btn-danger" (click)="removechildren(i)">Remove</button></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        <button type="button" class="btn btn-secondary" (click)="addchildren()">Add Row</button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <hr>
-                <div class="mt-6">
-                  <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-                  <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-                </div>
-                <div class="card-footer text-end">
-                  <button type="button" class="btn btn-secondary text-white me-2" (click)="goToEmploy()">
+                  <hr>
+                  <div class="mt-6">
+                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                  </div>
+                  <div class="card-footer text-end">
+                    <button type="button" class="btn btn-secondary text-white me-2" (click)="goToChild()">
                       Next
-                  </button>
-              </div>
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
-            </form>
 
           </div>
         </div>

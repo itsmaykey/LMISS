@@ -2,14 +2,14 @@ import { PatientFormService } from './ScriptForms/patient-form/patient-form.serv
 import { Component, OnInit } from '@angular/core';
 import { ApplicationDashboardService } from './service/application-dashboard.service';
 import { AuthService } from '../../Admin/Auth/AuthService';
-import { FormArray, FormGroup } from '@angular/forms';
+import { Form, FormArray, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SchoolFormService } from './ScriptForms/patient-SchoolForm/school-form.service';
 import { PatientParentFormService } from './ScriptForms/patient-ParentForm/patient-parent-form.service';
 import { formatDate } from '@angular/common';
 import { PatientSpouseFormService } from './ScriptForms/patient-SpouseForm/patient-spouse-form.service';
 import { SiblingsFormService } from './ScriptForms/patient-SiblingForm/siblings-form.service';
-
+import { ChildrensFormService } from './ScriptForms/patient-childrenForm/childrens-form.service';
 @Component({
   selector: 'app-application-dashboard',
   templateUrl: './application-dashboard.component.html',
@@ -21,6 +21,7 @@ export class ApplicationDashboardComponent implements OnInit {
   patientSchoolForm!: FormGroup;
   patientSpouseForm!: FormGroup;
   patientSiblingsForm!: FormGroup;
+  patientChildrenForm!: FormGroup;
   //siblings!: FormArray;
 
   ExistedPatient: any = [];
@@ -28,6 +29,7 @@ export class ApplicationDashboardComponent implements OnInit {
   ExistedPatientParent: any = [];
   ExistedPatientSpouse: any = [];
   ExistedPatientSibling: any = [];
+  ExistedPatientChildren: any = [];
   userInfo: any;
 
   admissionType: any = [];
@@ -54,7 +56,8 @@ export class ApplicationDashboardComponent implements OnInit {
     private service: ApplicationDashboardService,
     private schoolFormService: SchoolFormService,
     private patientSpouseFormService: PatientSpouseFormService,
-    private siblingsFormService: SiblingsFormService
+    private siblingsFormService: SiblingsFormService,
+    private childrenFormService: ChildrensFormService
   ) {}
 
   ngOnInit(): void {
@@ -81,6 +84,7 @@ export class ApplicationDashboardComponent implements OnInit {
     this.loadExistedPatientParentData(patientCode);
     this.loadExistedPatientSpouseData(patientCode);
     this.loadExistedPatientSiblingsData(patientCode);
+    this.loadExistedPatientChildrensData(patientCode);
   }
 
   initializeForms(): void {
@@ -89,6 +93,7 @@ export class ApplicationDashboardComponent implements OnInit {
     this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode);
     this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode);
     this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode);
+    this.patientChildrenForm = this.childrenFormService.createPatientChildrenForm(this.ExistedPatientCode);
     // this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
   }
 
@@ -191,6 +196,12 @@ export class ApplicationDashboardComponent implements OnInit {
         this.ExistedPatientSibling = response;
         console.log(this.ExistedPatientSibling);
         if (this.ExistedPatientSibling.length > 0) {
+          this.ExistedPatientSibling.forEach((sibling: any) => {
+            const birthDateValue = new Date(sibling.siblingBirthDate);
+            if (!isNaN(birthDateValue.getTime())) {
+              sibling.siblingBirthDate = birthDateValue.toISOString().split('T')[0];
+            }
+          });
           this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode, { siblings: this.ExistedPatientSibling });
         } else {
           this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode);
@@ -198,6 +209,28 @@ export class ApplicationDashboardComponent implements OnInit {
       },
       error: () => {
         this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode);
+      },
+    });
+  }
+  loadExistedPatientChildrensData(patientCode: string): void {
+    this.service.getExistedPatientChildrenData(patientCode).subscribe({
+      next: (response) => {
+        this.ExistedPatientChildren = response;
+        console.log(this.ExistedPatientChildren);
+        if (this.ExistedPatientChildren.length > 0) {
+          this.ExistedPatientChildren.forEach((children: any) => {
+            const birthDateValue = new Date(children.childBirthDate);
+            if (!isNaN(birthDateValue.getTime())) {
+              children.childBirthDate = birthDateValue.toISOString().split('T')[0];
+            }
+          });
+          this.patientChildrenForm = this.childrenFormService.createPatientChildrenForm(this.ExistedPatientCode, { childrens: this.ExistedPatientChildren });
+        } else {
+          this.patientChildrenForm = this.childrenFormService.createPatientChildrenForm(this.ExistedPatientCode);
+        }
+      },
+      error: () => {
+        this.patientChildrenForm = this.childrenFormService.createPatientChildrenForm(this.ExistedPatientCode);
       },
     });
   }
@@ -317,6 +350,37 @@ export class ApplicationDashboardComponent implements OnInit {
   removeSibling(index: number): void {
     this.siblings.removeAt(index);
   }
+
+
+  patientChildrenFormSubmit(): void {
+
+    if (this.patientChildrenForm.value) {
+
+      this.childrenFormService.submitPatientChildrenForm(this.patientChildrenForm.value).subscribe({
+        next: (response) => {
+          console.log('Patient children Form submitted successfully:', response);
+        },
+        error: (error) => {
+          console.error('Error submitting Patient children Form:', error);
+        },
+      });
+    } else {
+      console.error('Patient children Form is invalid');
+    }
+  }
+  get childrens(): FormArray {
+    return this.patientChildrenForm.get('childrens') as FormArray;
+  }
+
+  addchildren(): void {
+    this.childrens.push(this.childrenFormService.createChildrenFormGroup());
+  }
+
+  removechildren(index: number): void {
+    this.childrens.removeAt(index);
+  }
+
+
 
   // Event handlers
   onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
@@ -448,27 +512,7 @@ export class ApplicationDashboardComponent implements OnInit {
     }
   }
 
-  childrens: any[] = [
-    {
-      name: '',
-      age: '',
-      sex: '',
-      civilStatus: '',
-      occupation: '',
-      education: '',
-    },
-  ];
 
-  childrensaddRow() {
-    this.childrens.push({
-      name: '',
-      age: '',
-      sex: '',
-      civilStatus: '',
-      occupation: '',
-      education: '',
-    });
-  }
   employments: any[] = [{ epd: '', nca: '', addr: '', pos: '' }];
   employmentsaddRow() {
     this.employments.push({ epd: '', nca: '', addr: '', pos: '' });

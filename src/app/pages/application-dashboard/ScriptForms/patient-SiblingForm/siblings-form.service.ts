@@ -24,7 +24,7 @@ export class SiblingsFormService {
   createSiblingFormGroup(siblingData: any = {}): FormGroup {
     return this.fb.group({
       siblingName: [siblingData.siblingName || '', Validators.required],
-      siblingAge: [siblingData.siblingAge || '', Validators.required],
+      siblingBirthDate: [siblingData.siblingBirthDate || '', Validators.required],
       siblingSexId: [siblingData.siblingSexId || '', Validators.required],
       siblingCivilStatusId: [siblingData.siblingCivilStatusId || '', Validators.required],
       siblingOccupation: [siblingData.siblingOccupation || '', Validators.required],
@@ -40,7 +40,7 @@ export class SiblingsFormService {
         recNo: 0,
         patientCode: siblingFormData.patientCode,
         siblingName: sibling.siblingName,
-        siblingAge: sibling.siblingAge,
+        siblingBirthDate: sibling.siblingBirthDate,
         siblingSexId: sibling.siblingSexId,
         siblingCivilStatusId: sibling.siblingCivilStatusId,
         siblingOccupation: sibling.siblingOccupation,
