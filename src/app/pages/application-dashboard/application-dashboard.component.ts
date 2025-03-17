@@ -10,6 +10,7 @@ import { formatDate } from '@angular/common';
 import { PatientSpouseFormService } from './ScriptForms/patient-SpouseForm/patient-spouse-form.service';
 import { SiblingsFormService } from './ScriptForms/patient-SiblingForm/siblings-form.service';
 import { ChildrensFormService } from './ScriptForms/patient-childrenForm/childrens-form.service';
+import { EmploymentFormService } from './ScriptForms/patientEmploymentForm/employment-form.service';
 @Component({
   selector: 'app-application-dashboard',
   templateUrl: './application-dashboard.component.html',
@@ -21,6 +22,7 @@ export class ApplicationDashboardComponent implements OnInit {
   patientSchoolForm!: FormGroup;
   patientSpouseForm!: FormGroup;
   patientSiblingsForm!: FormGroup;
+  patientEmploymentForm!: FormGroup;
   patientChildrenForm!: FormGroup;
   //siblings!: FormArray;
 
@@ -30,6 +32,7 @@ export class ApplicationDashboardComponent implements OnInit {
   ExistedPatientSpouse: any = [];
   ExistedPatientSibling: any = [];
   ExistedPatientChildren: any = [];
+  ExistedPatientEmployee: any = [];
   userInfo: any;
 
   admissionType: any = [];
@@ -57,7 +60,8 @@ export class ApplicationDashboardComponent implements OnInit {
     private schoolFormService: SchoolFormService,
     private patientSpouseFormService: PatientSpouseFormService,
     private siblingsFormService: SiblingsFormService,
-    private childrenFormService: ChildrensFormService
+    private childrenFormService: ChildrensFormService,
+    private employeeFormService: EmploymentFormService
   ) {}
 
   ngOnInit(): void {
@@ -85,6 +89,7 @@ export class ApplicationDashboardComponent implements OnInit {
     this.loadExistedPatientSpouseData(patientCode);
     this.loadExistedPatientSiblingsData(patientCode);
     this.loadExistedPatientChildrensData(patientCode);
+    this.loadExistedPatientEmployeeData(patientCode);
   }
 
   initializeForms(): void {
@@ -93,6 +98,7 @@ export class ApplicationDashboardComponent implements OnInit {
     this.patientParentForm = this.patientParentFormService.createPatientParentForm(this.ExistedPatientCode);
     this.patientSpouseForm = this.patientSpouseFormService.createPatientSpouseForm(this.ExistedPatientCode);
     this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode);
+    this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode);
     this.patientChildrenForm = this.childrenFormService.createPatientChildrenForm(this.ExistedPatientCode);
     // this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
   }
@@ -234,6 +240,26 @@ export class ApplicationDashboardComponent implements OnInit {
       },
     });
   }
+  loadExistedPatientEmployeeData(patientCode: string): void {
+    this.service.getExistedPatientEmploymentData(patientCode).subscribe({
+      next: (response) => {
+        this.ExistedPatientEmployee = response;
+        console.log(this.ExistedPatientEmployee);
+        if (this.ExistedPatientEmployee.length > 0) {
+          this.ExistedPatientEmployee.forEach((employ: any) => {
+       
+          
+          });
+          this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode, { employs: this.ExistedPatientChildren });
+        } else {
+          this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode);
+        }
+      },
+      error: () => {
+        this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode);
+      },
+    });
+  }
 
   fetchAdditionalData(): void {
     this.service.getDrugEffect().subscribe({
@@ -330,15 +356,18 @@ export class ApplicationDashboardComponent implements OnInit {
       this.siblingsFormService.submitPatientSiblingForm(this.patientSiblingsForm.value).subscribe({
         next: (response) => {
           console.log('Patient Sibling Form submitted successfully:', response);
+        
         },
         error: (error) => {
           console.error('Error submitting Patient Sibling Form:', error);
+          
         },
       });
     } else {
       console.error('Patient Sibling Form is invalid');
     }
   }
+  
   get siblings(): FormArray {
     return this.patientSiblingsForm.get('siblings') as FormArray;
   }
@@ -380,6 +409,33 @@ export class ApplicationDashboardComponent implements OnInit {
     this.childrens.removeAt(index);
   }
 
+  patientEmployeeFormSubmit(): void {
+
+    if (this.patientEmploymentForm.value) {
+
+      this.employeeFormService.submitPatientEmployeeForm(this.patientEmploymentForm.value).subscribe({
+        next: (response) => {
+          console.log('Patient employee Form submitted successfully:', response);
+        },
+        error: (error) => {
+          console.error('Error submitting Patient employee Form:', error);
+        },
+      });
+    } else {
+      console.error('Patient employee Form is invalid');
+    }
+  }
+  get employs(): FormArray {
+    return this.patientEmploymentForm.get('employs') as FormArray;
+  }
+
+  addemploy(): void {
+    this.employs.push(this.employeeFormService.createEmployeeFormGroup());
+  }
+
+  removeEmploy(index: number): void {
+    this.employs.removeAt(index);
+  }
 
 
   // Event handlers

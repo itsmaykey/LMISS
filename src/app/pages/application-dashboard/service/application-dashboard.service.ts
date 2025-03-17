@@ -57,6 +57,9 @@ constructor(private http: HttpClient) { }
   postPatientSiblingData(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSiblingData`, data);
     }
+  postPatientEmplymentData(data: any) {
+      return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientEmplymentData`, data);
+      }
     postPatientChildrenData(data: any) {
       return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientChildrenData`, data);
       }
@@ -76,6 +79,9 @@ constructor(private http: HttpClient) { }
   }
   getExistedPatientSiblingData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientSiblings?patientCode=${patientCode}`);
+  }
+  getExistedPatientEmploymentData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientEmployment?patientCode=${patientCode}`);
   }
   getExistedPatientChildrenData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientChildren?patientCode=${patientCode}`);
