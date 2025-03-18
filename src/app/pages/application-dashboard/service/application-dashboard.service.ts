@@ -57,8 +57,8 @@ constructor(private http: HttpClient) { }
   postPatientSiblingData(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSiblingData`, data);
     }
-  postPatientEmplymentData(data: any) {
-      return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientEmplymentData`, data);
+  postPatientEmploymentData(data: any) {
+      return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientEmploymentData`, data);
       }
     postPatientChildrenData(data: any) {
       return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientChildrenData`, data);

@@ -544,7 +544,7 @@
                           <tbody formArrayName="childrens">
                             <tr *ngFor="let children of childrens.controls; let i = index" [formGroupName]="i">
 
-                              <td><input class="form-control" type="text" formControlName="childName" placeholder="Enter Last Name" required></td>
+                              <td><input class="form-control" type="text" formControlName="childName" placeholder="Enter Full Name" required></td>
                               <td style="width: 8%;"> <input type="date" class="form-control" formControlName="childBirthDate" placeholder="Enter Birthdate"></td>
                               <td style="width: 10%;"><select class="select2 form-select" formControlName="childSexId">
                                 <option value="" selected disabled>Select</option>
@@ -586,49 +586,54 @@
       </div>
     </div>
     <div class="tab-pane fade hide" id="EmployHisto" role="tabpanel">
-        <div class="card">
-          <div class="card-header">
-            <h4 class="card-header-title">Employment Record</h4>
-            <hr>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-12">
-                <table class="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th style="width: 15%;">Employment Period Date</th>
-                      <th style="width: 25%;">Name of Company/Agency</th>
-                      <th style="width: 25%;">Address</th>
-                      <th style="width: 15%;">Position / Status</th>
-                      <th style="width: 20%;">Reason for Leaving/Dismissal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let employment of employments">
-                      <td><input class="form-control" type="text" [(ngModel)]="employment.epd" name="employmentEpd" placeholder="Enter Period Date" required></td>
-                      <td><input class="form-control" type="text" [(ngModel)]="employment.nca" name="employmentNca" placeholder="Enter Company Name" required></td>
-                      <td><input class="form-control" type="text" [(ngModel)]="employment.addr" name="employmentAddr" placeholder="Enter Address" required></td>
-                      <td><input class="form-control" type="text" [(ngModel)]="employment.pos" name="employmentPos" placeholder="Enter Position" required></td>
-                      <td><input class="form-control" type="text" [(ngModel)]="employment.reason" name="employmentReason" placeholder="Enter Reason" required></td>
-                    </tr>
-                  </tbody>
-                </table>
-                <button type="button" class="btn btn-secondary mt-3" (click)="employmentsaddRow()">Add Row</button>
-              </div>
-            </div>
-            <hr>
-            <div class="mt-4">
-              <button type="submit" class="btn btn-primary text-white me-2">Save changes</button>
-              <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-            </div>
-          </div>
-           <div class="card-footer text-end">
-           <button type="button" class="btn btn-secondary text-white me-2" (click)="goToSubstanceHisto()">
-           Next
-          </button>
-      </div>
+      <div class="card">
+      <div class="card-header">
+        <h4 class="card-header-title">Employment Record</h4>
+        <hr>
         </div>
+        <div class="card-body">
+          <div *ngIf="patientEmploymentForm" >
+        <form [formGroup]="patientEmploymentForm!" (ngSubmit)="patientEmployeeFormSubmit()">
+          <div class="row">
+          <div class="col-md-12">
+            <table class="table table-bordered">
+            <thead>
+              <tr>
+              <th style="width: 15%;">Employment Period Date</th>
+              <th style="width: 25%;">Name of Company/Agency</th>
+              <th style="width: 25%;">Address</th>
+              <th style="width: 15%;">Position / Status</th>
+              <th style="width: 20%;">Reason for Leaving/Dismissal</th>
+              </tr>
+            </thead>
+            <tbody formArrayName="employs">
+              <tr *ngFor="let employ of employs.controls; let i = index" [formGroupName]="i">
+              <td><input class="form-control" type="text" formControlName="patientEPeriodDate"  name="employmentEpd" placeholder="Enter Period Date" required></td>
+              <td><input class="form-control" type="text" formControlName="patientNameofCompany" name="employmentNca" placeholder="Enter Company Name" required></td>
+              <td><input class="form-control" type="text" formControlName="patientCompanyAddress" name="employmentAddr" placeholder="Enter Address" required></td>
+              <td><input class="form-control" type="text" formControlName="patientCompanyPosition" name="employmentPos" placeholder="Enter Position" required></td>
+              <td><input class="form-control" type="text" formControlName="patientReasonforLeaving" name="employmentReason" placeholder="Enter Reason" required></td>
+              <td hidden style="width: 15%;"><input class="form-control" type="text" formControlName="employmentCode" ></td>
+            </tr>
+            </tbody>
+            </table>
+            <button type="button" class="btn btn-secondary mt-3" (click)="employmentsaddRow()">Add Row</button>
+          </div>
+          </div>
+          <hr>
+          <div class="mt-4">
+          <button type="submit" class="btn btn-primary text-white me-2">Save changes</button>
+          <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+          </div>
+        </form>
+        </div>
+      </div>
+        <div class="card-footer text-end">
+        <button type="button" class="btn btn-secondary text-white me-2" (click)="goToSubstanceHisto()">
+          Next
+        </button>
+        </div>
+      </div>
     </div>
     <div class="tab-pane fade hide" id="SubstanceHisto" role="tabpanel">
         <div class="card mb-5">

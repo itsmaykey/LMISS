@@ -246,16 +246,13 @@ export class ApplicationDashboardComponent implements OnInit {
         this.ExistedPatientEmployee = response;
         console.log(this.ExistedPatientEmployee);
         if (this.ExistedPatientEmployee.length > 0) {
-          this.ExistedPatientEmployee.forEach((employ: any) => {
-       
-          
-          });
-          this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode, { employs: this.ExistedPatientChildren });
-        } else {
-          this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode);
-        }
+            this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode, this.ExistedPatientEmployee[0]);
+          } else {
+            this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode);
+          }
       },
-      error: () => {
+      error: (error) => {
+        console.error('Error loading Existed Patient Employee Data:', error);
         this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode);
       },
     });
@@ -410,9 +407,9 @@ export class ApplicationDashboardComponent implements OnInit {
   }
 
   patientEmployeeFormSubmit(): void {
-
-    if (this.patientEmploymentForm.value) {
-
+    if (this.patientEmploymentForm.valid) { // ✅ Check if form is valid
+      console.log("Form Data:", this.patientEmploymentForm.value); // ✅ Debugging
+  
       this.employeeFormService.submitPatientEmployeeForm(this.patientEmploymentForm.value).subscribe({
         next: (response) => {
           console.log('Patient employee Form submitted successfully:', response);
@@ -422,14 +419,15 @@ export class ApplicationDashboardComponent implements OnInit {
         },
       });
     } else {
-      console.error('Patient employee Form is invalid');
+      console.error('Patient employee Form is invalid', this.patientEmploymentForm.errors); // ✅ Show validation errors
     }
   }
+  
   get employs(): FormArray {
     return this.patientEmploymentForm.get('employs') as FormArray;
   }
 
-  addemploy(): void {
+  employmentsaddRow(): void {
     this.employs.push(this.employeeFormService.createEmployeeFormGroup());
   }
 
@@ -569,10 +567,7 @@ export class ApplicationDashboardComponent implements OnInit {
   }
 
 
-  employments: any[] = [{ epd: '', nca: '', addr: '', pos: '' }];
-  employmentsaddRow() {
-    this.employments.push({ epd: '', nca: '', addr: '', pos: '' });
-  }
+ 
   drugHistories: any[] = [{ dc: '', ds: '', lu: '', udq: '', hd: '' }];
   drughistoriessaddRow() {
     this.drugHistories.push({ dc: '', ds: '', lu: '', udq: '', hd: '' });

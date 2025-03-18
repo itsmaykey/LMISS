@@ -21,28 +21,29 @@ export class EmploymentFormService {
   }
   createEmployeeFormGroup(EmployeeData: any = {}): FormGroup {
     return this.fb.group({
+      patientEPeriodDate: [EmployeeData.patientEPeriodDate || '', Validators.required],
       patientNameofCompany: [EmployeeData.patientNameofCompany || '', Validators.required],
       patientCompanyAddress: [EmployeeData.patientCompanyAddress || '', Validators.required],
       patientCompanyPosition: [EmployeeData.patientCompanyPosition || '', Validators.required],
       patientReasonforLeaving: [EmployeeData.patientReasonforLeaving || '', Validators.required],
-      
+      employmentCode: [EmployeeData.employmentCode || '']
     });
   }
 
 
   submitPatientEmployeeForm(employeeFormData: any): Observable<any> {
     const formattedData = {
-      patientEmployeeDatum: employeeFormData.employs.map((employ: any) => ({
+      listPatientEmploymentData: employeeFormData.employs.map((employ: any) => ({
         recNo: 0,
         patientCode: employeeFormData.patientCode,
+        patientEPeriodDate: employ.patientEPeriodDate,
         patientNameofCompany: employ.patientNameofCompany,
         patientCompanyAddress: employ.patientCompanyAddress,
         patientCompanyPosition: employ.patientCompanyPosition,
         patientReasonforLeaving: employ.patientReasonforLeaving,
-       
         employmentCode: employ.employmentCode === '' ? '' : employ.employmentCode
       }))
     };
-    return this.applicationdashboardService.postPatientEmplymentData(formattedData);
+    return this.applicationdashboardService.postPatientEmploymentData(formattedData);
   }
 }
