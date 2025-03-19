@@ -573,7 +573,7 @@
                     <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                   </div>
                   <div class="card-footer text-end">
-                    <button type="button" class="btn btn-secondary text-white me-2" (click)="goToChild()">
+                    <button type="button" class="btn btn-secondary text-white me-2" (click)="goToEmploy()">
                       Next
                     </button>
                   </div>
@@ -636,229 +636,297 @@
       </div>
     </div>
     <div class="tab-pane fade hide" id="SubstanceHisto" role="tabpanel">
-        <div class="card mb-5">
-          <div class="card-header">
-            <h4 class="card-header-title">Drug History</h4>
-            <hr>
-          </div>
-
-          <div class="card-body pt-4">
-            <form id="DrugHistoryForm">
-              <div class="row g-4">
-                <div class="row">
-                  <div class="col-md-12">
-                    <table class="table table-bordered" >
-                      <thead>
-                        <tr>
-                          <th>Drug / Chem</th>
-                          <th>Date Started</th>
-                          <th>Latest Use</th>
-                          <th>Usual Dose<br></th>
-                          <th>Highest Dose<br></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr *ngFor="let drughistory of drugHistories">
-                          <td><input class="form-control" type="text" [(ngModel)]="drughistory.dc" name="drughistoryDc" placeholder="Enter Last Name" required></td>
-                          <td><input class="form-control" type="text" [(ngModel)]="drughistory.ds" name="drughistoryDs" placeholder="Age" required></td>
-                          <td><input class="form-control" type="text" [(ngModel)]="drughistory.lu" name="drughistoryLu" placeholder="Enter Occupation" required></td>
-                          <td><input class="form-control" type="text" [(ngModel)]="drughistory.udq" name="drughistoryUdq" placeholder="Enter Educational Attainment" required></td>
-                          <td><input class="form-control" type="text" [(ngModel)]="drughistory.hd" name="drughistoryHd" placeholder="Enter Educational Attainment" required></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <br>
-                    <button type="button" class="btn btn-secondary" (click)="drughistoriessaddRow()">Add Row</button>
+      <div class="nav-align-top nav-tabs-shadow mb-6">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item active show" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#navDrugHistory" role="tab" aria-selected="true">
+              Drug History
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#navReason" role="tab" aria-selected="false">
+              Reason for Using Drugs
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#navDrugEffects" role="tab" aria-selected="false">
+              Drug Effects
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#navRehabRecord" role="tab" aria-selected="false">
+              Rehabilitation Record
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#navPersonalHealth" role="tab" aria-selected="false">
+              Personal Health History
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#navFamilyHealth" role="tab" aria-selected="false">
+              Family Health Record
+            </button>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade active show" id="navDrugHistory" role="tabpanel">
+            <!-- Drug History Content -->
+            <div class="card mb-5">
+              <div class="card-header">
+                <h4 class="card-header-title">Drug History</h4>
+                <hr>
+              </div>
+              <div class="card-body pt-4">
+                <form id="DrugHistoryForm">
+                  <div class="row g-4">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th>Drug / Chem</th>
+                              <th>Date Started</th>
+                              <th>Latest Use</th>
+                              <th>Usual Dose</th>
+                              <th>Highest Dose</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let drughistory of drugHistories">
+                              <td><input class="form-control" type="text" [(ngModel)]="drughistory.dc" name="drughistoryDc" placeholder="Enter Drug Name" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="drughistory.ds" name="drughistoryDs" placeholder="Date Started" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="drughistory.lu" name="drughistoryLu" placeholder="Latest Use" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="drughistory.udq" name="drughistoryUdq" placeholder="Usual Dose" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="drughistory.hd" name="drughistoryHd" placeholder="Highest Dose" required></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        <button type="button" class="btn btn-secondary" (click)="drughistoriessaddRow()">Add Row</button>
+                      </div>
+                    </div>
+                  
                   </div>
-                </div>
-              </div>
-              <hr>
-              <div class="mt-6">
-                <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-                <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-              </div>
-            </form>
-          </div>
-
-      </div>
-      <div class="card mb-5">
-        <div class="card-header">
-          <h4 class="card-header-title">Reason for Using Drugs</h4>
-        </div>
-        <div class="card-body pt-4">
-          <form id="ReasonForm">
-            <div class="row g-4">
-              <div class="row">
-                <div class="col-md-12">
-                    <label for="yrGrad" class="form-label">Reason for using Drugs?</label>
-                    <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter">
-
-                </div>
-                <div class="col-md-12">
-                  <label for="yrGrad" class="form-label">How do you support your vices?</label>
-                  <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter">
-
-              </div>
-              </div>
-            </div>
-            <hr>
-            <div class="mt-6">
-              <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-              <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-            </div>
-          </form>
-        </div>
-    </div>
-    <div class="card mb-5">
-      <div class="card-header">
-        <h4 class="card-header-title">Drug Effects</h4>
-      </div>
-
-      <div class="card-body pt-4">
-        <form id="drugEffectForm">
-          <div class="row g-4">
-            <div class="row">
-              <div class="col-md-12">
-                <label for="yrGrad" class="form-label">Unwanted effect of use/abused (please check whatever is applicable)</label>
-                <div class="row">
-                  <div *ngFor="let x of drugEffects" class="form-check mb-0 ms-2 col-md-2">
-                    <input class="form-check-input" type="checkbox" [value]="x.drugEffectCode" (change)="onCheckboxChange($event, x)">
-                    {{ x.drugEffectDesc }}
+                  <hr>
+                  <div class="mt-6">
+                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                   </div>
-                </div>
-                <div class="col-md-12">
-                  <label for="yrGrad" class="form-label">Other bad effects/Experience</label>
-                  <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter">
-
-              </div>
+                </form>
               </div>
             </div>
+              <div class="card-footer text-end">
+              <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavReason()">
+                        Next
+              </button>
+              </div>
           </div>
-          <hr>
-          <div class="mt-6">
-            <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-            <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-    <div class="card mb-5">
-      <div class="card-header">
-        <h4 class="card-header-title">Rehabilitation Record</h4>
-      </div>
-
-      <div class="card-body pt-4">
-        <form id="PrevRehabForm">
-          <div class="row g-4">
-            <div class="row">
-              <div class="col-md-12">
-                <table class="table table-bordered" >
-                  <thead>
-                    <tr>
-                      <th>Period</th>
-                      <th>Rehabilitation Center</th>
-                      <th>What Happened? explain</th>
-
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let prevRehab of PrevRehab">
-                      <td style="width: 15%;"><input class="form-control" type="text" [(ngModel)]="prevRehab.pr" name="prevRehabPr" placeholder="Enter Last Name" required></td>
-                      <td style="width: 25%;"><input class="form-control" type="text" [(ngModel)]="prevRehab.rc" name="prevRehabRc" placeholder="Age" required></td>
-                      <td style="width: 60%;"><input class="form-control" type="text" [(ngModel)]="prevRehab.whe" name="prevRehabWhe" placeholder="Enter Occupation" required></td>
-
-                    </tr>
-                  </tbody>
-                </table>
-                <br>
-                <button type="button" class="btn btn-secondary" (click)="PrevRehabaddRow()">Add Row</button>
+          <div class="tab-pane fade" id="navReason" role="tabpanel">
+            <!-- Reason for Using Drugs Content -->
+            <div class="card mb-5">
+              <div class="card-header">
+                <h4 class="card-header-title">Reason for Using Drugs</h4>
+              </div>
+              <div class="card-body pt-4">
+                <form id="ReasonForm">
+                  <div class="row g-4">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label for="reason" class="form-label">Reason for using Drugs?</label>
+                        <input type="text" class="form-control" id="reason" name="reason" placeholder="Enter Reason">
+                      </div>
+                      <div class="col-md-12">
+                        <label for="support" class="form-label">How do you support your vices?</label>
+                        <input type="text" class="form-control" id="support" name="support" placeholder="Enter Support Method">
+                      </div>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="mt-6">
+                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                  </div>
+                </form>
               </div>
             </div>
-          </div>
-          <hr>
-          <div class="mt-6">
-            <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-            <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-          </div>
-        </form>
-
-      </div>
-    </div>
-    <div class="card mb-5">
-      <div class="card-header">
-        <h4 class="card-header-title">Personal Health History</h4>
-      </div>
-      <div class="card-body pt-4">
-        <form id="ReasonForm">
-          <div class="row g-4">
-            <div class="row">
-              <div class="col-md-12">
-                  <label for="yrGrad" class="form-label">Personal Health History</label>
-                  <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder=" Enter">
+            <div class="card-footer text-end">
+              <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavDrugEffects()">
+                        Next
+              </button>
               </div>
-
-            </div>
           </div>
-          <hr>
-          <div class="mt-6">
-            <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-            <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-    <div class="card mb-5">
-      <div class="card-header">
-        <h4 class="card-header-title">Family Health Record</h4>
-      </div>
-
-      <div class="card-body pt-4">
-        <form id="FamHealthHistoryForm">
-          <div class="row g-4">
-            <div class="row">
-              <div class="col-md-12">
-                <table class="table table-bordered" >
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Blood Pressure</th>
-                      <th>Height</th>
-                      <th>Weigth</th>
-                      <th>RR</th>
-                      <th>CR</th>
-                      <th>Tattoo Marks/Scars</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let FamHealthHistory of FamHealthHistories">
-                      <td style="width: 40%;"><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.n" name="FamHealthHistoryN" placeholder="Enter Last Name" required></td>
-                      <td style="width: 10%;"><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.bp" name="FamHealthHistoryBp" placeholder="Age" required></td>
-                      <td style="width: 10%;"><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.h" name="FamHealthHistoryH" placeholder="Enter Occupation" required></td>
-                      <td style="width: 10%;"><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.w" name="FamHealthHistoryW" placeholder="Enter Occupation" required></td>
-                      <td style="width: 10%;"><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.rr" name="FamHealthHistoryRR" placeholder="Enter Occupation" required></td>
-                      <td style="width: 10%;"><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.cr" name="FamHealthHistoryCR" placeholder="Enter Occupation" required></td>
-                      <td style="width: 10%;"><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.tms" name="FamHealthHistoryTms" placeholder="Enter Occupation" required></td>
-                    </tr>
-                  </tbody>
-                </table>
-                <br>
-                <button type="button" class="btn btn-secondary" (click)="FamHealthHistoriesaddRow()">Add Row</button>
+          <div class="tab-pane fade" id="navDrugEffects" role="tabpanel">
+            <!-- Drug Effects Content -->
+            <div class="card mb-5">
+              <div class="card-header">
+                <h4 class="card-header-title">Drug Effects</h4>
+              </div>
+              <div class="card-body pt-4">
+                <form id="drugEffectForm">
+                  <div class="row g-4">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label for="effects" class="form-label">Unwanted effects of use/abuse (please check whatever is applicable)</label>
+                        <div class="row">
+                          <div *ngFor="let x of drugEffects" class="form-check mb-0 ms-2 col-md-2">
+                            <input class="form-check-input" type="checkbox" [value]="x.drugEffectCode" (change)="onCheckboxChange($event, x)">
+                            {{ x.drugEffectDesc }}
+                          </div>
+                        </div>
+                        <div class="col-md-12">
+                          <label for="otherEffects" class="form-label">Other bad effects/Experience</label>
+                          <input type="text" class="form-control" id="otherEffects" name="otherEffects" placeholder="Enter Other Effects">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="mt-6">
+                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                  </div>
+                </form>
               </div>
             </div>
+            <div class="card-footer text-end">
+              <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavRehabRecord()">
+                        Next
+              </button>
+              </div>
           </div>
-          <hr>
-          <div class="mt-6">
-            <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-            <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+          <div class="tab-pane fade" id="navRehabRecord" role="tabpanel">
+            <!-- Rehabilitation Record Content -->
+            <div class="card mb-5">
+              <div class="card-header">
+                <h4 class="card-header-title">Rehabilitation Record</h4>
+              </div>
+              <div class="card-body pt-4">
+                <form id="PrevRehabForm">
+                  <div class="row g-4">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th>Period</th>
+                              <th>Rehabilitation Center</th>
+                              <th>What Happened? Explain</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let prevRehab of PrevRehab">
+                              <td><input class="form-control" type="text" [(ngModel)]="prevRehab.pr" name="prevRehabPr" placeholder="Enter Period" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="prevRehab.rc" name="prevRehabRc" placeholder="Enter Center" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="prevRehab.whe" name="prevRehabWhe" placeholder="Explain" required></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        <button type="button" class="btn btn-secondary" (click)="PrevRehabaddRow()">Add Row</button>
+                      </div>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="mt-6">
+                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="card-footer text-end">
+              <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavPersonalHealth()">
+                        Next
+              </button>
+              </div>
           </div>
-        </form>
+          <div class="tab-pane fade" id="navPersonalHealth" role="tabpanel">
+            <!-- Personal Health History Content -->
+            <div class="card mb-5">
+              <div class="card-header">
+                <h4 class="card-header-title">Personal Health History</h4>
+              </div>
+              <div class="card-body pt-4">
+                <form id="PersonalHealthForm">
+                  <div class="row g-4">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label for="personalHealth" class="form-label">Personal Health History</label>
+                        <input type="text" class="form-control" id="personalHealth" name="personalHealth" placeholder="Enter Personal Health History">
+                      </div>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="mt-6">
+                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="card-footer text-end">
+              <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavFamilyHealth()">
+                        Next
+              </button>
+              </div>
+          </div>
+          <div class="tab-pane fade" id="navFamilyHealth" role="tabpanel">
+            <!-- Family Health Record Content -->
+            <div class="card mb-5">
+              <div class="card-header">
+                <h4 class="card-header-title">Family Health Record</h4>
+              </div>
+              <div class="card-body pt-4">
+                <form id="FamHealthHistoryForm">
+                  <div class="row g-4">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Blood Pressure</th>
+                              <th>Height</th>
+                              <th>Weight</th>
+                              <th>RR</th>
+                              <th>CR</th>
+                              <th>Tattoo Marks/Scars</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let FamHealthHistory of FamHealthHistories">
+                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.n" name="FamHealthHistoryN" placeholder="Enter Name" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.bp" name="FamHealthHistoryBp" placeholder="Enter BP" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.h" name="FamHealthHistoryH" placeholder="Enter Height" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.w" name="FamHealthHistoryW" placeholder="Enter Weight" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.rr" name="FamHealthHistoryRR" placeholder="Enter RR" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.cr" name="FamHealthHistoryCR" placeholder="Enter CR" required></td>
+                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.tms" name="FamHealthHistoryTms" placeholder="Enter Marks/Scars" required></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        <button type="button" class="btn btn-secondary" (click)="FamHealthHistoriesaddRow()">Add Row</button>
+                      </div>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="mt-6">
+                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="card-footer text-end">
+              <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoAppHisto()">
+                        Next
+              </button>
+              </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="card-footer text-end">
-      <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoAppHisto()">
-      Next
-     </button>
- </div>
     </div>
     <div class="tab-pane fade hide" id="ApplicationHisto" role="tabpanel">
       <div class="row">

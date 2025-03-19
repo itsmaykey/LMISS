@@ -246,7 +246,7 @@ export class ApplicationDashboardComponent implements OnInit {
         this.ExistedPatientEmployee = response;
         console.log(this.ExistedPatientEmployee);
         if (this.ExistedPatientEmployee.length > 0) {
-            this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode, this.ExistedPatientEmployee[0]);
+            this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode, {employs: this.ExistedPatientEmployee});
           } else {
             this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode);
           }
@@ -407,22 +407,22 @@ export class ApplicationDashboardComponent implements OnInit {
   }
 
   patientEmployeeFormSubmit(): void {
-    if (this.patientEmploymentForm.valid) { // ✅ Check if form is valid
-      console.log("Form Data:", this.patientEmploymentForm.value); // ✅ Debugging
-  
-      this.employeeFormService.submitPatientEmployeeForm(this.patientEmploymentForm.value).subscribe({
-        next: (response) => {
-          console.log('Patient employee Form submitted successfully:', response);
-        },
-        error: (error) => {
-          console.error('Error submitting Patient employee Form:', error);
-        },
-      });
-    } else {
-      console.error('Patient employee Form is invalid', this.patientEmploymentForm.errors); // ✅ Show validation errors
-    }
+  if (this.patientEmploymentForm.valid) { // ✅ Check if form is valid
+    console.log("Form Data:", this.patientEmploymentForm.value); // ✅ Debugging
+
+    this.employeeFormService.submitPatientEmployeeForm(this.patientEmploymentForm.value).subscribe({
+      next: (response) => {
+        console.log('Patient employee Form submitted successfully:', response);
+      },
+      error: (error) => {
+        console.error('Error submitting Patient employee Form:', error);
+      },
+    });
+  } else {
+    console.error('Patient employee Form is invalid', this.patientEmploymentForm.errors); // ✅ Show validation errors
   }
-  
+}
+
   get employs(): FormArray {
     return this.patientEmploymentForm.get('employs') as FormArray;
   }
@@ -551,12 +551,30 @@ export class ApplicationDashboardComponent implements OnInit {
   goToPatientDashboard(): void {
     this.router.navigate(['/patientDashboard']);
   }
-
+  gotoNavReason(): void {
+    this.showTab('#navReason');
+  }
+  gotoNavDrugEffects(): void {
+    this.showTab('#navDrugEffects');
+  }
+  gotoNavRehabRecord(): void {
+    this.showTab('#navRehabRecord');
+  }
+  gotoNavPersonalHealth(): void {
+    this.showTab('#navPersonalHealth');
+  }
+  gotoNavFamilyHealth(): void {
+    this.showTab('#navFamilyHealth');
+  }
   goToSelectedApp(patientCode: string): void {
     this.router.navigate(['/application', patientCode]).then(() => {
       alert(`Selected Patient Code: ${patientCode}`);
     });
+
+   
   }
+
+  ////navSub
 
   private showTab(selector: string): void {
     const tabElement = document.querySelector(`[data-bs-target="${selector}"]`);
