@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApplicationDashboardService } from '../../service/application-dashboard.service';
 import { OnInit } from '@angular/core';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -91,25 +92,52 @@ export class PatientFormService {
       this.dashboardService.postPatientData(patientFormData).subscribe({
         next: (response) => {
           console.log('User registered successfully:', response);
-          alert('User registered successfully!');
+          Swal.fire({
+            title: "Successfully Saved!",
+            text: "The patient data has been saved.",
+            icon: "success",
+            timer: 1000, 
+            timerProgressBar: true,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false
+          });
         },
         error: (err) => {
           console.error('API Error:', err);
-
+  
+          let errorMessage = "Failed to register user. Please try again.";
           if (err.status === 400) {
-            alert('Validation failed. Please check your inputs.');
+            errorMessage = "Validation failed. Please check your inputs.";
           } else if (err.status === 401) {
-            alert('Unauthorized. Please check your permissions.');
+            errorMessage = "Unauthorized. Please check your permissions.";
           } else if (err.status === 500) {
-            alert('Server error. Please try again later.');
-          } else {
-            alert('Failed to register user. Please try again.');
+            errorMessage = "Server error. Please try again later.";
           }
-        },
+  
+          // Show error alert
+          Swal.fire({
+            title: "Error!",
+            text: errorMessage,
+            icon: "error",
+            confirmButtonText: "OK",
+            allowOutsideClick: false,
+            allowEscapeKey: false
+          });
+        }
       });
     } else {
       console.warn('Form submission attempted with invalid data:', patientForm.value);
-      alert('Please fill in all required fields correctly.');
+  
+      // Show warning if form is invalid
+      Swal.fire({
+        title: "Invalid Submission!",
+        text: "Please fill in all required fields correctly.",
+        icon: "warning",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      });
     }
   }
 }

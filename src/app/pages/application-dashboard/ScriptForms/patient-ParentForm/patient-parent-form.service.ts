@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApplicationDashboardService } from '../../service/application-dashboard.service';
+import Swal from 'sweetalert2';
 
 
 @Injectable({
@@ -55,33 +56,66 @@ export class PatientParentFormService {
 
           // Check if fatherName and motherName are empty
           if (!patientParentFormData.fatherName?.trim() || !patientParentFormData.motherName?.trim()) {
-            alert('Father Name and Mother Name cannot be empty.');
-            return;
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Error',
+          text: 'Father Name and Mother Name cannot be empty.',
+        });
+        return;
           }
 
           console.log('Submitting patient school form:', patientParentFormData);
           this.applicationdashboardService.postPatientParentData(patientParentFormData).subscribe({
-            next: (response) => {
-              console.log('Parents Data Saved successfully:', response);
-              alert('Parents Data Saved successfully');
-            },
-            error: (err) => {
-              console.error('API Error:', err);
+        next: (response) => {
+          console.log('Parents Data Saved successfully:', response);
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Parents Data Saved successfully.',
+            showConfirmButton: false,
+            timer: 1000, 
+            timerProgressBar: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false
+          });
+        },
+        error: (err) => {
+          console.error('API Error:', err);
 
-              if (err.status === 400) {
-                alert('Validation failed. Please check your inputs.');
-              } else if (err.status === 401) {
-                alert('Unauthorized. Please check your permissions.');
-              } else if (err.status === 500) {
-                alert('Server error. Please try again later.');
-              } else {
-                alert('Failed to register user. Please try again.');
-              }
-            },
+          if (err.status === 400) {
+            Swal.fire({
+          icon: 'error',
+          title: 'Validation Error',
+          text: 'Validation failed. Please check your inputs.',
+            });
+          } else if (err.status === 401) {
+            Swal.fire({
+          icon: 'error',
+          title: 'Unauthorized',
+          text: 'Unauthorized. Please check your permissions.',
+            });
+          } else if (err.status === 500) {
+            Swal.fire({
+          icon: 'error',
+          title: 'Server Error',
+          text: 'Server error. Please try again later.',
+            });
+          } else {
+            Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to register user. Please try again.',
+            });
+          }
+        },
           });
         } else {
           console.warn('Form submission attempted with invalid data:', patientParentForm.value);
-          alert('Please fill in all required fields correctly.');
+          Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Form',
+        text: 'Please fill in all required fields correctly.',
+          });
         }
       }
 

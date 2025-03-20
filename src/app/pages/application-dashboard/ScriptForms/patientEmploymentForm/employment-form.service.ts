@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ApplicationDashboardService } from '../../service/application-dashboard.service';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +45,26 @@ export class EmploymentFormService {
         employmentCode: employ.employmentCode === '' ? '' : employ.employmentCode
       }))
     };
-    return this.applicationdashboardService.postPatientEmploymentData(formattedData);
+    return new Observable((observer) => {
+      this.applicationdashboardService.postPatientEmploymentData(formattedData).subscribe({
+        next: (response) => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Patient employment data submitted successfully!'
+          });
+          observer.next(response);
+          observer.complete();
+        },
+        error: (error) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to submit patient employment data. Please try again.'
+          });
+          observer.error(error);
+        }
+      });
+    });
   }
 }

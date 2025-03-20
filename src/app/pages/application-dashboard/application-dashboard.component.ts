@@ -11,6 +11,7 @@ import { PatientSpouseFormService } from './ScriptForms/patient-SpouseForm/patie
 import { SiblingsFormService } from './ScriptForms/patient-SiblingForm/siblings-form.service';
 import { ChildrensFormService } from './ScriptForms/patient-childrenForm/childrens-form.service';
 import { EmploymentFormService } from './ScriptForms/patientEmploymentForm/employment-form.service';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-application-dashboard',
   templateUrl: './application-dashboard.component.html',
@@ -409,7 +410,18 @@ export class ApplicationDashboardComponent implements OnInit {
   patientEmployeeFormSubmit(): void {
   if (this.patientEmploymentForm.valid) { // ✅ Check if form is valid
     console.log("Form Data:", this.patientEmploymentForm.value); // ✅ Debugging
-
+    Swal.fire({
+      title: "Success!",
+      text: "Successfully Saved!",
+      icon: "success",
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showLoaderOnConfirm: true,
+      timer: 1000, 
+      timerProgressBar: true,
+    });
+    
     this.employeeFormService.submitPatientEmployeeForm(this.patientEmploymentForm.value).subscribe({
       next: (response) => {
         console.log('Patient employee Form submitted successfully:', response);

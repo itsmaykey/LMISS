@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ApplicationDashboardService } from '../../service/application-dashboard.service';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +50,27 @@ export class ChildrensFormService {
         childrenCode: children.childrenCode === '' ? '' : children.childrenCode
       }))
     };
-    return this.applicationdashboardService.postPatientChildrenData(formattedData);
+
+    return new Observable((observer) => {
+      this.applicationdashboardService.postPatientChildrenData(formattedData).subscribe({
+        next: (response) => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Patient children data has been successfully submitted!'
+          });
+          observer.next(response);
+          observer.complete();
+        },
+        error: (error) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while submitting patient children data.'
+          });
+          observer.error(error);
+        }
+      });
+    });
   }
 }
