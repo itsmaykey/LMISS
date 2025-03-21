@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
   providedIn: 'root'
 })
 export class SiblingsFormService {
+  isSubmitting: boolean = false; 
   constructor(
     private fb: FormBuilder,
     private applicationdashboardService: ApplicationDashboardService
@@ -36,45 +37,61 @@ export class SiblingsFormService {
 
 
   submitPatientSiblingForm(siblingFormData: any): Observable<any> {
+    if (this.isSubmitting) {
+        console.warn("Submission in progress, preventing duplicate requests.");
+        return new Observable((observer) => {
+            observer.error("Submission already in progress.");
+        }); // Prevent multiple submissions
+    }
+
     const formattedData = {
-      listPatientSiblingDatum: siblingFormData.siblings.map((sibling: any) => ({
-        recNo: 0,
-        patientCode: siblingFormData.patientCode,
-        siblingName: sibling.siblingName,
-        siblingBirthDate: sibling.siblingBirthDate,
-        siblingSexId: sibling.siblingSexId,
-        siblingCivilStatusId: sibling.siblingCivilStatusId,
-        siblingOccupation: sibling.siblingOccupation,
-        siblingEducationAttainment: sibling.siblingEducationAttainment,
-        siblingCode: sibling.siblingCode === '' ? '' : sibling.siblingCode
-      }))
+        listPatientSiblingDatum: siblingFormData.siblings.map((sibling: any) => ({
+            recNo: 0,
+            patientCode: siblingFormData.patientCode,
+            siblingName: sibling.siblingName,
+            siblingBirthDate: sibling.siblingBirthDate,
+            siblingSexId: sibling.siblingSexId,
+            siblingCivilStatusId: sibling.siblingCivilStatusId,
+            siblingOccupation: sibling.siblingOccupation,
+            siblingEducationAttainment: sibling.siblingEducationAttainment,
+            siblingCode: sibling.siblingCode === '' ? '' : sibling.siblingCode
+        }))
     };
 
     return new Observable((observer) => {
-      this.applicationdashboardService.postPatientSiblingData(formattedData).subscribe({
-        next: (response) => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: 'Sibling data submitted successfully!',
-            timer: 1000, 
-            timerProgressBar: true,
-            showConfirmButton: false,
-            allowOutsideClick: false,
-            allowEscapeKey: false
-          });
-          observer.next(response);
-          observer.complete();
-        },
-        error: (error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to submit sibling data. Please try again.'
-          });
-          observer.error(error);
-        }
-      });
+        this.isSubmitting = true;
+
+        this.applicationdashboardService.postPatientSiblingData(formattedData).subscribe({
+            next: (response) => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Sibling data submitted successfully!',
+                    timer: 1000,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then(() => {
+                    this.isSubmitting = false; // Reset flag after success
+                });
+
+                observer.next(response);
+                observer.complete();
+            },
+            error: (error) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to submit sibling data. Please try again.'
+                }).then(() => {
+                    this.isSubmitting = false; // Reset flag after error
+                });
+
+                observer.error(error);
+            }
+        });
     });
-  }
+}
+
 }

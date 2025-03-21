@@ -18,6 +18,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./application-dashboard.component.css'],
 })
 export class ApplicationDashboardComponent implements OnInit {
+    isSubmitting: boolean = false;
   patientParentForm!: FormGroup;
   patientForm!: FormGroup;
   patientSchoolForm!: FormGroup;
@@ -26,7 +27,6 @@ export class ApplicationDashboardComponent implements OnInit {
   patientEmploymentForm!: FormGroup;
   patientChildrenForm!: FormGroup;
   //siblings!: FormArray;
-
   ExistedPatient: any = [];
   ExistedPatientSchool: any = [];
   ExistedPatientParent: any = [];
@@ -410,17 +410,6 @@ export class ApplicationDashboardComponent implements OnInit {
   patientEmployeeFormSubmit(): void {
   if (this.patientEmploymentForm.valid) { // ✅ Check if form is valid
     console.log("Form Data:", this.patientEmploymentForm.value); // ✅ Debugging
-    Swal.fire({
-      title: "Success!",
-      text: "Successfully Saved!",
-      icon: "success",
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      showLoaderOnConfirm: true,
-      timer: 1000, 
-      timerProgressBar: true,
-    });
     
     this.employeeFormService.submitPatientEmployeeForm(this.patientEmploymentForm.value).subscribe({
       next: (response) => {
@@ -488,44 +477,55 @@ export class ApplicationDashboardComponent implements OnInit {
   onMunicipalityChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     this.onChangeCitymunCode = selectElement.value;
-
+  
     console.log('Municipality changed to:', this.onChangeCitymunCode);
-
-    if (this.ExistedPatient.length > 0 && this.ExistedPatient[0].citymunCode) {
-      this.onChangeCitymunCode = this.ExistedPatient[0].citymunCode;
+  
+    if (this.onChangeCitymunCode) {
+      this.service.getBrgy(this.onChangeCitymunCode).subscribe({
+        next: (response) => {
+          // Ensure response is an array of barangays
+          this.brgy = response;
+          console.log('Barangays:', this.brgy);
+        },
+        error: (error) => {
+          console.error('Error fetching barangays:', error);
+        },
+      });
+    } else {
+      console.warn('No city municipality code selected.');
     }
-
-    this.service.getBrgy(this.onChangeCitymunCode).subscribe({
-      next: (response) => {
-        this.brgy = response;
-        console.log('Barangays:', this.brgy);
-      },
-      error: (error) => {
-        console.error('Error fetching barangays:', error);
-      },
-    });
   }
-
+  
   onBarangayChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
-    this.onChangeBarangay = selectElement.value;
-
-    console.log('Barangay changed to:', this.onChangeBarangay);
-
-    if (this.ExistedPatient.length > 0 && this.ExistedPatient[0].brgyCode) {
-      this.onChangeBarangay = this.ExistedPatient[0].brgyCode;
+    let selectedBarangay = selectElement.value;
+  
+    console.log('Barangay changed to:', selectedBarangay);
+  
+    // Fallback to ExistedPatient if no selection is made
+    if (!selectedBarangay && this.ExistedPatient?.length > 0 && this.ExistedPatient[0].brgyCode) {
+      selectedBarangay = this.ExistedPatient[0].brgyCode;
     }
-
-    this.service.getprk(this.onChangeBarangay).subscribe({
-      next: (response) => {
-        this.prk = response;
-        console.log('Puroks:', this.prk);
-      },
-      error: (error) => {
-        console.error('Error fetching puroks:', error);
-      },
-    });
+  
+    this.onChangeBarangay = selectedBarangay;
+  
+    if (this.onChangeBarangay) {
+      this.service.getprk(this.onChangeBarangay).subscribe({
+        next: (response) => {
+          // Ensure response is an array of puroks
+          this.prk = response;
+          console.log('Puroks:', this.prk);
+        },
+        error: (error) => {
+          console.error('Error fetching puroks:', error);
+        },
+      });
+    } else {
+      console.warn('No valid barangay selected. Skipping purok fetch.');
+    }
   }
+  
+  
 
   // Navigation methods
   goToSubstanceHisto(): void {

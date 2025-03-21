@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
   providedIn: 'root'
 })
 export class SchoolFormService {
+  isSubmitting: boolean = false; 
 
 
 existed: any;
@@ -50,51 +51,54 @@ existed: any;
 
   submitPatientSchoolForm(PatientSchoolForm: FormGroup): void {
     if (PatientSchoolForm.valid) {
+      this.isSubmitting = true;
       console.log(PatientSchoolForm.value);
       const patientShoolFormData = PatientSchoolForm.value;
       console.log('Submitting patient school form:', patientShoolFormData);
       this.applicationdashboardService.postPatientSchoolData(patientShoolFormData).subscribe({
       next: (response) => {
-        console.log('School Data Saved successfully:', response);
-        Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'School Data Saved successfully',
-        timer: 1000, 
-        timerProgressBar: true,
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        allowEscapeKey: false
-        });
+      console.log('School Data Saved successfully:', response);
+      Swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: 'School Data Saved successfully',
+      timer: 1000, 
+      timerProgressBar: true,
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false
+      });
+      this.isSubmitting = false;
       },
       error: (err) => {
-        console.error('API Error:', err);
+      console.error('API Error:', err);
 
-        if (err.status === 400) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Validation Error',
-          text: 'Validation failed. Please check your inputs.',
-        });
-        } else if (err.status === 401) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Unauthorized',
-          text: 'Unauthorized. Please check your permissions.',
-        });
-        } else if (err.status === 500) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Server Error',
-          text: 'Server error. Please try again later.',
-        });
-        } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to register user. Please try again.',
-        });
-        }
+      if (err.status === 400) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Validation failed. Please check your inputs.',
+      });
+      } else if (err.status === 401) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Unauthorized',
+        text: 'Unauthorized. Please check your permissions.',
+      });
+      } else if (err.status === 500) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Server Error',
+        text: 'Server error. Please try again later.',
+      });
+      } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to register user. Please try again.',
+      });
+      }
+      this.isSubmitting = false;
       },
       });
     } else {
@@ -104,6 +108,7 @@ existed: any;
       title: 'Invalid Form',
       text: 'Please fill in all required fields correctly.',
       });
+      this.isSubmitting = false;
     }
-    }
+  }
 }

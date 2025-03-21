@@ -3,12 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApplicationDashboardService } from '../../service/application-dashboard.service';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PatientSpouseFormService {
-
+  isSubmitting: boolean = false; 
 
    existed: any;
    constructor(
@@ -47,31 +48,62 @@ export class PatientSpouseFormService {
          });
        }
        submitPatientSpouseForm(patientSpouseForm: FormGroup): void {
-         if (patientSpouseForm.valid) {
-           const patientSpouseFormData = patientSpouseForm.value;
-           console.log('Submitting patient school form:', patientSpouseFormData);
-           this.applicationdashboardService.postPatientSpouseData(patientSpouseFormData).subscribe({
-             next: (response) => {
-               console.log('Parents Data Saved successfully:', response);
-               alert('Parents Data Saved successfully');
-             },
-             error: (err) => {
-               console.error('API Error:', err);
-
-               if (err.status === 400) {
-                 alert('Validation failed. Please check your inputs.');
-               } else if (err.status === 401) {
-                 alert('Unauthorized. Please check your permissions.');
-               } else if (err.status === 500) {
-                 alert('Server error. Please try again later.');
-               } else {
-                 alert('Failed to register user. Please try again.');
-               }
-             },
-           });
-         } else {
-           console.warn('Form submission attempted with invalid data:', patientSpouseForm.value);
-           alert('Please fill in all required fields correctly.');
-         }
-       }
+        if (this.isSubmitting) {
+            console.warn("Submission in progress, preventing duplicate requests.");
+            return; // Prevent multiple submissions
+        }
+    
+        if (patientSpouseForm.valid) {
+            this.isSubmitting = true; // Set isSubmitting to true before making the request
+            const patientSpouseFormData = patientSpouseForm.value;
+    
+            console.log('Submitting patient spouse form:', patientSpouseFormData);
+    
+            this.applicationdashboardService.postPatientSpouseData(patientSpouseFormData).subscribe({
+                next: (response) => {
+                    console.log('Spouse Data Saved successfully:', response);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Spouse data saved successfully.',
+                        showConfirmButton: false,
+                        timer: 1000,
+                        timerProgressBar: true,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then(() => {
+                        this.isSubmitting = false; // Reset after success alert
+                    });
+                },
+                error: (err) => {
+                    console.error('API Error:', err);
+    
+                    let errorMessage = "Failed to register user. Please try again.";
+                    if (err.status === 400) {
+                        errorMessage = "Validation failed. Please check your inputs.";
+                    } else if (err.status === 401) {
+                        errorMessage = "Unauthorized. Please check your permissions.";
+                    } else if (err.status === 500) {
+                        errorMessage = "Server error. Please try again later.";
+                    }
+    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorMessage,
+                    }).then(() => {
+                        this.isSubmitting = false; // Reset after error alert
+                    });
+                }
+            });
+        } else {
+            console.warn('Form submission attempted with invalid data:', patientSpouseForm.value);
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Submission!',
+                text: 'Please fill in all required fields correctly.',
+            });
+        }
+    }
+    
 }

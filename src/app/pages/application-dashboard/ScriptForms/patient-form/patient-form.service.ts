@@ -6,16 +6,18 @@ import { ApplicationDashboardService } from '../../service/application-dashboard
 import { OnInit } from '@angular/core';
 import Swal from 'sweetalert2';
 
+
 @Injectable({
   providedIn: 'root'
 })
 export class PatientFormService {
-
+  isSubmitting: boolean = false; 
  existed: any;
   constructor(
       private fb: FormBuilder,
       private dashboardService: ApplicationDashboardService,
-      private route: ActivatedRoute,) {}
+      private route: ActivatedRoute,
+      private router: Router) {}
 
 
   ngOninit(): void {
@@ -25,6 +27,8 @@ export class PatientFormService {
    if (patientCode) {
      this.existed = this.dashboardService.getExistedPatientData(patientCode);
      console.log('ExistedPatient:', this.existed);
+     this.router.navigate(['/application', this.existed]);
+
    }
  });
 
@@ -89,6 +93,7 @@ export class PatientFormService {
   submitPatientForm(patientForm: FormGroup): void {
     if (patientForm.valid) {
       const patientFormData = patientForm.value;
+      this.isSubmitting = true;
       this.dashboardService.postPatientData(patientFormData).subscribe({
         next: (response) => {
           console.log('User registered successfully:', response);
@@ -102,7 +107,11 @@ export class PatientFormService {
             allowOutsideClick: false,
             allowEscapeKey: false
           });
+          this.isSubmitting = false;
+          this.router.navigate(['/application', patientForm.get('patientCode')?.value]);
+          
         },
+        
         error: (err) => {
           console.error('API Error:', err);
   
@@ -115,7 +124,6 @@ export class PatientFormService {
             errorMessage = "Server error. Please try again later.";
           }
   
-          // Show error alert
           Swal.fire({
             title: "Error!",
             text: errorMessage,
@@ -124,12 +132,11 @@ export class PatientFormService {
             allowOutsideClick: false,
             allowEscapeKey: false
           });
+          this.isSubmitting = false;
         }
       });
     } else {
       console.warn('Form submission attempted with invalid data:', patientForm.value);
-  
-      // Show warning if form is invalid
       Swal.fire({
         title: "Invalid Submission!",
         text: "Please fill in all required fields correctly.",
@@ -138,6 +145,7 @@ export class PatientFormService {
         allowOutsideClick: false,
         allowEscapeKey: false
       });
+      this.isSubmitting = false;
     }
   }
 }

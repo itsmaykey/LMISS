@@ -7,32 +7,31 @@
                   <i class="bx bx-sm bx-user me-1"></i> Account
                 </a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" *ngIf="ExistedPatientCode !== null && ExistedPatientCode !== undefined && ExistedPatientCode !== ''">
                 <a class="nav-link" data-bs-toggle="tab" data-bs-target="#EducationalAttain" role="tab" aria-selected="false">
                     <i class="bx bx-sm bx-book-open me-1"></i> Educational Attainment
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" *ngIf="ExistedPatientCode !== null && ExistedPatientCode !== undefined && ExistedPatientCode !== ''">
                 <a class="nav-link" data-bs-toggle="tab" data-bs-target="#FamHistory" role="tab" aria-selected="false">
                     <i class="bx bx-sm bx-group me-1"></i> Family History
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" *ngIf="ExistedPatientCode !== null && ExistedPatientCode !== undefined && ExistedPatientCode !== ''">
               <a class="nav-link" data-bs-toggle="tab" data-bs-target="#EmployHisto" role="tab" aria-selected="false">
                   <i class="bx bx-sm bx-briefcase me-1"></i> Employment History
               </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" *ngIf="ExistedPatientCode !== null && ExistedPatientCode !== undefined && ExistedPatientCode !== ''">
             <a class="nav-link" data-bs-toggle="tab" data-bs-target="#SubstanceHisto" role="tab" aria-selected="false">
                 <i class="bx bx-sm bx-capsule me-1"></i> Substance Use History
             </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" *ngIf="ExistedPatientCode !== null && ExistedPatientCode !== undefined && ExistedPatientCode !== ''">
           <a class="nav-link" data-bs-toggle="tab" data-bs-target="#ApplicationHisto" role="tab" aria-selected="false">
             <i class="bx bx-sm bx-task me-1"></i> Application
           </a>
         </li>
-
             </ul>
           </div>
           <div class="tab-content custom-tab-content">
@@ -173,7 +172,7 @@
                     </div>
                     <hr>
                     <div class="mt-6">
-                      <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                      <button type="submit" class="btn btn-primary me-3 text-white"  [disabled]="isSubmitting">Save changes</button>
                       <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                     </div>
 
@@ -181,7 +180,7 @@
                 </form>
               </div>
 
-              <div class="card-footer text-end">
+              <div class="card-footer text-end" *ngIf="ExistedPatientCode !== null && ExistedPatientCode !== undefined && ExistedPatientCode !== ''">
                 <button type="button" class="btn btn-secondary text-white me-2" (click)="goToEducational()">
                     Next
                 </button>
@@ -253,7 +252,7 @@
         </div>
         <hr>
         <div class="mt-6">
-          <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+          <button type="submit" class="btn btn-primary me-3 text-white"  [disabled]="isSubmitting">Save changes</button>
           <button type="reset" class="btn btn-outline-secondary">Cancel</button>
         </div>
     </div>
@@ -372,7 +371,7 @@
 
               <hr>
               <div class="mt-6">
-                <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                <button type="submit" class="btn btn-primary me-3 text-white"  [disabled]="isSubmitting">Save changes</button>
                 <button type="reset" class="btn btn-outline-secondary">Cancel</button>
               </div>
               <div class="card-footer text-end">
@@ -449,7 +448,7 @@
               </div>
               <hr>
               <div class="mt-6">
-                <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="isSubmitting">Save changes</button>
                 <button type="reset" class="btn btn-outline-secondary">Cancel</button>
               </div>
               <div class="card-footer text-end">
@@ -509,7 +508,7 @@
                 </div>
                 <hr>
                 <div class="mt-6">
-                  <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                  <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="isSubmitting">Save changes</button>
                   <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                 </div>
                 <div class="card-footer text-end">
@@ -569,7 +568,7 @@
                   </div>
                   <hr>
                   <div class="mt-6">
-                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="isSubmitting">Save changes</button>
                     <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                   </div>
                   <div class="card-footer text-end">
@@ -593,7 +592,7 @@
         </div>
         <div class="card-body">
           <div *ngIf="patientEmploymentForm" >
-        <form [formGroup]="patientEmploymentForm!" (ngSubmit)="patientEmployeeFormSubmit()">
+        <form [formGroup]="patientEmploymentForm" (ngSubmit)="patientEmployeeFormSubmit()" >
           <div class="row">
           <div class="col-md-12">
             <table class="table table-bordered">
@@ -622,7 +621,7 @@
           </div>
           <hr>
           <div class="mt-4">
-          <button type="submit" class="btn btn-primary text-white me-2">Save changes</button>
+          <button type="submit" class="btn btn-primary text-white me-2" [disabled]="isSubmitting">Save changes</button>
           <button type="reset" class="btn btn-outline-secondary">Cancel</button>
           </div>
         </form>
