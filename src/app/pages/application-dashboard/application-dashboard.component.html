@@ -190,6 +190,7 @@
             <!-- /Account -->
           </div>
     </div>
+
     <div class="tab-pane fade hide" id="EducationalAttain" role="tabpanel">
         <div class="card mb-5">
           <div class="card-header">
@@ -634,7 +635,8 @@
         </div>
       </div>
     </div>
-    <div class="tab-pane fade hide" id="SubstanceHisto" role="tabpanel">
+    
+    <div class="tab-pane fade" id="SubstanceHisto" role="tabpanel">
       <div class="nav-align-top nav-tabs-shadow mb-6">
         <ul class="nav nav-tabs" role="tablist">
           <li class="nav-item active show" role="presentation">
@@ -670,14 +672,14 @@
         </ul>
         <div class="tab-content">
           <div class="tab-pane fade active show" id="navDrugHistory" role="tabpanel">
-            <!-- Drug History Content -->
-            <div class="card mb-5">
-              <div class="card-header">
-                <h4 class="card-header-title">Drug History</h4>
-                <hr>
-              </div>
-              <div class="card-body pt-4">
-                <form id="DrugHistoryForm">
+          <div *ngIf="patientDrugHistoryForm">
+            <form [formGroup]="patientDrugHistoryForm" (ngSubmit)="patientDrugHistoryFormSumit()">
+              <div class="card mb-5">
+                <div class="card-header">
+                  <h4 class="card-header-title">Drug History</h4>
+                  <hr>
+                </div>
+                <div class="card-body pt-4">
                   <div class="row g-4">
                     <div class="row">
                       <div class="col-md-12">
@@ -692,12 +694,25 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr *ngFor="let drughistory of drugHistories">
-                              <td><input class="form-control" type="text" [(ngModel)]="drughistory.dc" name="drughistoryDc" placeholder="Enter Drug Name" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="drughistory.ds" name="drughistoryDs" placeholder="Date Started" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="drughistory.lu" name="drughistoryLu" placeholder="Latest Use" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="drughistory.udq" name="drughistoryUdq" placeholder="Usual Dose" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="drughistory.hd" name="drughistoryHd" placeholder="Highest Dose" required></td>
+                            <tr *ngFor="let drughistory of drugHistorys.controls; let i = index" [formGroupName]="i">
+                              <td style="width: 15%;">
+                                <select class="select2 form-select" formControlName="drugSubstanceId">
+                                  <option value="" disabled selected>Select</option>
+                                  <option *ngFor="let x of dSubstance" [value]="x.drugSubstanceId">{{x.drugSubstanceDesc}}</option>
+                                </select>
+                              </td>
+                              <td style="width: 8%;">
+                                <input type="date" class="form-control" formControlName="dateStarted" placeholder="Enter Date">
+                              </td>
+                              <td style="width: 8%;">
+                                <input type="date" class="form-control" formControlName="latestUse" placeholder="Enter Date">
+                              </td>
+                              <td>
+                                <input class="form-control" type="text" formControlName="dosageTaken" name="drughistoryUdq" placeholder="Usual Dose" required>
+                              </td>
+                              <td>
+                                <input class="form-control" type="text" formControlName="highestDosageTaken" name="drughistoryHd" placeholder="Highest Dose" required>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -705,22 +720,22 @@
                         <button type="button" class="btn btn-secondary" (click)="drughistoriessaddRow()">Add Row</button>
                       </div>
                     </div>
-                  
                   </div>
                   <hr>
                   <div class="mt-6">
                     <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
                     <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                   </div>
-                </form>
+                </div>
               </div>
-            </div>
-              <div class="card-footer text-end">
+            </form>
+            <div class="card-footer text-end">
               <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavReason()">
-                        Next
+                Next
               </button>
-              </div>
+            </div>
           </div>
+</div>
           <div class="tab-pane fade" id="navReason" role="tabpanel">
             <!-- Reason for Using Drugs Content -->
             <div class="card mb-5">
@@ -751,10 +766,11 @@
             </div>
             <div class="card-footer text-end">
               <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavDrugEffects()">
-                        Next
+                Next
               </button>
-              </div>
+            </div>
           </div>
+
           <div class="tab-pane fade" id="navDrugEffects" role="tabpanel">
             <!-- Drug Effects Content -->
             <div class="card mb-5">
@@ -790,10 +806,11 @@
             </div>
             <div class="card-footer text-end">
               <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavRehabRecord()">
-                        Next
+                Next
               </button>
-              </div>
+            </div>
           </div>
+
           <div class="tab-pane fade" id="navRehabRecord" role="tabpanel">
             <!-- Rehabilitation Record Content -->
             <div class="card mb-5">
@@ -815,9 +832,15 @@
                           </thead>
                           <tbody>
                             <tr *ngFor="let prevRehab of PrevRehab">
-                              <td><input class="form-control" type="text" [(ngModel)]="prevRehab.pr" name="prevRehabPr" placeholder="Enter Period" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="prevRehab.rc" name="prevRehabRc" placeholder="Enter Center" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="prevRehab.whe" name="prevRehabWhe" placeholder="Explain" required></td>
+                              <td>
+                                <input class="form-control" type="text" [(ngModel)]="prevRehab.pr" name="prevRehabPr" placeholder="Enter Period" required>
+                              </td>
+                              <td>
+                                <input class="form-control" type="text" [(ngModel)]="prevRehab.rc" name="prevRehabRc" placeholder="Enter Center" required>
+                              </td>
+                              <td>
+                                <input class="form-control" type="text" [(ngModel)]="prevRehab.whe" name="prevRehabWhe" placeholder="Explain" required>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -836,10 +859,11 @@
             </div>
             <div class="card-footer text-end">
               <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavPersonalHealth()">
-                        Next
+                Next
               </button>
-              </div>
+            </div>
           </div>
+
           <div class="tab-pane fade" id="navPersonalHealth" role="tabpanel">
             <!-- Personal Health History Content -->
             <div class="card mb-5">
@@ -866,10 +890,11 @@
             </div>
             <div class="card-footer text-end">
               <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavFamilyHealth()">
-                        Next
+                Next
               </button>
-              </div>
+            </div>
           </div>
+
           <div class="tab-pane fade" id="navFamilyHealth" role="tabpanel">
             <!-- Family Health Record Content -->
             <div class="card mb-5">
@@ -895,13 +920,27 @@
                           </thead>
                           <tbody>
                             <tr *ngFor="let FamHealthHistory of FamHealthHistories">
-                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.n" name="FamHealthHistoryN" placeholder="Enter Name" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.bp" name="FamHealthHistoryBp" placeholder="Enter BP" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.h" name="FamHealthHistoryH" placeholder="Enter Height" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.w" name="FamHealthHistoryW" placeholder="Enter Weight" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.rr" name="FamHealthHistoryRR" placeholder="Enter RR" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.cr" name="FamHealthHistoryCR" placeholder="Enter CR" required></td>
-                              <td><input class="form-control" type="text" [(ngModel)]="FamHealthHistory.tms" name="FamHealthHistoryTms" placeholder="Enter Marks/Scars" required></td>
+                              <td>
+                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.n" name="FamHealthHistoryN" placeholder="Enter Name" required>
+                              </td>
+                              <td>
+                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.bp" name="FamHealthHistoryBp" placeholder="Enter BP" required>
+                              </td>
+                              <td>
+                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.h" name="FamHealthHistoryH" placeholder="Enter Height" required>
+                              </td>
+                              <td>
+                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.w" name="FamHealthHistoryW" placeholder="Enter Weight" required>
+                              </td>
+                              <td>
+                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.rr" name="FamHealthHistoryRR" placeholder="Enter RR" required>
+                              </td>
+                              <td>
+                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.cr" name="FamHealthHistoryCR" placeholder="Enter CR" required>
+                              </td>
+                              <td>
+                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.tms" name="FamHealthHistoryTms" placeholder="Enter Marks/Scars" required>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -920,13 +959,14 @@
             </div>
             <div class="card-footer text-end">
               <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoAppHisto()">
-                        Next
+                Next
               </button>
-              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
     <div class="tab-pane fade hide" id="ApplicationHisto" role="tabpanel">
       <div class="row">
 
@@ -1039,5 +1079,5 @@
     </div>
 
 
-
+  </div>
 </div>

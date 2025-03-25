@@ -11,6 +11,7 @@ import { PatientSpouseFormService } from './ScriptForms/patient-SpouseForm/patie
 import { SiblingsFormService } from './ScriptForms/patient-SiblingForm/siblings-form.service';
 import { ChildrensFormService } from './ScriptForms/patient-childrenForm/childrens-form.service';
 import { EmploymentFormService } from './ScriptForms/patientEmploymentForm/employment-form.service';
+import { PatientDrugHistoryService } from './ScriptForms/patient-drugHistory/patient-drug-history.service';
 import Swal from 'sweetalert2';
 @Component({
   selector: 'app-application-dashboard',
@@ -26,6 +27,7 @@ export class ApplicationDashboardComponent implements OnInit {
   patientSiblingsForm!: FormGroup;
   patientEmploymentForm!: FormGroup;
   patientChildrenForm!: FormGroup;
+  patientDrugHistoryForm!: FormGroup;
   //siblings!: FormArray;
   ExistedPatient: any = [];
   ExistedPatientSchool: any = [];
@@ -34,6 +36,7 @@ export class ApplicationDashboardComponent implements OnInit {
   ExistedPatientSibling: any = [];
   ExistedPatientChildren: any = [];
   ExistedPatientEmployee: any = [];
+  ExistedPatientDrugHistory: any = [];
   userInfo: any;
 
   admissionType: any = [];
@@ -43,6 +46,7 @@ export class ApplicationDashboardComponent implements OnInit {
   prk: any = [];
   nationality: any = [];
   civilStatus: any = [];
+  dSubstance: any = [];
   religion: any = [];
   drugEffects: any = [];
   educationalAttainment: any = [];
@@ -62,7 +66,8 @@ export class ApplicationDashboardComponent implements OnInit {
     private patientSpouseFormService: PatientSpouseFormService,
     private siblingsFormService: SiblingsFormService,
     private childrenFormService: ChildrensFormService,
-    private employeeFormService: EmploymentFormService
+    private employeeFormService: EmploymentFormService,
+    private PatientDrugHistoryService: PatientDrugHistoryService
   ) {}
 
   ngOnInit(): void {
@@ -91,6 +96,7 @@ export class ApplicationDashboardComponent implements OnInit {
     this.loadExistedPatientSiblingsData(patientCode);
     this.loadExistedPatientChildrensData(patientCode);
     this.loadExistedPatientEmployeeData(patientCode);
+    this.loadExistedPatientDrugHistoryData(patientCode);
   }
 
   initializeForms(): void {
@@ -101,6 +107,7 @@ export class ApplicationDashboardComponent implements OnInit {
     this.patientSiblingsForm = this.siblingsFormService.createPatientSiblingForm(this.ExistedPatientCode);
     this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode);
     this.patientChildrenForm = this.childrenFormService.createPatientChildrenForm(this.ExistedPatientCode);
+    this.patientDrugHistoryForm = this.PatientDrugHistoryService.createPatientDrugHistoryForm(this.ExistedPatientCode);
     // this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
   }
 
@@ -258,7 +265,32 @@ export class ApplicationDashboardComponent implements OnInit {
       },
     });
   }
-
+  loadExistedPatientDrugHistoryData(patientCode: string): void {
+    this.service.getExistedPatientDrugHistoryData(patientCode).subscribe({
+      next: (response) => {
+        this.ExistedPatientDrugHistory = response;
+        console.log(this.ExistedPatientDrugHistory);
+        if (this.ExistedPatientDrugHistory.length === 0) {
+          // Add a blank value if no data exists
+          this.ExistedPatientDrugHistory.push({ dateStarted: '', latestUse: '', frequency: '' });
+        }
+        this.ExistedPatientDrugHistory.forEach((drugHistory: any) => {
+          const dateStarted = new Date(drugHistory.dateStarted);
+          const latestUse = new Date(drugHistory.latestUse);
+          if (!isNaN(dateStarted.getTime())) {
+            drugHistory.dateStarted = dateStarted.toISOString().split('T')[0];
+          }
+          if (!isNaN(latestUse.getTime())) {
+            drugHistory.latestUse = latestUse.toISOString().split('T')[0];
+          }
+        });
+        this.patientDrugHistoryForm = this.PatientDrugHistoryService.createPatientDrugHistoryForm(this.ExistedPatientCode, { drugHistorys: this.ExistedPatientDrugHistory });
+      },
+      error: () => {
+        this.patientDrugHistoryForm = this.PatientDrugHistoryService.createPatientDrugHistoryForm(this.ExistedPatientCode, { drugHistorys: [{ dateStarted: '', latestUse: '', substance: '', frequency: '' }] });
+      },
+    });
+  }
   fetchAdditionalData(): void {
     this.service.getDrugEffect().subscribe({
       next: (response) => {
@@ -310,7 +342,15 @@ export class ApplicationDashboardComponent implements OnInit {
         console.error('Error:', error);
       },
     });
-
+    this.service.getDrugSubstance().subscribe({
+      next: (response) => {
+        this.dSubstance = response;
+        console.log(this.dSubstance);
+      },
+      error: (error) => {
+        console.error('Error:', error);
+      },
+    });
     this.service.getNationality().subscribe({
       next: (response) => {
         this.nationality = response;
@@ -365,18 +405,38 @@ export class ApplicationDashboardComponent implements OnInit {
       console.error('Patient Sibling Form is invalid');
     }
   }
-  
   get siblings(): FormArray {
     return this.patientSiblingsForm.get('siblings') as FormArray;
   }
-
-  addSibling(): void {
-    this.siblings.push(this.siblingsFormService.createSiblingFormGroup());
-  }
-
   removeSibling(index: number): void {
     this.siblings.removeAt(index);
   }
+  addSibling(): void {
+    this.siblings.push(this.siblingsFormService.createSiblingFormGroup());
+  }
+  patientDrugHistoryFormSumit(): void {
+    if (this.patientDrugHistoryForm.value) {
+
+      this.PatientDrugHistoryService.submitPatientDrugHistoryForm(this.patientDrugHistoryForm.value).subscribe({
+        next: (response: any) => {
+          console.log('Patient drug history Form submitted successfully:', response);
+        },
+        error: (error: any) => {
+          console.error('Error submitting Patient children Form:', error);
+        },
+      });
+    } else {
+      console.error('Patient children Form is invalid');
+    }
+  }
+  drughistoriessaddRow(): void {
+    this.drugHistorys.push(this.PatientDrugHistoryService.createDrugHistoryFormGroup());
+  }
+ 
+  get drugHistorys(): FormArray {
+    return this.patientDrugHistoryForm.get('drugHistorys') as FormArray;
+  }
+  
 
 
   patientChildrenFormSubmit(): void {
@@ -594,13 +654,6 @@ export class ApplicationDashboardComponent implements OnInit {
       const tabInstance = new (window as any).bootstrap.Tab(tabElement);
       tabInstance.show();
     }
-  }
-
-
- 
-  drugHistories: any[] = [{ dc: '', ds: '', lu: '', udq: '', hd: '' }];
-  drughistoriessaddRow() {
-    this.drugHistories.push({ dc: '', ds: '', lu: '', udq: '', hd: '' });
   }
 
   PrevRehab: any[] = [{ pr: '', rc: '', whe: '' }];
