@@ -723,7 +723,7 @@
                   </div>
                   <hr>
                   <div class="mt-6">
-                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="isSubmitting">Save changes</button>
                     <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                   </div>
                 </div>
@@ -735,34 +735,40 @@
               </button>
             </div>
           </div>
-</div>
-          <div class="tab-pane fade" id="navReason" role="tabpanel">
+      </div>
+            <div class="tab-pane fade" id="navReason" role="tabpanel">
             <!-- Reason for Using Drugs Content -->
             <div class="card mb-5">
               <div class="card-header">
-                <h4 class="card-header-title">Reason for Using Drugs</h4>
+              <h4 class="card-header-title">Reason for Using Drugs</h4>
               </div>
               <div class="card-body pt-4">
-                <form id="ReasonForm">
+              <div *ngIf="patientDrugReasonForm">
+                  <form [formGroup]="patientDrugReasonForm"  (ngSubmit)="patientDrugReasonFormSubmit()">
                   <div class="row g-4">
                     <div class="row">
+                      <div class="col-md-3" hidden>
+                        <label for="lname" class="form-label">Patient Code</label>
+                        <input class="form-control" type="text" formControlName="patientCode" placeholder="Enter Last Name">
+                      </div>
                       <div class="col-md-12">
                         <label for="reason" class="form-label">Reason for using Drugs?</label>
-                        <input type="text" class="form-control" id="reason" name="reason" placeholder="Enter Reason">
+                        <input type="text" class="form-control" formControlName="reasonForUsingDrugs" id="reason" name="reason" placeholder="Enter Reason">
                       </div>
                       <div class="col-md-12">
                         <label for="support" class="form-label">How do you support your vices?</label>
-                        <input type="text" class="form-control" id="support" name="support" placeholder="Enter Support Method">
+                        <input type="text" class="form-control" formControlName="patientSupportVices" id="support" name="support" placeholder="Enter Support Method">
                       </div>
                     </div>
                   </div>
                   <hr>
                   <div class="mt-6">
-                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="isSubmitting">Save changes</button>
                     <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                   </div>
                 </form>
               </div>
+            </div>
             </div>
             <div class="card-footer text-end">
               <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavDrugEffects()">
@@ -778,7 +784,9 @@
                 <h4 class="card-header-title">Drug Effects</h4>
               </div>
               <div class="card-body pt-4">
-                <form id="drugEffectForm">
+                <div *ngIf="patientDrugEffectForm">
+                  <form [formGroup]="patientDrugEffectForm"  (ngSubmit)="patientDrugEffectFormSubmit()">
+                    
                   <div class="row g-4">
                     <div class="row">
                       <div class="col-md-12">
@@ -798,12 +806,13 @@
                   </div>
                   <hr>
                   <div class="mt-6">
-                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="isSubmitting">Save changes</button>
                     <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                   </div>
                 </form>
-              </div>
             </div>
+          </div>
+        </div>
             <div class="card-footer text-end">
               <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavRehabRecord()">
                 Next

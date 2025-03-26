@@ -69,6 +69,12 @@ constructor(private http: HttpClient) { }
   postPatientDrugHistoryData(data: any) {
         return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientDrugHistoryData`, data);
         }
+  postPatientReasonUsingDrugsData(data: any) {
+        return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientReasonUsingDrugsData`, data);
+        }
+  postPatientDrugEffectData(data: any) {
+        return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientDrugEffectData`, data);
+        }
 //forExistedPatientDATA
   getExistedPatientData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}`);
@@ -95,7 +101,12 @@ constructor(private http: HttpClient) { }
   getExistedPatientDrugHistoryData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientDrugHistory?patientCode=${patientCode}`);
   }
-
+  getExistedPatientDrugReasonData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientReasonUsingDrugs?patientCode=${patientCode}`);
+  }
+  getExistedPatientDrugEffectData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientDrugEffect?patientCode=${patientCode}`);
+  }
   }
 
 

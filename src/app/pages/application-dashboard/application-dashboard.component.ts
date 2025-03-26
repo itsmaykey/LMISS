@@ -12,6 +12,8 @@ import { SiblingsFormService } from './ScriptForms/patient-SiblingForm/siblings-
 import { ChildrensFormService } from './ScriptForms/patient-childrenForm/childrens-form.service';
 import { EmploymentFormService } from './ScriptForms/patientEmploymentForm/employment-form.service';
 import { PatientDrugHistoryService } from './ScriptForms/patient-drugHistory/patient-drug-history.service';
+import { PatientDrugReasonService } from './ScriptForms/patientDrugReason/patient-drug-reason.service';
+import { PatientDrugEffectService } from './ScriptForms/patientDrugEffect/patient-drug-effect.service';
 import Swal from 'sweetalert2';
 @Component({
   selector: 'app-application-dashboard',
@@ -28,6 +30,8 @@ export class ApplicationDashboardComponent implements OnInit {
   patientEmploymentForm!: FormGroup;
   patientChildrenForm!: FormGroup;
   patientDrugHistoryForm!: FormGroup;
+  patientDrugReasonForm!: FormGroup;
+  patientDrugEffectForm!: FormGroup;
   //siblings!: FormArray;
   ExistedPatient: any = [];
   ExistedPatientSchool: any = [];
@@ -37,6 +41,8 @@ export class ApplicationDashboardComponent implements OnInit {
   ExistedPatientChildren: any = [];
   ExistedPatientEmployee: any = [];
   ExistedPatientDrugHistory: any = [];
+  ExistedPatientDrugReason: any = [];
+  ExistedPatientDrugEffect: any = [];
   userInfo: any;
 
   admissionType: any = [];
@@ -67,7 +73,9 @@ export class ApplicationDashboardComponent implements OnInit {
     private siblingsFormService: SiblingsFormService,
     private childrenFormService: ChildrensFormService,
     private employeeFormService: EmploymentFormService,
-    private PatientDrugHistoryService: PatientDrugHistoryService
+    private PatientDrugHistoryService: PatientDrugHistoryService,
+    private PatientDrugReasonService: PatientDrugReasonService,
+    private PatientDrugEffectService: PatientDrugEffectService,
   ) {}
 
   ngOnInit(): void {
@@ -97,6 +105,8 @@ export class ApplicationDashboardComponent implements OnInit {
     this.loadExistedPatientChildrensData(patientCode);
     this.loadExistedPatientEmployeeData(patientCode);
     this.loadExistedPatientDrugHistoryData(patientCode);
+    this.loadExistedPatientDrugReasonData(patientCode);
+    this.loadExistedPatientDrugEffectData(patientCode);
   }
 
   initializeForms(): void {
@@ -108,6 +118,8 @@ export class ApplicationDashboardComponent implements OnInit {
     this.patientEmploymentForm = this.employeeFormService.createPatientEmployeeForm(this.ExistedPatientCode);
     this.patientChildrenForm = this.childrenFormService.createPatientChildrenForm(this.ExistedPatientCode);
     this.patientDrugHistoryForm = this.PatientDrugHistoryService.createPatientDrugHistoryForm(this.ExistedPatientCode);
+    this.patientDrugReasonForm = this.PatientDrugReasonService.createPatientDrugReasonForm(this.ExistedPatientCode);
+    this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(this.ExistedPatientCode);
     // this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
   }
 
@@ -287,7 +299,39 @@ export class ApplicationDashboardComponent implements OnInit {
         this.patientDrugHistoryForm = this.PatientDrugHistoryService.createPatientDrugHistoryForm(this.ExistedPatientCode, { drugHistorys: this.ExistedPatientDrugHistory });
       },
       error: () => {
-        this.patientDrugHistoryForm = this.PatientDrugHistoryService.createPatientDrugHistoryForm(this.ExistedPatientCode, { drugHistorys: [{ dateStarted: '', latestUse: '', substance: '', frequency: '' }] });
+        this.patientDrugHistoryForm = this.PatientDrugHistoryService.createPatientDrugHistoryForm(this.ExistedPatientCode, { drugHistorys: [{ dateStarted: '', latestUse: '', frequency: '' }] });
+      },
+    });
+  }
+  loadExistedPatientDrugEffectData(patientCode: string): void {
+    this.service.getExistedPatientDrugEffectData(patientCode).subscribe({
+      next: (response) => {
+        this.ExistedPatientDrugEffect = response;
+        if (this.ExistedPatientDrugEffect.length > 0) {
+         
+          this.patientDrugReasonForm = this.PatientDrugEffectService.createPatientDrugEffectForm(this.ExistedPatientCode, this.ExistedPatientDrugEffect[0]);
+        } else {
+          this.patientDrugReasonForm = this.PatientDrugEffectService.createPatientDrugEffectForm(this.ExistedPatientCode);
+        }
+      },
+      error: () => {
+        this.patientDrugReasonForm = this.PatientDrugEffectService.createPatientDrugEffectForm(this.ExistedPatientDrugEffect[0]);
+      },
+    });
+  }
+  loadExistedPatientDrugReasonData(patientCode: string): void {
+    this.service.getExistedPatientDrugReasonData(patientCode).subscribe({
+      next: (response) => {
+        this.ExistedPatientDrugReason = response;
+        if (this.ExistedPatientDrugReason.length > 0) {
+         
+          this.patientDrugReasonForm = this.PatientDrugReasonService.createPatientDrugReasonForm(this.ExistedPatientCode, this.ExistedPatientDrugReason[0]);
+        } else {
+          this.patientDrugReasonForm = this.PatientDrugReasonService.createPatientDrugReasonForm(this.ExistedPatientCode);
+        }
+      },
+      error: () => {
+        this.patientDrugReasonForm = this.PatientDrugReasonService.createPatientDrugReasonForm(this.ExistedPatientDrugReason[0]);
       },
     });
   }
@@ -386,7 +430,12 @@ export class ApplicationDashboardComponent implements OnInit {
   patientSpouseFormSubmit(): void {
     this.patientSpouseFormService.submitPatientSpouseForm(this.patientSpouseForm);
   }
-
+  patientDrugReasonFormSubmit(): void {
+    this.PatientDrugReasonService.submitPatientDrugReasonForm(this.patientDrugReasonForm);
+  }
+  patientDrugEffectFormSubmit(): void {
+    this.PatientDrugEffectService.submitPatientDrugEffectForm(this.patientDrugEffectForm);
+  }
   patientSiblingsFormSubmit(): void {
     console.log(this.patientParentForm.valid);
     if (this.patientSiblingsForm.value) {
