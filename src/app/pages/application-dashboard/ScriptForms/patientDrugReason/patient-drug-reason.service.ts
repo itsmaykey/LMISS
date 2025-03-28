@@ -34,6 +34,7 @@ export class PatientDrugReasonService {
          return this.fb.group({
            patientCode : [ ExistedPatientCode, Validators.required],
            reasonForUsingDrugs: [existingPatientDrugReasonData.reasonForUsingDrugs || '' ,Validators.required],
+           drugEffectCode: [existingPatientDrugReasonData.drugEffectCode || '' ],
            patientSupportVices: [existingPatientDrugReasonData.patientSupportVices || '', Validators.required],
          });
        }

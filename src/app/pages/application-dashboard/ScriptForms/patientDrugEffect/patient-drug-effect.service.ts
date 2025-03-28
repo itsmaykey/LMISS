@@ -33,27 +33,26 @@ export class PatientDrugEffectService {
   
           return this.fb.group({
             patientCode : [ ExistedPatientCode, Validators.required],
-            drugEffectCode: [existingPatientDrugEffectData.drugEffectCode || '' ,Validators.required],
-            patientSupportVices: [existingPatientDrugEffectData.patientSupportVices || '', Validators.required],
+            drugEffectCode: [existingPatientDrugEffectData.drugEffectCode || '', Validators.required],
           });
         }
-        submitPatientDrugEffectForm(patientDrugReasonForm: FormGroup): void {
+        submitPatientDrugEffectForm(patientDrugEffectForm: FormGroup): void {
           if (this.isSubmitting) {
               console.warn("Submission in progress, preventing duplicate requests.");
-              return; // Prevent multiple submissions
+              return; 
           }
       
-          if (patientDrugReasonForm.valid) {
-              this.isSubmitting = true; // Set isSubmitting to true at the start
-              const patientDrugReasonFormData = patientDrugReasonForm.value;
-              console.log('Submitting patient reason form:', patientDrugReasonFormData);
-              this.applicationdashboardService.postPatientReasonUsingDrugsData(patientDrugReasonFormData).subscribe({
+          if (patientDrugEffectForm.valid) {
+              this.isSubmitting = true; 
+              const patientDrugEffectFormData = patientDrugEffectForm.value;
+              console.log('Submitting patient Effects form:', patientDrugEffectFormData);
+              this.applicationdashboardService.postPatientDrugEffectData(patientDrugEffectFormData).subscribe({
                   next: (response) => {
-                      console.log('Reason Data Saved successfully:', response);
+                      console.log('Effects Data Saved successfully:', response);
                       Swal.fire({
                           icon: 'success',
                           title: 'Success',
-                          text: 'Reason Data Saved successfully.',
+                          text: 'Effects Data Saved successfully.',
                           showConfirmButton: false,
                           timer: 1000, 
                           timerProgressBar: true,
@@ -85,7 +84,7 @@ export class PatientDrugEffectService {
                   }
               });
           } else {
-              console.warn('Form submission attempted with invalid data:', patientDrugReasonForm.value);
+              console.warn('Form submission attempted with invalid data:', patientDrugEffectForm.value);
               Swal.fire({
                   icon: 'warning',
                   title: 'Invalid Form',
