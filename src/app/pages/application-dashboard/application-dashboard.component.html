@@ -793,13 +793,17 @@
                         <label for="effects" class="form-label">Unwanted effects of use/abuse (please check whatever is applicable)</label>
                         <div class="row">
                           <div *ngFor="let x of drugEffects" class="form-check mb-0 ms-2 col-md-2">
-                            <input class="form-check-input" type="checkbox" [value]="x.drugEffectCode" (change)="onCheckboxChange($event, x)">
+                            <input 
+                              class="form-check-input" 
+                              type="checkbox"
+                              [checked]="x.selected"
+                              (change)="onCheckboxChange($event, x, patientDrugEffectForm)"> 
                             {{ x.drugEffectDesc }}
                           </div>
                         </div>
                         <div class="col-md-12">
                           <label for="otherEffects" class="form-label">Other bad effects/Experience</label>
-                          <input type="text" class="form-control" id="otherEffects" name="otherEffects" placeholder="Enter Other Effects">
+                          <input type="text" class="form-control" id="otherEffects"  name="otherEffects" placeholder="Enter Other Effects">
                         </div>
                       </div>
                     </div>
@@ -820,58 +824,61 @@
             </div>
           </div>
 
-          <div class="tab-pane fade" id="navRehabRecord" role="tabpanel">
-            <!-- Rehabilitation Record Content -->
-            <div class="card mb-5">
-              <div class="card-header">
+            <div class="tab-pane fade" id="navRehabRecord" role="tabpanel">
+            <div *ngIf="patientRehabRecordForm">
+              <form [formGroup]="patientRehabRecordForm" (ngSubmit)="patientRehabRecordFormSubmit()">
+              <div class="card mb-5">
+                <div class="card-header">
                 <h4 class="card-header-title">Rehabilitation Record</h4>
-              </div>
-              <div class="card-body pt-4">
-                <form id="PrevRehabForm">
-                  <div class="row g-4">
-                    <div class="row">
-                      <div class="col-md-12">
-                        <table class="table table-bordered">
-                          <thead>
-                            <tr>
-                              <th>Period</th>
-                              <th>Rehabilitation Center</th>
-                              <th>What Happened? Explain</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr *ngFor="let prevRehab of PrevRehab">
-                              <td>
-                                <input class="form-control" type="text" [(ngModel)]="prevRehab.pr" name="prevRehabPr" placeholder="Enter Period" required>
-                              </td>
-                              <td>
-                                <input class="form-control" type="text" [(ngModel)]="prevRehab.rc" name="prevRehabRc" placeholder="Enter Center" required>
-                              </td>
-                              <td>
-                                <input class="form-control" type="text" [(ngModel)]="prevRehab.whe" name="prevRehabWhe" placeholder="Explain" required>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <br>
-                        <button type="button" class="btn btn-secondary" (click)="PrevRehabaddRow()">Add Row</button>
-                      </div>
-                    </div>
+                </div>
+                <div class="card-body pt-4">
+                <div class="row g-4">
+                  <div class="row">
+                  <div class="col-md-12">
+                    <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                      <th>Period</th>
+                      <th>Rehabilitation Center</th>
+                      <th>What Happened? Explain</th>
+                      </tr>
+                    </thead>
+                    <tbody formArrayName="rehabRecords">
+                      
+                      <tr *ngFor="let rehabRecord of rehabRecords.controls; let i = index" [formGroupName]="i">
+                        
+                      <td>
+                        <input class="form-control" type="text" formControlName="rehabilitationPeriod" placeholder="Enter Period" required>
+                      </td>
+                      <td>
+                        <input class="form-control" type="text" formControlName="rehabilitationCenter" placeholder="Enter Center" required>
+                      </td>
+                      <td>
+                        <input class="form-control" type="text" formControlName="patientReason" placeholder="Explain" required>
+                      </td>
+                      </tr>
+                    </tbody>
+                    </table>
+                    <br>
+                    <button type="button" class="btn btn-secondary" (click)="addRehabRecord()">Add Row</button>
                   </div>
-                  <hr>
-                  <div class="mt-6">
-                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
-                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                   </div>
-                </form>
+                </div>
+                <hr>
+                <div class="mt-6">
+                  <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="isSubmitting">Save changes</button>
+                  <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                </div>
+                </div>
               </div>
+              </form>
             </div>
             <div class="card-footer text-end">
               <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavPersonalHealth()">
-                Next
+              Next
               </button>
             </div>
-          </div>
+            </div>
 
           <div class="tab-pane fade" id="navPersonalHealth" role="tabpanel">
             <!-- Personal Health History Content -->
@@ -880,22 +887,30 @@
                 <h4 class="card-header-title">Personal Health History</h4>
               </div>
               <div class="card-body pt-4">
-                <form id="PersonalHealthForm">
+                  <div *ngIf="patientPersonalHealthForm">
+                    
+                <form [formGroup]="patientPersonalHealthForm" (ngSubmit)="patientPersonalHealthFormSubmit()">
                   <div class="row g-4">
                     <div class="row">
+                      <div class="col-md-3" style="display: none;">
+                        <label for="lname" class="form-label">Patient Code</label>
+                        <input class="form-control" type="text" formControlName="patientCode" placeholder="Enter Last Name">
+                      </div>
                       <div class="col-md-12">
                         <label for="personalHealth" class="form-label">Personal Health History</label>
-                        <input type="text" class="form-control" id="personalHealth" name="personalHealth" placeholder="Enter Personal Health History">
+                        <textarea class="form-control" id="personalHealth" formControlName="patientHealthHistory" rows="4"
+                          placeholder="Enter Personal Health History"></textarea>
                       </div>
                     </div>
                   </div>
                   <hr>
-                  <div class="mt-6">
-                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                  <div class="mt-4">
+                    <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="isSubmitting">Save changes</button>
                     <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                   </div>
                 </form>
               </div>
+            </div>
             </div>
             <div class="card-footer text-end">
               <button type="button" class="btn btn-secondary text-white me-2" (click)="gotoNavFamilyHealth()">
@@ -903,6 +918,7 @@
               </button>
             </div>
           </div>
+          
 
           <div class="tab-pane fade" id="navFamilyHealth" role="tabpanel">
             <!-- Family Health Record Content -->
@@ -911,7 +927,8 @@
                 <h4 class="card-header-title">Family Health Record</h4>
               </div>
               <div class="card-body pt-4">
-                <form id="FamHealthHistoryForm">
+                <div *ngIf="FamHealthHistoryForm">
+                  <form [formGroup]="FamHealthHistoryForm" (ngSubmit)="patientFamHealthFormSubmit()">
                   <div class="row g-4">
                     <div class="row">
                       <div class="col-md-12">
@@ -927,40 +944,42 @@
                               <th>Tattoo Marks/Scars</th>
                             </tr>
                           </thead>
-                          <tbody>
-                            <tr *ngFor="let FamHealthHistory of FamHealthHistories">
-                              <td>
-                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.n" name="FamHealthHistoryN" placeholder="Enter Name" required>
-                              </td>
-                              <td>
-                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.bp" name="FamHealthHistoryBp" placeholder="Enter BP" required>
-                              </td>
-                              <td>
-                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.h" name="FamHealthHistoryH" placeholder="Enter Height" required>
-                              </td>
-                              <td>
-                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.w" name="FamHealthHistoryW" placeholder="Enter Weight" required>
-                              </td>
-                              <td>
-                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.rr" name="FamHealthHistoryRR" placeholder="Enter RR" required>
-                              </td>
-                              <td>
-                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.cr" name="FamHealthHistoryCR" placeholder="Enter CR" required>
-                              </td>
-                              <td>
-                                <input class="form-control" type="text" [(ngModel)]="FamHealthHistory.tms" name="FamHealthHistoryTms" placeholder="Enter Marks/Scars" required>
-                              </td>
-                            </tr>
-                          </tbody>
+                            <tbody formArrayName="FamHealthHistories">
+                              <tr *ngFor="let famHealth of FamHealthHistories.controls; let i = index" [formGroupName]="i">
+                                <td>
+                                  <input class="form-control" type="text" formControlName="familyName" placeholder="Enter Name" required>
+                                </td>
+                                <td>
+                                  <input class="form-control" type="text" formControlName="familyBloodPressure" placeholder="Enter BP" required>
+                                </td>
+                                <td>
+                                  <input class="form-control" type="text" formControlName="familyHeight" placeholder="Enter Height" required>
+                                </td>
+                                <td>
+                                  <input class="form-control" type="text" formControlName="familyWeight" placeholder="Enter Weight" required>
+                                </td>
+                                <td>
+                                  <input class="form-control" type="text" formControlName="familyRr" placeholder="Enter RR" required>
+                                </td>
+                                <td>
+                                  <input class="form-control" type="text" formControlName="familyCr" placeholder="Enter CR" required>
+                                </td>
+                                <td>
+                                  <input class="form-control" type="text" formControlName="familyTattooMarks" placeholder="Enter Marks/Scars" required>
+                                </td>
+                              </tr>
+                            </tbody>
+                         
+                          
                         </table>
                         <br>
-                        <button type="button" class="btn btn-secondary" (click)="FamHealthHistoriesaddRow()">Add Row</button>
+                        <button type="button" class="btn btn-secondary" (click)="FamHealthHistoriesaddRow()" >Add Row</button>
                       </div>
                     </div>
                   </div>
                   <hr>
                   <div class="mt-6">
-                    <button type="submit" class="btn btn-primary me-3 text-white">Save changes</button>
+                    <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="isSubmitting">Save changes</button>
                     <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                   </div>
                 </form>

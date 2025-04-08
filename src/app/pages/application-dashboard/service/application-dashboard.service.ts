@@ -75,6 +75,15 @@ constructor(private http: HttpClient) { }
   postPatientDrugEffectData(data: any) {
         return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientDrugEffectData`, data);
         }
+  postPatientHealthHistoryData(data: any) {
+        return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientHealthHistoryData`, data);
+        }
+  postPatientRehabilitationData(data: any) {
+          return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientRehabilitationData`, data);
+          }
+  postPatientFamilyHistoryData(data: any) {
+          return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientFamilyHistoryData`, data);
+        }
 //forExistedPatientDATA
   getExistedPatientData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}`);
@@ -106,6 +115,15 @@ constructor(private http: HttpClient) { }
   }
   getExistedPatientDrugEffectData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientDrugEffect?patientCode=${patientCode}`);
+  }
+  getExistedPatientHealthHistoryData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientHealthHistory?patientCode=${patientCode}`);
+  }
+  getExistedPatientRehabilitationRecordData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientHealthHistory?patientCode=${patientCode}`);
+  }
+  getExistedPatientFamilyHealth(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientFamilyHealth?patientCode=${patientCode}`);
   }
   }
 

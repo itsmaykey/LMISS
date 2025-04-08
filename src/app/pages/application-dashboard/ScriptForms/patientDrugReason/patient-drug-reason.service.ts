@@ -34,18 +34,17 @@ export class PatientDrugReasonService {
          return this.fb.group({
            patientCode : [ ExistedPatientCode, Validators.required],
            reasonForUsingDrugs: [existingPatientDrugReasonData.reasonForUsingDrugs || '' ,Validators.required],
-           drugEffectCode: [existingPatientDrugReasonData.drugEffectCode || '' ],
            patientSupportVices: [existingPatientDrugReasonData.patientSupportVices || '', Validators.required],
          });
        }
        submitPatientDrugReasonForm(patientDrugReasonForm: FormGroup): void {
          if (this.isSubmitting) {
              console.warn("Submission in progress, preventing duplicate requests.");
-             return; // Prevent multiple submissions
+             return;
          }
      
          if (patientDrugReasonForm.valid) {
-             this.isSubmitting = true; // Set isSubmitting to true at the start
+             this.isSubmitting = true; 
              const patientDrugReasonFormData = patientDrugReasonForm.value;
              console.log('Submitting patient reason form:', patientDrugReasonFormData);
              this.applicationdashboardService.postPatientReasonUsingDrugsData(patientDrugReasonFormData).subscribe({
