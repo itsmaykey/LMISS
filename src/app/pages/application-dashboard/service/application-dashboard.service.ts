@@ -84,6 +84,9 @@ constructor(private http: HttpClient) { }
   postPatientFamilyHistoryData(data: any) {
           return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientFamilyHistoryData`, data);
         }
+  postPatientAssessmentData(data: any) {
+          return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientAssessmentData`, data);
+        }
 //forExistedPatientDATA
   getExistedPatientData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}`);
@@ -125,9 +128,11 @@ constructor(private http: HttpClient) { }
   getExistedPatientFamilyHealth(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientFamilyHealth?patientCode=${patientCode}`);
   }
+  getExistedPatientAssessmentData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientAssessment?patientCode=${patientCode}`);
   }
 
-
+}
 
 
 
