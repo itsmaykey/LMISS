@@ -19,10 +19,8 @@ export class PatientFamHealthService {
     createPatientFamHealthHistoryForm(ExistedPatientCode: string, existingFamHealthHistoryData: any = {}): FormGroup {
       return this.fb.group({
         patientCode: [ExistedPatientCode, Validators.required],
-        FamHealthHistories: this.fb.array(
-          existingFamHealthHistoryData.FamHealthHistories && Array.isArray(existingFamHealthHistoryData.FamHealthHistories)
-            ? existingFamHealthHistoryData.FamHealthHistories.map((famHealth: any) => this.createFamHealthFormGroup(famHealth))
-            : []
+        famHealths: this.fb.array(
+          existingFamHealthHistoryData.famHealths ? existingFamHealthHistoryData.famHealths.map((famHealth: any) => this.createFamHealthFormGroup(famHealth)) : [this.createFamHealthFormGroup()]
         )
       });
     }
@@ -43,23 +41,25 @@ export class PatientFamHealthService {
       if (this.isSubmitting) {
         return new Observable(); // Prevent multiple submissions
       }
-  
+    
       this.isSubmitting = true; // Disable further submissions
-  
+    
       const formattedData = {
-        patientFamilyHistory: famHealthFormData.famHealth.map((famHealth: any) => ({
+        patientFamilyHistory: famHealthFormData.famHealths.map((famHealth: any) => ({
           recNo: 0,
           patientCode: famHealthFormData.patientCode,
-          familyName: famHealthFormData.familyName,
-          familyBloodPressure: famHealthFormData.familyBloodPressure,
-          familyHeight: famHealthFormData.familyHeight,
-          familyWeight: famHealthFormData.familyWeight,
-          familyRr: famHealthFormData.familyRr,
-          familyCr: famHealthFormData.familyCr,
-          familyTattooMarks: famHealthFormData.familyTattooMarks
+          familyName: famHealth.familyName,
+          familyBloodPressure: famHealth.familyBloodPressure,
+          familyHeight: famHealth.familyHeight,
+          familyWeight: famHealth.familyWeight,
+          familyRr: famHealth.familyRr,
+          familyCr: famHealth.familyCr,
+          familyTattooMarks: famHealth.familyTattooMarks
         }))
       };
-  
+    
+      console.log('Formatted data being sent:', formattedData);
+    
       return new Observable((observer) => {
         this.applicationdashboardService.postPatientFamilyHistoryData(formattedData).subscribe({
           next: (response) => {
@@ -73,7 +73,7 @@ export class PatientFamHealthService {
               allowOutsideClick: false,
               allowEscapeKey: false
             });
-  
+    
             this.isSubmitting = false; // Re-enable submission on success
             observer.next(response);
             observer.complete();
@@ -84,11 +84,12 @@ export class PatientFamHealthService {
               title: 'Error',
               text: 'Failed to submit Patient Family History data. Please try again.'
             });
-  
+    
             this.isSubmitting = false; // Re-enable submission on error
             observer.error(error);
           }
         });
       });
     }
+    
 }

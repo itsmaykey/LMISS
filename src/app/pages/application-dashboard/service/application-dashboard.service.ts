@@ -123,7 +123,7 @@ constructor(private http: HttpClient) { }
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientHealthHistory?patientCode=${patientCode}`);
   }
   getExistedPatientRehabilitationRecordData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientHealthHistory?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientPrevRehab?patientCode=${patientCode}`);
   }
   getExistedPatientFamilyHealth(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientFamilyHealth?patientCode=${patientCode}`);

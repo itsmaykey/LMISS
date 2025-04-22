@@ -299,12 +299,19 @@ export class ApplicationDashboardComponent implements OnInit {
     this.service.getExistedPatientRehabilitationRecordData(patientCode).subscribe({
       next: (response) => {
         this.ExistedPatientRehabRecord = response;
-        console.log(this.ExistedPatientRehabRecord);
-        if (this.ExistedPatientRehabRecord.length > 0) {
-            this.patientRehabRecordForm = this.PatientRehabRecordService.createPatientRehabRecordForm(this.ExistedPatientCode, {rehabRecords: this.ExistedPatientRehabRecord});
-          } else {
-            this.patientRehabRecordForm = this.PatientRehabRecordService.createPatientRehabRecordForm(this.ExistedPatientCode);
-          }
+        console.log('Fetched rehab record:', this.ExistedPatientRehabRecord);
+  
+        // Confirm the data is an array and has expected structure
+        if (Array.isArray(this.ExistedPatientRehabRecord) && this.ExistedPatientRehabRecord.length > 0) {
+          console.log('Populating form with rehab data...');
+          this.patientRehabRecordForm = this.PatientRehabRecordService.createPatientRehabRecordForm(
+            this.ExistedPatientCode,
+            { rehabRecords: this.ExistedPatientRehabRecord }
+          );
+        } else {
+          console.log('No rehab records found or data format incorrect. Initializing empty form...');
+          this.patientRehabRecordForm = this.PatientRehabRecordService.createPatientRehabRecordForm(this.ExistedPatientCode);
+        }
       },
       error: (error) => {
         console.error('Error loading Existed Patient Rehab Data:', error);
@@ -312,6 +319,7 @@ export class ApplicationDashboardComponent implements OnInit {
       },
     });
   }
+  
 
   loadExistedPatientDrugHistoryData(patientCode: string): void {
     this.service.getExistedPatientDrugHistoryData(patientCode).subscribe({
@@ -344,7 +352,7 @@ export class ApplicationDashboardComponent implements OnInit {
       next: (response) => {
         this.ExistedPatientDrugEffect = response;
         if (this.ExistedPatientDrugEffect.length > 0) {
-         
+          console.log('Fetched Drug Effect:', this.ExistedPatientDrugEffect);
           this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(this.ExistedPatientCode, this.ExistedPatientDrugEffect[0]);
         } else {
           this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(this.ExistedPatientCode);
@@ -353,6 +361,7 @@ export class ApplicationDashboardComponent implements OnInit {
       error: () => {
         this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(this.ExistedPatientDrugEffect[0]);
       },
+      
     });
   }
   loadExistedPatientDrugReasonData(patientCode: string): void {
@@ -392,7 +401,7 @@ export class ApplicationDashboardComponent implements OnInit {
         this.ExistedPatientFamHealth = response;
         console.log(this.ExistedPatientFamHealth);
         if (this.ExistedPatientFamHealth.length > 0) {
-            this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode, {FamHealthHistories: this.ExistedPatientFamHealth});
+            this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode, {famHealths: this.ExistedPatientFamHealth});
           } else {
             this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode);
           }
@@ -403,6 +412,7 @@ export class ApplicationDashboardComponent implements OnInit {
       },
     });
   }
+  
   fetchAdditionalData(): void {
     this.service.getDrugEffect().subscribe({
       next: (response) => {
@@ -648,19 +658,20 @@ export class ApplicationDashboardComponent implements OnInit {
           console.log('Patient Family Health Form submitted successfully:', response);
         },
         error: (error) => {
-          console.error('Error submitting Patient Rehab Form:', error);
+          console.error('Error submitting Patient Fam Health Form:', error);
         },
       });
     } else {
       console.error('Patient Family Health Form is invalid', this.FamHealthHistoryForm.errors); // ✅ Show validation errors
     }
   }
-  get FamHealthHistories(): FormArray {
-    return this.FamHealthHistoryForm.get('FamHealthHistories') as FormArray;
+  
+  get famHealths(): FormArray {
+    return this.FamHealthHistoryForm.get('famHealths') as FormArray;
   }
 
   FamHealthHistoriesaddRow(): void {
-    this.FamHealthHistories.push(this.PatientFamHealthService.createFamHealthFormGroup());
+    this.famHealths.push(this.PatientFamHealthService.createFamHealthFormGroup());
   }
   // Event handlers
   onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
@@ -688,7 +699,7 @@ export class ApplicationDashboardComponent implements OnInit {
     const drugEffectCodeArray = patientDrugEffectForm.get('drugEffectCode') as FormArray;
   
     if (checkbox.checked) {
-      // ✅ Add drugEffectCode if checked
+     
       drugEffectCodeArray.push(new FormControl(drugEffect.drugEffectCode));
     } else {
       const index = drugEffectCodeArray.controls.findIndex(control => control.value === drugEffect.drugEffectCode);
@@ -697,7 +708,7 @@ export class ApplicationDashboardComponent implements OnInit {
       }
     }
   
-    console.log('Updated drugEffectCode:', drugEffectCodeArray.value); // ✅ Debugging
+    console.log('Updated drugEffectCode:', drugEffectCodeArray.value); 
   }
   
 

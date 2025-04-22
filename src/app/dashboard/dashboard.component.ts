@@ -103,12 +103,10 @@ this.isLoading = true;
     }
   }
 
-
-
   public onEvent(event: any): void {
-    const results = event as ScannerQRCodeResult[]; // Cast to ScannerQRCodeResult[]
+    const results = event as ScannerQRCodeResult[]; 
     if (results && results.length) {
-      this.scannedData = results[0].value; // Update scanned data
+      this.scannedData = results[0].value; 
       console.log('Scanned QR Code:', this.scannedData);
     }
   }

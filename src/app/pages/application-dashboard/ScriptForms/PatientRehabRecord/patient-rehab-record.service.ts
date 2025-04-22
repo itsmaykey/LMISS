@@ -15,13 +15,12 @@ patientRehabRecordForm!: FormGroup;
     private applicationdashboardService: ApplicationDashboardService
   ) {}
   
+ 
   createPatientRehabRecordForm(ExistedPatientCode: string, existingRehabRecordData: any = {}): FormGroup {
     return this.fb.group({
       patientCode: [ExistedPatientCode, Validators.required],
       rehabRecords: this.fb.array(
-        existingRehabRecordData.rehabRecords && Array.isArray(existingRehabRecordData.rehabRecords)
-          ? existingRehabRecordData.rehabRecords.map((rehabRecord: any) => this.createRehabRecordFormGroup(rehabRecord))
-          : []
+        existingRehabRecordData.rehabRecords ? existingRehabRecordData.rehabRecords.map((rehabRecord: any) => this.createRehabRecordFormGroup(rehabRecord)) : [this.createRehabRecordFormGroup()]
       )
     });
   }

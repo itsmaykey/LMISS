@@ -693,7 +693,7 @@
                               <th>Highest Dose</th>
                             </tr>
                           </thead>
-                          <tbody>
+                          <tbody formArrayName="drugHistorys">
                             <tr *ngFor="let drughistory of drugHistorys.controls; let i = index" [formGroupName]="i">
                               <td style="width: 15%;">
                                 <select class="select2 form-select" formControlName="drugSubstanceId">
@@ -701,6 +701,7 @@
                                   <option *ngFor="let x of dSubstance" [value]="x.drugSubstanceId">{{x.drugSubstanceDesc}}</option>
                                 </select>
                               </td>
+                              
                               <td style="width: 8%;">
                                 <input type="date" class="form-control" formControlName="dateStarted" placeholder="Enter Date">
                               </td>
@@ -803,7 +804,7 @@
                         </div>
                         <div class="col-md-12">
                           <label for="otherEffects" class="form-label">Other bad effects/Experience</label>
-                          <input type="text" class="form-control" id="otherEffects"  name="otherEffects" placeholder="Enter Other Effects">
+                          <input type="text" class="form-control" id="otherEffects" formControlName="drugOtherEffects"  name="otherEffects" placeholder="Enter Other Effects">
                         </div>
                       </div>
                     </div>
@@ -844,9 +845,7 @@
                       </tr>
                     </thead>
                     <tbody formArrayName="rehabRecords">
-                      
                       <tr *ngFor="let rehabRecord of rehabRecords.controls; let i = index" [formGroupName]="i">
-                        
                       <td>
                         <input class="form-control" type="text" formControlName="rehabilitationPeriod" placeholder="Enter Period" required>
                       </td>
@@ -944,8 +943,8 @@
                               <th>Tattoo Marks/Scars</th>
                             </tr>
                           </thead>
-                            <tbody formArrayName="FamHealthHistories">
-                              <tr *ngFor="let famHealth of FamHealthHistories.controls; let i = index" [formGroupName]="i">
+                            <tbody formArrayName="famHealths">
+                              <tr *ngFor="let famHealth of famHealths.controls; let i = index" [formGroupName]="i">
                                 <td>
                                   <input class="form-control" type="text" formControlName="familyName" placeholder="Enter Name" required>
                                 </td>

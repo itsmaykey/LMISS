@@ -14,6 +14,7 @@ export class EmploymentFormService {
     private fb: FormBuilder,
     private applicationdashboardService: ApplicationDashboardService
   ) {}
+  
   createPatientEmployeeForm(ExistedPatientCode: string, existingEmployeeData: any = {}): FormGroup {
     return this.fb.group({
       patientCode: [ExistedPatientCode, Validators.required],
@@ -22,6 +23,7 @@ export class EmploymentFormService {
       )
     });
   }
+  
   createEmployeeFormGroup(EmployeeData: any = {}): FormGroup {
     return this.fb.group({
       patientEPeriodDate: [EmployeeData.patientEPeriodDate || '', Validators.required],
