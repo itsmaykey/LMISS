@@ -10,6 +10,7 @@ export class PatientRehabRecordService {
 
 isSubmitting: boolean = false; 
 patientRehabRecordForm!: FormGroup;
+
   constructor(
     private fb: FormBuilder,
     private applicationdashboardService: ApplicationDashboardService
@@ -36,11 +37,25 @@ patientRehabRecordForm!: FormGroup;
 
   submitPatientRehabRecordForm(rehabRecordFormData: any): Observable<any> {
     if (this.isSubmitting) {
-      return new Observable(); // Prevent multiple submissions
+      console.warn("Submission in progress, preventing duplicate requests.");
+      return new Observable((observer) => {
+        observer.error("Submission already in progress.");
+      });
     }
-
-    this.isSubmitting = true; // Disable further submissions
-
+  
+    // ✅ Check if no records were added
+    if (!rehabRecordFormData.rehabRecords || rehabRecordFormData.rehabRecords.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Records',
+        text: 'Please add at least one rehabilitation record before submitting.',
+        confirmButtonText: 'OK'
+      });
+      return new Observable(); // Prevent submission
+    }
+  
+    this.isSubmitting = true;
+  
     const formattedData = {
       previousRehabilitationDatums: rehabRecordFormData.rehabRecords.map((rehabRecord: any) => ({
         recNo: 0,
@@ -51,7 +66,7 @@ patientRehabRecordForm!: FormGroup;
         prevCode: rehabRecord.prevCode === '' ? '' : rehabRecord.prevCode
       }))
     };
-
+  
     return new Observable((observer) => {
       this.applicationdashboardService.postPatientRehabilitationData(formattedData).subscribe({
         next: (response) => {
@@ -64,9 +79,11 @@ patientRehabRecordForm!: FormGroup;
             showConfirmButton: false,
             allowOutsideClick: false,
             allowEscapeKey: false
+          }).then(() => {
+            this.isSubmitting = false;
+            rehabRecordFormData.rehabRecords = []; // ✅ Clear form on success
           });
-
-          this.isSubmitting = false; // Re-enable submission on success
+  
           observer.next(response);
           observer.complete();
         },
@@ -75,12 +92,14 @@ patientRehabRecordForm!: FormGroup;
             icon: 'error',
             title: 'Error',
             text: 'Failed to submit patient Rehabilitation data. Please try again.'
+          }).then(() => {
+            this.isSubmitting = false;
           });
-
-          this.isSubmitting = false; // Re-enable submission on error
+  
           observer.error(error);
         }
       });
     });
   }
+  
 }

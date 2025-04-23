@@ -11,7 +11,7 @@ export class PatientDrugEffectService {
   
   isSubmitting: boolean = false;
   existed: any;
-  patientDrugEffectForm: FormGroup = this.createPatientDrugEffectForm('', {}); // Initialize with default values
+
 
   constructor(
     private fb: FormBuilder,
@@ -40,42 +40,39 @@ export class PatientDrugEffectService {
     });
   }
 
-  // Create the patient drug effect form with pre-populated data if available
+ 
   createPatientDrugEffectForm(ExistedPatientCode: string, existingPatientDrugEffectData: any = {}): FormGroup {
-    const rawCodes = existingPatientDrugEffectData.drugEffectCode;
-    const codesArray = Array.isArray(rawCodes)
-      ? rawCodes
-      : rawCodes
-        ? [rawCodes]
+    const rawCode = existingPatientDrugEffectData.drugEffectCode;
+    const codesArray = Array.isArray(rawCode)
+      ? rawCode
+      : rawCode
+        ? [rawCode]
         : [];
   
-    // Create the form with FormArray for drug effects
     return this.fb.group({
       patientCode: [ExistedPatientCode, Validators.required],
       drugEffectCode: this.fb.array(
-        codesArray.map((code: string) => this.fb.control(code))  // Initialize with existing drug effect codes
+        codesArray.map(code => this.fb.control(code))
       ),
       drugOtherEffects: [existingPatientDrugEffectData.drugOtherEffects || '']
     });
   }
+  
+  
 
-  // Submit the form data to the backend
   submitPatientDrugEffectForm(patientDrugEffectForm: FormGroup): void {
     if (this.isSubmitting) {
       console.warn("Submission in progress, preventing duplicate requests.");
       return;
     }
 
-    // Ensure form is valid before submission
     if (patientDrugEffectForm.valid) {
       this.isSubmitting = true;
 
-      // Get selected drug effect codes from FormArray
       const selectedEffects = (patientDrugEffectForm.get('drugEffectCode') as FormArray).value;
       const drugOtherEffects = patientDrugEffectForm.get('drugOtherEffects')?.value;
       const patientCode = patientDrugEffectForm.get('patientCode')?.value;
 
-      // Prepare the data for submission
       const formData = {
         drugEffectDatum: selectedEffects.map((code: string) => ({
           recNo: 0,  // Assuming `recNo` is the primary key or identifier (could be changed)
@@ -125,8 +122,5 @@ export class PatientDrugEffectService {
     }
   }
 
-  // Helper function to access the FormArray in the form
-  get drugEffectCodes(): FormArray {
-    return this.patientDrugEffectForm.get('drugEffectCode') as FormArray;
-  }
+ 
 }

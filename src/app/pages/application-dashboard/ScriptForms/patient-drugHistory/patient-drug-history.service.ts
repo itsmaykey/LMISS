@@ -40,59 +40,72 @@ export class PatientDrugHistoryService {
 
   submitPatientDrugHistoryForm(drugHistoryData: any): Observable<any> {
     if (this.isSubmitting) {
-        console.warn("Submission in progress, preventing duplicate requests.");
-        return new Observable((observer) => {
-            observer.error("Submission already in progress.");
-        }); // Prevent multiple submissions
+      console.warn("Submission in progress, preventing duplicate requests.");
+      return new Observable((observer) => {
+        observer.error("Submission already in progress.");
+      });
     }
-
+  
+    // ✅ Check if no records were added
+    if (!drugHistoryData.drugHistorys || drugHistoryData.drugHistorys.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Records',
+        text: 'Please add at least one drug history record before submitting.',
+        confirmButtonText: 'OK'
+      });
+      return new Observable(); // Prevent submission
+    }
+  
     const formattedData = {
       patientDrugHistories: drugHistoryData.drugHistorys.map((drugHistory: any) => ({
-            recNo: 0,
-            patientCode: drugHistoryData.patientCode,
-            drugSubstanceId: drugHistory.drugSubstanceId,
-            dateStarted: drugHistory.dateStarted,
-            latestUse: drugHistory.latestUse,
-            dosageTaken: drugHistory.dosageTaken,
-            highestDosageTaken: drugHistory.highestDosageTaken,
-            patientDHCode: drugHistory.patientDHCode === '' ? '' : drugHistory.patientDHCode
-        }))
+        recNo: 0,
+        patientCode: drugHistoryData.patientCode,
+        drugSubstanceId: drugHistory.drugSubstanceId,
+        dateStarted: drugHistory.dateStarted,
+        latestUse: drugHistory.latestUse,
+        dosageTaken: drugHistory.dosageTaken,
+        highestDosageTaken: drugHistory.highestDosageTaken,
+        patientDHCode: drugHistory.patientDHCode === '' ? '' : drugHistory.patientDHCode
+      }))
     };
-
+  
     return new Observable((observer) => {
-        this.isSubmitting = true; // Prevent multiple requests
-
-        this.applicationdashboardService.postPatientDrugHistoryData(formattedData).subscribe({
-            next: (response) => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Patient drug history data has been successfully submitted!',
-                    timer: 1000,
-                    timerProgressBar: true,
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then(() => {
-                    this.isSubmitting = false; // Reset flag after alert
-                });
-
-                observer.next(response);
-                observer.complete();
-            },
-            error: (error) => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred while submitting patient drug history data.'
-                }).then(() => {
-                    this.isSubmitting = false; // Reset flag after alert
-                });
-
-                observer.error(error);
-            }
-        });
+      this.isSubmitting = true;
+  
+      this.applicationdashboardService.postPatientDrugHistoryData(formattedData).subscribe({
+        next: (response) => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Patient drug history data has been successfully submitted!',
+            timer: 1000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false
+          }).then(() => {
+            this.isSubmitting = false;
+            drugHistoryData.drugHistorys = []; // ✅ Clear form data on success
+          });
+  
+          observer.next(response);
+          observer.complete();
+        },
+        error: (error) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to submit patient drug history data. Please try again.'
+          }).then(() => {
+            this.isSubmitting = false;
+          });
+  
+          observer.error(error);
+        }
+      });
     });
-}
+  }
+  
 
 }

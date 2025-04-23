@@ -38,11 +38,25 @@ export class EmploymentFormService {
 
   submitPatientEmployeeForm(employeeFormData: any): Observable<any> {
     if (this.isSubmitting) {
-      return new Observable(); // Prevent multiple submissions
+      console.warn("Submission in progress, preventing duplicate requests.");
+      return new Observable((observer) => {
+        observer.error("Submission already in progress.");
+      });
     }
-
+  
+    // ✅ Check if no records were added
+    if (!employeeFormData.employs || employeeFormData.employs.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Records',
+        text: 'Please add at least one employment record before submitting.',
+        confirmButtonText: 'OK'
+      });
+      return new Observable(); // Prevent submission
+    }
+  
     this.isSubmitting = true; // Disable further submissions
-
+  
     const formattedData = {
       listPatientEmploymentData: employeeFormData.employs.map((employ: any) => ({
         recNo: 0,
@@ -55,7 +69,7 @@ export class EmploymentFormService {
         employmentCode: employ.employmentCode === '' ? '' : employ.employmentCode
       }))
     };
-
+  
     return new Observable((observer) => {
       this.applicationdashboardService.postPatientEmploymentData(formattedData).subscribe({
         next: (response) => {
@@ -68,9 +82,11 @@ export class EmploymentFormService {
             showConfirmButton: false,
             allowOutsideClick: false,
             allowEscapeKey: false
+          }).then(() => {
+            this.isSubmitting = false;
+            employeeFormData.employs = []; // ✅ Clear form data on success
           });
-
-          this.isSubmitting = false; // Re-enable submission on success
+  
           observer.next(response);
           observer.complete();
         },
@@ -79,12 +95,14 @@ export class EmploymentFormService {
             icon: 'error',
             title: 'Error',
             text: 'Failed to submit patient employment data. Please try again.'
+          }).then(() => {
+            this.isSubmitting = false;
           });
-
-          this.isSubmitting = false; // Re-enable submission on error
+  
           observer.error(error);
         }
       });
     });
   }
+  
 }

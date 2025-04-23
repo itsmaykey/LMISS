@@ -351,19 +351,26 @@ export class ApplicationDashboardComponent implements OnInit {
     this.service.getExistedPatientDrugEffectData(patientCode).subscribe({
       next: (response) => {
         this.ExistedPatientDrugEffect = response;
-        if (this.ExistedPatientDrugEffect.length > 0) {
-          console.log('Fetched Drug Effect:', this.ExistedPatientDrugEffect);
-          this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(this.ExistedPatientCode, this.ExistedPatientDrugEffect[0]);
-        } else {
-          this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(this.ExistedPatientCode);
-        }
+        console.log(this.ExistedPatientDrugEffect);
+        // Step 1: Extract all codes from existing data
+        const selectedCodes = this.ExistedPatientDrugEffect.map((item: any) => item.drugEffectCode);
+  
+        // Step 2: Loop through your checkbox list and mark selected ones
+        this.drugEffects.forEach((effect: { drugEffectCode: string; selected: boolean }) => {
+          effect.selected = selectedCodes.includes(effect.drugEffectCode);
+        });
+  
+        // Step 3: Create the form using the first record (or however you're using it)
+        const firstRecord = this.ExistedPatientDrugEffect[0] || {};
+        this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(patientCode, firstRecord);
       },
       error: () => {
-        this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(this.ExistedPatientDrugEffect[0]);
+        this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(patientCode);
       },
-      
     });
   }
+  
+  
   loadExistedPatientDrugReasonData(patientCode: string): void {
     this.service.getExistedPatientDrugReasonData(patientCode).subscribe({
       next: (response) => {
@@ -671,8 +678,11 @@ export class ApplicationDashboardComponent implements OnInit {
   }
 
   FamHealthHistoriesaddRow(): void {
-    this.famHealths.push(this.PatientFamHealthService.createFamHealthFormGroup());
+    const newRow = this.PatientFamHealthService.createFamHealthFormGroup();
+    newRow.patchValue({ isNew: true }); // ✅ Add a custom flag to mark this row as new
+    this.famHealths.push(newRow);
   }
+  
   // Event handlers
   onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
     const checkbox = event.target as HTMLInputElement;
@@ -694,22 +704,21 @@ export class ApplicationDashboardComponent implements OnInit {
 
   private selectedDrugEffectsMap = new Map<string, any>();
 
-  onCheckboxChange(event: Event, drugEffect: any, patientDrugEffectForm: FormGroup) {
-    const checkbox = event.target as HTMLInputElement;
-    const drugEffectCodeArray = patientDrugEffectForm.get('drugEffectCode') as FormArray;
+  onCheckboxChange(event: any, item: any, form: FormGroup) {
+    const drugEffectArray = form.get('drugEffectCode') as FormArray;
   
-    if (checkbox.checked) {
-     
-      drugEffectCodeArray.push(new FormControl(drugEffect.drugEffectCode));
+    if (event.target.checked) {
+      drugEffectArray.push(new FormControl(item.drugEffectCode));
+      item.selected = true;
     } else {
-      const index = drugEffectCodeArray.controls.findIndex(control => control.value === drugEffect.drugEffectCode);
-      if (index !== -1) {
-        drugEffectCodeArray.removeAt(index);
+      const index = drugEffectArray.controls.findIndex(ctrl => ctrl.value === item.drugEffectCode);
+      if (index >= 0) {
+        drugEffectArray.removeAt(index);
       }
+      item.selected = false;
     }
-  
-    console.log('Updated drugEffectCode:', drugEffectCodeArray.value); 
   }
+  
   
 
 
