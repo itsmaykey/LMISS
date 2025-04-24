@@ -79,6 +79,7 @@
                       <div class="col-md-2">
                         <label for="bPalce" class="form-label">Birth Place</label>
                         <input type="text" class="form-control" formControlName="birthplace" placeholder="Enter Birth Place">
+                        
                       </div>
                       <div class="col-md-2">
                         <label for="sex" class="form-label">Sex</label>
@@ -786,7 +787,6 @@
               </div>
               <div class="card-body pt-4">
                 <div *ngIf="patientDrugEffectForm">
-                  
                   <form [formGroup]="patientDrugEffectForm"  (ngSubmit)="patientDrugEffectFormSubmit()">
                     
                   <div class="row g-4">
@@ -794,14 +794,19 @@
                       <div class="col-md-12">
                         <label for="effects" class="form-label">Unwanted effects of use/abuse (please check whatever is applicable)</label>
                         <div class="row">
-                          <div *ngFor="let x of drugEffects" class="form-check mb-0 ms-2 col-md-2">
-                            <input 
-                              class="form-check-input" 
+                          <div formArrayName="drugEffectCode" class="row">
+                            <div *ngFor="let x of drugEffects; let i = index" class="form-check mb-0 ms-2 col-md-2">
+                              <input
+                              class="form-check-input"
                               type="checkbox"
-                              [checked]="x.selected"
-                              (change)="onCheckboxChange($event, x, patientDrugEffectForm)"> 
-                            {{ x.drugEffectDesc }}
+                              [value]="x.drugEffectCode"
+                              [checked]="(patientDrugEffectForm.get('drugEffectCode')?.value || []).includes(x.drugEffectCode)"
+                              (change)="onCheckboxChange($event, x, patientDrugEffectForm)">
+                              {{ x.drugEffectDesc }}
+                            </div>
                           </div>
+                          
+                          
                         </div>
                         <div class="col-md-12">
                           <label for="otherEffects" class="form-label">Other bad effects/Experience</label>
@@ -1007,30 +1012,40 @@
               <hr>
             </div>
             <div class="card-body pt-4">
-              <form id="AssessmentForm">
+              <div *ngIf="AssessmentForm">
+                <form [formGroup]="AssessmentForm"  (ngSubmit)="AssessmentFormSubmit()">
                 <div class="row g-4">
                   <div class="row">
                     <div class="row">
-                      <div *ngFor="let x of admissionType" style="font-size: 10px;" class="form-check mb-0 ms-2 col-md-2">
-                        <input class="form-check-input" type="checkbox" [value]="x.admissionCode"
-                          (change)="onAdmissionTypeCheckboxChange($event, x)">
-                        {{ x.admissionDesc }}
+                   
+                      <div formArrayName="admissionCode" class="row">
+                        <div *ngFor="let x of admissionType; let i = index" class="form-check mb-0 ms-2 col-md-2">
+                          <input
+                          class="form-check-input"
+                          type="checkbox"
+                          [value]="x.admissionCode"
+                          [checked]="(AssessmentForm.get('admissionCode')?.value || []).includes(x.admissionCode)"
+                          (change)="onAdmissionTypeCheckboxChange($event, x, AssessmentForm)">
+                          {{ x.admissionDesc}}
+                        </div>
                       </div>
                     </div>
-
-                    <div class="col-md-12">
-                      <label for="yrGrad" class="form-label">Assessment</label>
-                      <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder="Enter">
+                   
+                    <!-- <div class="col-md-12">
+                      <label for="Assessment" class="form-label">Assessment</label>
+                      <textarea class="form-control" id="Assessment" formControlName="admittingStaffAssessment" rows="2"
+                      placeholder="Enter Assessment"></textarea>
                     </div>
-
                     <div class="col-md-12">
-                      <label for="yrGrad" class="form-label">Plan</label>
-                      <input type="text" class="form-control" id="yrGrad" name="yrGrad" placeholder="Enter">
+                      <label for="Plan" class="form-label">Plan</label>
+                      <textarea class="form-control" id="Plan" formControlName="admittingStaffPlan" rows="2"
+                      placeholder="Enter Plan"></textarea>
                     </div>
+                 
                     <div class="col-md-12">
                       <label for="appDate" class="form-label">Application Date</label>
-                      <input type="date" class="form-control"  placeholder="Enter Date">
-                    </div>
+                      <input type="date" formControlName="patientAssessmentDate" class="form-control"  placeholder="Enter Date">
+                    </div> -->
                     <div class="divider text-end">
                       <div style="text-decoration: underline;">Prepared By:</div>
                     </div>
@@ -1047,6 +1062,7 @@
                 </div>
               </form>
             </div>
+          </div>
           </div>
         </div>
 

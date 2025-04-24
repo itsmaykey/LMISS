@@ -3,15 +3,14 @@ import { Injectable } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { ApplicationDashboardService } from '../../service/application-dashboard.service';
 import Swal from 'sweetalert2';
-
 @Injectable({
   providedIn: 'root'
 })
-export class PatientDrugEffectService {
+export class PatientStaffAssessmentService {
+
   
   isSubmitting: boolean = false;
   existed: any;
-
 
   constructor(
     private fb: FormBuilder,
@@ -24,14 +23,14 @@ export class PatientDrugEffectService {
     this.route.paramMap.subscribe((params) => {
       const patientCode = params.get('patientCode');
       if (patientCode) {
-        this.applicationdashboardService.getExistedPatientDrugEffectData(patientCode).subscribe({
+        this.applicationdashboardService.getExistedPatientAssessmentData(patientCode).subscribe({
           next: (data) => {
             this.existed = data;
             console.log('Existed Patient:', this.existed);
 
             // Now initialize the form using the fetched data
             if (this.existed) {
-              this.createPatientDrugEffectForm(this.existed.patientCode, this.existed);
+              this.createStaffAssessmentForm(this.existed.patientCode, this.existed);
             }
           },
           error: (err) => console.error('Error fetching patient data:', err)
@@ -41,8 +40,8 @@ export class PatientDrugEffectService {
   }
 
  
-  createPatientDrugEffectForm(ExistedPatientCode: string, existingPatientDrugEffectData: any = {}): FormGroup {
-    const rawCode = existingPatientDrugEffectData.drugEffectCode;
+  createStaffAssessmentForm(ExistedPatientCode: string, existingStaffAssessmenttData: any = {}): FormGroup {
+    const rawCode = existingStaffAssessmenttData.admissionCode;
     const codesArray = Array.isArray(rawCode)
       ? rawCode
       : rawCode
@@ -51,40 +50,46 @@ export class PatientDrugEffectService {
   
     return this.fb.group({
       patientCode: [ExistedPatientCode, Validators.required],
-      drugEffectCode: this.fb.array(
+      admissionCode: this.fb.array(
         codesArray.map(code => this.fb.control(code))
       ),
-      drugOtherEffects: [existingPatientDrugEffectData.drugOtherEffects || '']
+   
     });
   }
   
   
 
-  submitPatientDrugEffectForm(patientDrugEffectForm: FormGroup): void {
+  submitAssessmentForm(AssessmentForm: FormGroup): void {
     if (this.isSubmitting) {
       console.warn("Submission in progress, preventing duplicate requests.");
       return;
     }
-
-    if (patientDrugEffectForm.valid) {
+  
+    if (AssessmentForm.valid) {
       this.isSubmitting = true;
-
-      const selectedEffects = (patientDrugEffectForm.get('drugEffectCode') as FormArray).value;
-      const drugOtherEffects = patientDrugEffectForm.get('drugOtherEffects')?.value;
-      const patientCode = patientDrugEffectForm.get('patientCode')?.value;
-
+  
+      const selectedAdmission = (AssessmentForm.get('admissionCode') as FormArray).value;
+      const patientCode = AssessmentForm.get('patientCode')?.value;
+  
+      // Get current date in YYYY-MM-DD format
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const admissionDate = `${yyyy}-${mm}-${dd}`;
+  
       const formData = {
-        drugEffectDatum: selectedEffects.map((code: string) => ({
-          recNo: 0,  
+        listAdmissionData: selectedAdmission.map((code: string) => ({
+          recNo: 0,
           patientCode: patientCode,
-          drugEffectCode: code,
-          drugOtherEffects: drugOtherEffects,
+          admissionCode: code,
+          admissionDate: admissionDate
         }))
       };
-
+  
       console.log('Final Data to Submit:', formData);
-
-      this.applicationdashboardService.postPatientDrugEffectData(formData).subscribe({
+  
+      this.applicationdashboardService.postPatientAssessmentData(formData).subscribe({
         next: (response) => {
           console.log('Effects Data Saved successfully:', response);
           Swal.fire({
@@ -112,7 +117,7 @@ export class PatientDrugEffectService {
         }
       });
     } else {
-      console.warn('Invalid form submission:', patientDrugEffectForm.value);
+      console.warn('Invalid form submission:', AssessmentForm.value);
       Swal.fire({
         icon: 'warning',
         title: 'Invalid Form',
@@ -120,6 +125,6 @@ export class PatientDrugEffectService {
       });
     }
   }
+  
 
- 
 }

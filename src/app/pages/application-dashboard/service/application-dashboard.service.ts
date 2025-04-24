@@ -87,6 +87,9 @@ constructor(private http: HttpClient) { }
   postPatientAssessmentData(data: any) {
           return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientAssessmentData`, data);
         }
+  postAdmissionData(data: any) {
+          return this.http.post(`${environment.apiUrl}PostPatientDatas/PostAdmissionData`, data);
+        }
 //forExistedPatientDATA
   getExistedPatientData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}`);
@@ -131,7 +134,9 @@ constructor(private http: HttpClient) { }
   getExistedPatientAssessmentData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientAssessment?patientCode=${patientCode}`);
   }
-
+  getExistedPatientAdmissionData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientAdmission?patientCode=${patientCode}`);
+  }
 }
 
 
