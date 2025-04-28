@@ -4,10 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApplicationDashboardService } from '../../service/application-dashboard.service';
+import Swal from 'sweetalert2';
 @Injectable({
   providedIn: 'root'
 })
 export class SchoolFormService {
+  isSubmitting: boolean = false; 
 
 
 existed: any;
@@ -49,32 +51,64 @@ existed: any;
 
   submitPatientSchoolForm(PatientSchoolForm: FormGroup): void {
     if (PatientSchoolForm.valid) {
+      this.isSubmitting = true;
       console.log(PatientSchoolForm.value);
       const patientShoolFormData = PatientSchoolForm.value;
       console.log('Submitting patient school form:', patientShoolFormData);
       this.applicationdashboardService.postPatientSchoolData(patientShoolFormData).subscribe({
-        next: (response) => {
+      next: (response) => {
+      console.log('School Data Saved successfully:', response);
+      Swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: 'School Data Saved successfully',
+      timer: 1000, 
+      timerProgressBar: true,
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false
+      });
+      this.isSubmitting = false;
+      },
+      error: (err) => {
+      console.error('API Error:', err);
 
-          console.log('School Data Saved successfully:', response);
-          alert('School Data Saved successfully');
-        },
-        error: (err) => {
-          console.error('API Error:', err);
-
-          if (err.status === 400) {
-            alert('Validation failed. Please check your inputs.');
-          } else if (err.status === 401) {
-            alert('Unauthorized. Please check your permissions.');
-          } else if (err.status === 500) {
-            alert('Server error. Please try again later.');
-          } else {
-            alert('Failed to register user. Please try again.');
-          }
-        },
+      if (err.status === 400) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Validation failed. Please check your inputs.',
+      });
+      } else if (err.status === 401) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Unauthorized',
+        text: 'Unauthorized. Please check your permissions.',
+      });
+      } else if (err.status === 500) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Server Error',
+        text: 'Server error. Please try again later.',
+      });
+      } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to register user. Please try again.',
+      });
+      }
+      this.isSubmitting = false;
+      },
       });
     } else {
       console.warn('Form submission attempted with invalid data:', PatientSchoolForm.value);
-      alert('Please fill in all required fields correctly.');
+      Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Form',
+      text: 'Please fill in all required fields correctly.',
+      });
+      this.isSubmitting = false;
     }
   }
 }
