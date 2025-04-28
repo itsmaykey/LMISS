@@ -5,7 +5,6 @@ import { DashboardServiceService } from './dashboard-service/dashboard-service.s
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 
-
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -27,7 +26,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   userInfo: any;
 
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router) {
+
+  }
+
 
   ngOnInit(): void {
     this.userInfo = this.authService.getUserInfo();
@@ -36,12 +38,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   patientNames(): void {
     this.service.getPatients().subscribe((response: any) => {
       this.patients = response.map((owner: any) => ({ ...owner }));
-      this.filteredSearchNames = []; 
+      this.filteredSearchNames = [];
     });
   }
   FilteredSearchNames(): void {
     if (!this.searchText || this.searchText.trim() === '') {
-      this.filteredSearchNames = []; 
+      this.filteredSearchNames = [];
       return;
     }
 
@@ -53,6 +55,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       )
     );
   }
+
+
+
   goToAppDashboard() {
     this.router.navigate(['/application']);
   }

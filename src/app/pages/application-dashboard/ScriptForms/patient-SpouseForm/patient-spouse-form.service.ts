@@ -39,7 +39,6 @@ export class PatientSpouseFormService {
            spouseAddress: [existingPatientSpouseData.spouseAddress || '', Validators.required],
            spouseOccupation: [existingPatientSpouseData.spouseOccupation || '' ,Validators.required],
            spouseEmployer: [existingPatientSpouseData.spouseEmployer || '', Validators.required],
-
            spouseIncome: [existingPatientSpouseData.spouseIncome || '', Validators.required],
            spouseLivingArrangement: [existingPatientSpouseData.spouseLivingArrangement || '', Validators.required],
            spouseEduID: [existingPatientSpouseData.spouseEduID || '', Validators.required],
@@ -49,11 +48,11 @@ export class PatientSpouseFormService {
        submitPatientSpouseForm(patientSpouseForm: FormGroup): void {
          if (patientSpouseForm.valid) {
            const patientSpouseFormData = patientSpouseForm.value;
-           console.log('Submitting patient school form:', patientSpouseFormData);
+           console.log('Submitting patient spouse form:', patientSpouseFormData);
            this.applicationdashboardService.postPatientSpouseData(patientSpouseFormData).subscribe({
              next: (response) => {
-               console.log('Parents Data Saved successfully:', response);
-               alert('Parents Data Saved successfully');
+               console.log('Spouse Data Saved successfully:', response);
+               alert('Spouse Data Saved successfully');
              },
              error: (err) => {
                console.error('API Error:', err);
