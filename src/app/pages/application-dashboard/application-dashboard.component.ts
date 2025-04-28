@@ -71,7 +71,10 @@ export class ApplicationDashboardComponent implements OnInit {
   educationalAttainment: any = [];
   onChangeCitymunCode: string = '';
   onChangeBarangay: string = '';
-  selectedDrugEffects: any[] = [];
+  initialSelectedCodes: string[] = [];  
+  currentSelectedCodes: string[] = [];  
+  deselectedCodes: string[] = [];       
+  
   ExistedPatientCode = '';
 
   constructor(
@@ -368,11 +371,13 @@ export class ApplicationDashboardComponent implements OnInit {
         console.log(existingList);
         const selectedCodes = existingList.map((item: any) => item.drugEffectCode);
   
-        this.drugEffects = (drugEffects as any[]).map((effect: any) => ({
-          ...effect,
-          selected: selectedCodes.includes(effect.drugEffectCode)
-        }));
-        
+        // Filter the drugEffects to include only those with drugEffectStatus == 1
+        this.drugEffects = (drugEffects as any[])
+          .filter((effect: any) => effect.drugEffectStatus === 1)  // Added filter here
+          .map((effect: any) => ({
+            ...effect,
+            selected: selectedCodes.includes(effect.drugEffectCode)
+          }));
   
         const firstRecord = existingList.length > 0 ? {
           ...existingList[0],
@@ -390,6 +395,7 @@ export class ApplicationDashboardComponent implements OnInit {
       }
     });
   }
+  
   loadExistedPatientAssessmentData(patientCode: string): void {
     forkJoin({
       admissionType: this.service.getAdmissionType(),
@@ -768,18 +774,47 @@ export class ApplicationDashboardComponent implements OnInit {
       }
     }
   }
+
+
   onCheckboxChange(event: any, item: any, form: FormGroup) {
     const drugEffectArray = form.get('drugEffectCode') as FormArray;
+    const code = item.drugEffectCode;
   
     if (event.target.checked) {
-      drugEffectArray.push(new FormControl(item.drugEffectCode));
+      drugEffectArray.push(new FormControl(code));
+      item.selected = true;
+  
+      // Add to currentSelectedCodes if not present
+      if (!this.currentSelectedCodes.includes(code)) {
+        this.currentSelectedCodes.push(code);
+      }
+  
+      // Remove from deselected if it was there
+      this.deselectedCodes = this.deselectedCodes.filter(c => c !== code);
+  
     } else {
-      const index = drugEffectArray.controls.findIndex(ctrl => ctrl.value === item.drugEffectCode);
+      const index = drugEffectArray.controls.findIndex(ctrl => ctrl.value === code);
       if (index >= 0) {
         drugEffectArray.removeAt(index);
       }
+      item.selected = false;
+  
+      // Remove from currentSelectedCodes
+      this.currentSelectedCodes = this.currentSelectedCodes.filter(c => c !== code);
+  
+      // Add to deselectedCodes if not present
+      if (!this.deselectedCodes.includes(code)) {
+        this.deselectedCodes.push(code);
+      }
     }
+  
+    // 👇 Console the final result
+    console.log('✅ Selected (excluding deselected):', this.currentSelectedCodes);
+    console.log('❌ Deselected:', this.deselectedCodes);
   }
+  
+
+  
   
   onMunicipalityChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;

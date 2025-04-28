@@ -134,9 +134,7 @@ constructor(private http: HttpClient) { }
   getExistedPatientAssessmentData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientAssessment?patientCode=${patientCode}`);
   }
-  getExistedPatientAdmissionData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientAdmission?patientCode=${patientCode}`);
-  }
+
 }
 
 

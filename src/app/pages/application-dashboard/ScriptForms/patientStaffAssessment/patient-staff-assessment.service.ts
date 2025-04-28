@@ -57,8 +57,6 @@ export class PatientStaffAssessmentService {
     });
   }
   
-  
-
   submitAssessmentForm(AssessmentForm: FormGroup): void {
     if (this.isSubmitting) {
       console.warn("Submission in progress, preventing duplicate requests.");
