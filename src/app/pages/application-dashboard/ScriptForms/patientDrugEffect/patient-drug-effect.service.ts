@@ -8,7 +8,8 @@ import Swal from 'sweetalert2';
   providedIn: 'root'
 })
 export class PatientDrugEffectService {
-  
+  rawDrugEffectCodes: string[] = [];  // Add this at top of your component
+
   isSubmitting: boolean = false;
   existed: any;
   drugEffects: any[] = [];
@@ -48,6 +49,10 @@ allPreviouslySelectedCodes: string[] = [];
         ? [rawCode]
         : [];
   
+    console.log('Raw Code:', rawCode);
+  
+    this.rawDrugEffectCodes = codesArray;
+  
     return this.fb.group({
       patientCode: [ExistedPatientCode, Validators.required],
       drugEffectCode: this.fb.array(
@@ -58,7 +63,11 @@ allPreviouslySelectedCodes: string[] = [];
   }
   
   
-
+  
+  resetForm() {
+    this.allPreviouslySelectedCodes = [];
+  }
+  
   submitPatientDrugEffectForm(patientDrugEffectForm: FormGroup): void {
     if (this.isSubmitting) {
       console.warn("Submission in progress, preventing duplicate requests.");
@@ -68,35 +77,33 @@ allPreviouslySelectedCodes: string[] = [];
     if (patientDrugEffectForm.valid) {
       this.isSubmitting = true;
   
-      const selectedCodes = (patientDrugEffectForm.get('drugEffectCode') as FormArray).value;
-      const drugOtherEffects = patientDrugEffectForm.get('drugOtherEffects')?.value;
-      const patientCode = patientDrugEffectForm.get('patientCode')?.value;
+      const selectedCodes = (patientDrugEffectForm.get('drugEffectCode') as FormArray).value || [];
+      console.log('Selected Codes on Submit:', selectedCodes);
   
-      const deselectedCodes = this.allPreviouslySelectedCodes?.filter(code => !selectedCodes.includes(code)) || [];
+      const rawCode = this.rawDrugEffectCodes; 
+  
+      const missingCodes = rawCode.filter((code: string) => !selectedCodes.includes(code));
   
       const selectedDetails = selectedCodes.map((code: string) => ({
         recNo: 0,
-        patientCode: patientCode,
+        patientCode: patientDrugEffectForm.get('patientCode')?.value,
         drugEffectCode: code,
-        drugOtherEffects: drugOtherEffects,
-        drugEffectStatus: 1
+        drugOtherEffects: patientDrugEffectForm.get('drugOtherEffects')?.value,
+        drugEffectStatus: 1 
       }));
   
-      const deselectedDetails = deselectedCodes.map((code: string) => ({
+      const deselectedDetails = missingCodes.map((code: string) => ({
         recNo: 0,
-        patientCode: patientCode,
+        patientCode: patientDrugEffectForm.get('patientCode')?.value,
         drugEffectCode: code,
-        drugOtherEffects: drugOtherEffects,
-        drugEffectStatus: 0
+        drugOtherEffects: patientDrugEffectForm.get('drugOtherEffects')?.value,
+        drugEffectStatus: 0  
       }));
   
       const formData = {
-        drugEffectDatum: [...selectedDetails, ...deselectedDetails]
+        drugEffectDatum: [...selectedDetails, ...deselectedDetails]  
       };
   
-      console.log("✅ Selected:", selectedDetails);
-      console.log("❌ Deselected:", deselectedDetails);
-      console.log("📦 Final Data to Submit:", formData);
   
       this.applicationdashboardService.postPatientDrugEffectData(formData).subscribe({
         next: (response) => {
@@ -112,6 +119,8 @@ allPreviouslySelectedCodes: string[] = [];
             allowEscapeKey: false
           }).then(() => {
             this.isSubmitting = false;
+  
+            this.allPreviouslySelectedCodes = [...selectedCodes];
           });
         },
         error: (err) => {
@@ -135,6 +144,4 @@ allPreviouslySelectedCodes: string[] = [];
     }
   }
   
-  
- 
 }

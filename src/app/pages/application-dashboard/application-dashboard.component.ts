@@ -74,7 +74,7 @@ export class ApplicationDashboardComponent implements OnInit {
   initialSelectedCodes: string[] = [];  
   currentSelectedCodes: string[] = [];  
   deselectedCodes: string[] = [];       
-  
+  allPreviouslySelectedCodes: string[] = [];
   ExistedPatientCode = '';
 
   constructor(
@@ -368,12 +368,11 @@ export class ApplicationDashboardComponent implements OnInit {
     }).subscribe({
       next: ({ drugEffects, existingData }) => {
         const existingList = Array.isArray(existingData) ? existingData : [];
-        console.log(existingList);
+        console.log('Existing List:', existingList);
         const selectedCodes = existingList.map((item: any) => item.drugEffectCode);
   
-        // Filter the drugEffects to include only those with drugEffectStatus == 1
         this.drugEffects = (drugEffects as any[])
-          .filter((effect: any) => effect.drugEffectStatus === 1)  // Added filter here
+          .filter((effect: any) => effect.drugEffectStatus === 1)
           .map((effect: any) => ({
             ...effect,
             selected: selectedCodes.includes(effect.drugEffectCode)
@@ -381,12 +380,15 @@ export class ApplicationDashboardComponent implements OnInit {
   
         const firstRecord = existingList.length > 0 ? {
           ...existingList[0],
-          drugEffectCode: selectedCodes  
+          drugEffectCode: selectedCodes
         } : {
           drugEffectCode: []
         };
   
         this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(patientCode, firstRecord);
+  
+        // ❗ Save the loaded raw codes here:
+        this.allPreviouslySelectedCodes = [...selectedCodes]; // <-- this line important
       },
       error: (err) => {
         console.error('Error loading form data:', err);
@@ -395,6 +397,7 @@ export class ApplicationDashboardComponent implements OnInit {
       }
     });
   }
+  
   
   loadExistedPatientAssessmentData(patientCode: string): void {
     forkJoin({
@@ -784,12 +787,12 @@ export class ApplicationDashboardComponent implements OnInit {
       drugEffectArray.push(new FormControl(code));
       item.selected = true;
   
-      // Add to currentSelectedCodes if not present
+      
       if (!this.currentSelectedCodes.includes(code)) {
         this.currentSelectedCodes.push(code);
       }
   
-      // Remove from deselected if it was there
+     
       this.deselectedCodes = this.deselectedCodes.filter(c => c !== code);
   
     } else {
@@ -799,18 +802,15 @@ export class ApplicationDashboardComponent implements OnInit {
       }
       item.selected = false;
   
-      // Remove from currentSelectedCodes
+      
       this.currentSelectedCodes = this.currentSelectedCodes.filter(c => c !== code);
   
-      // Add to deselectedCodes if not present
+     
       if (!this.deselectedCodes.includes(code)) {
         this.deselectedCodes.push(code);
       }
     }
-  
-    // 👇 Console the final result
-    console.log('✅ Selected (excluding deselected):', this.currentSelectedCodes);
-    console.log('❌ Deselected:', this.deselectedCodes);
+
   }
   
 
