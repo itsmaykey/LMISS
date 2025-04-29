@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
   providedIn: 'root'
 })
 export class PatientSpouseFormService {
-  isSubmitting: boolean = false; 
+  isSubmitting: boolean = false;
 
    existed: any;
    constructor(
@@ -47,46 +47,17 @@ export class PatientSpouseFormService {
          });
        }
        submitPatientSpouseForm(patientSpouseForm: FormGroup): void {
-<<<<<<< HEAD
-         if (patientSpouseForm.valid) {
-           const patientSpouseFormData = patientSpouseForm.value;
-           console.log('Submitting patient spouse form:', patientSpouseFormData);
-           this.applicationdashboardService.postPatientSpouseData(patientSpouseFormData).subscribe({
-             next: (response) => {
-               console.log('Spouse Data Saved successfully:', response);
-               alert('Spouse Data Saved successfully');
-             },
-             error: (err) => {
-               console.error('API Error:', err);
-
-               if (err.status === 400) {
-                 alert('Validation failed. Please check your inputs.');
-               } else if (err.status === 401) {
-                 alert('Unauthorized. Please check your permissions.');
-               } else if (err.status === 500) {
-                 alert('Server error. Please try again later.');
-               } else {
-                 alert('Failed to register user. Please try again.');
-               }
-             },
-           });
-         } else {
-           console.warn('Form submission attempted with invalid data:', patientSpouseForm.value);
-           alert('Please fill in all required fields correctly.');
-         }
-       }
-=======
         if (this.isSubmitting) {
             console.warn("Submission in progress, preventing duplicate requests.");
             return; // Prevent multiple submissions
         }
-    
+
         if (patientSpouseForm.valid) {
             this.isSubmitting = true; // Set isSubmitting to true before making the request
             const patientSpouseFormData = patientSpouseForm.value;
-    
+
             console.log('Submitting patient spouse form:', patientSpouseFormData);
-    
+
             this.applicationdashboardService.postPatientSpouseData(patientSpouseFormData).subscribe({
                 next: (response) => {
                     console.log('Spouse Data Saved successfully:', response);
@@ -105,7 +76,7 @@ export class PatientSpouseFormService {
                 },
                 error: (err) => {
                     console.error('API Error:', err);
-    
+
                     let errorMessage = "Failed to register user. Please try again.";
                     if (err.status === 400) {
                         errorMessage = "Validation failed. Please check your inputs.";
@@ -114,7 +85,7 @@ export class PatientSpouseFormService {
                     } else if (err.status === 500) {
                         errorMessage = "Server error. Please try again later.";
                     }
-    
+
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -133,6 +104,5 @@ export class PatientSpouseFormService {
             });
         }
     }
-    
->>>>>>> aa7c26a0dde4442bcf02c27c2f1649bd5139ec7f
+
 }

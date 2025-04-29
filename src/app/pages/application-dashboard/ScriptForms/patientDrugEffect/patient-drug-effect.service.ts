@@ -1,6 +1,6 @@
 import { ActivatedRoute } from '@angular/router';
 import { Injectable } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApplicationDashboardService } from '../../service/application-dashboard.service';
 import Swal from 'sweetalert2';
 
@@ -8,11 +8,11 @@ import Swal from 'sweetalert2';
   providedIn: 'root'
 })
 export class PatientDrugEffectService {
-  
+
   isSubmitting: boolean = false;
   existed: any;
   drugEffects: any[] = [];
-allPreviouslySelectedCodes: string[] = [];
+  allPreviouslySelectedCodes: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -20,7 +20,7 @@ allPreviouslySelectedCodes: string[] = [];
     private route: ActivatedRoute
   ) {}
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
       const patientCode = params.get('patientCode');
       if (patientCode) {
@@ -30,6 +30,8 @@ allPreviouslySelectedCodes: string[] = [];
             console.log('Existed Patient:', this.existed);
 
             if (this.existed) {
+              this.allPreviouslySelectedCodes = this.existed.drugEffectCode || [];
+              console.log('Initialized Previously Selected Codes:', this.allPreviouslySelectedCodes);
               this.createPatientDrugEffectForm(this.existed.patientCode, this.existed);
             }
           },
@@ -39,15 +41,14 @@ allPreviouslySelectedCodes: string[] = [];
     });
   }
 
- 
   createPatientDrugEffectForm(ExistedPatientCode: string, existingPatientDrugEffectData: any = {}): FormGroup {
-    const rawCode = existingPatientDrugEffectData.drugEffectCode;
-    const codesArray = Array.isArray(rawCode)
-      ? rawCode
-      : rawCode
-        ? [rawCode]
-        : [];
-  
+    const rawCode = existingPatientDrugEffectData?.drugEffectCode || [];
+    const codesArray = Array.isArray(rawCode) ? rawCode : [rawCode];
+
+    // Initialize allPreviouslySelectedCodes
+    this.allPreviouslySelectedCodes = codesArray;
+    console.log('Initialized Previously Selected Codes:', this.allPreviouslySelectedCodes);
+
     return this.fb.group({
       patientCode: [ExistedPatientCode, Validators.required],
       drugEffectCode: this.fb.array(
@@ -56,24 +57,26 @@ allPreviouslySelectedCodes: string[] = [];
       drugOtherEffects: [existingPatientDrugEffectData.drugOtherEffects || '']
     });
   }
-  
-  
 
   submitPatientDrugEffectForm(patientDrugEffectForm: FormGroup): void {
     if (this.isSubmitting) {
       console.warn("Submission in progress, preventing duplicate requests.");
       return;
     }
-  
+
     if (patientDrugEffectForm.valid) {
       this.isSubmitting = true;
-  
+
       const selectedCodes = (patientDrugEffectForm.get('drugEffectCode') as FormArray).value;
       const drugOtherEffects = patientDrugEffectForm.get('drugOtherEffects')?.value;
       const patientCode = patientDrugEffectForm.get('patientCode')?.value;
-  
+
+      console.log("Selected Codes from Form:", selectedCodes);
+      console.log("Previously Selected Codes:", this.allPreviouslySelectedCodes);
+
       const deselectedCodes = this.allPreviouslySelectedCodes?.filter(code => !selectedCodes.includes(code)) || [];
-  
+      console.log("Deselected Codes:", deselectedCodes);
+
       const selectedDetails = selectedCodes.map((code: string) => ({
         recNo: 0,
         patientCode: patientCode,
@@ -81,7 +84,7 @@ allPreviouslySelectedCodes: string[] = [];
         drugOtherEffects: drugOtherEffects,
         drugEffectStatus: 1
       }));
-  
+
       const deselectedDetails = deselectedCodes.map((code: string) => ({
         recNo: 0,
         patientCode: patientCode,
@@ -89,15 +92,13 @@ allPreviouslySelectedCodes: string[] = [];
         drugOtherEffects: drugOtherEffects,
         drugEffectStatus: 0
       }));
-  
+
       const formData = {
         drugEffectDatum: [...selectedDetails, ...deselectedDetails]
       };
-  
-      console.log("✅ Selected:", selectedDetails);
-      console.log("❌ Deselected:", deselectedDetails);
-      console.log("📦 Final Data to Submit:", formData);
-  
+
+      console.log("Final Data to Submit:", formData);
+
       this.applicationdashboardService.postPatientDrugEffectData(formData).subscribe({
         next: (response) => {
           console.log('Effects Data Saved successfully:', response);
@@ -134,7 +135,4 @@ allPreviouslySelectedCodes: string[] = [];
       });
     }
   }
-  
-  
- 
 }

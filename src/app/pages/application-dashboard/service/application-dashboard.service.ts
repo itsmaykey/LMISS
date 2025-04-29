@@ -59,15 +59,6 @@ constructor(private http: HttpClient) { }
   }
   postPatientSiblingData(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSiblingData`, data);
-<<<<<<< HEAD
-  }
-  postPatientChildrenData(data: any) {
-      return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientChildrenData`, data);
-  }
-  postPatientEmploymentData(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientEmploymentData`, data);
-  }
-=======
     }
   postPatientEmploymentData(data: any) {
       return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientEmploymentData`, data);
@@ -99,7 +90,6 @@ constructor(private http: HttpClient) { }
   postAdmissionData(data: any) {
           return this.http.post(`${environment.apiUrl}PostPatientDatas/PostAdmissionData`, data);
         }
->>>>>>> aa7c26a0dde4442bcf02c27c2f1649bd5139ec7f
 //forExistedPatientDATA
   getExistedPatientData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}`);
@@ -123,12 +113,6 @@ constructor(private http: HttpClient) { }
   getExistedPatientChildrenData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientChildren?patientCode=${patientCode}`);
   }
-<<<<<<< HEAD
-  getExistedPatientEmploymentData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientEmployment?patientCode=${patientCode}`);
-  }
-
-=======
   getExistedPatientDrugHistoryData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientDrugHistory?patientCode=${patientCode}`);
   }
@@ -149,7 +133,6 @@ constructor(private http: HttpClient) { }
   }
   getExistedPatientAssessmentData(patientCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientAssessment?patientCode=${patientCode}`);
->>>>>>> aa7c26a0dde4442bcf02c27c2f1649bd5139ec7f
   }
 
 }

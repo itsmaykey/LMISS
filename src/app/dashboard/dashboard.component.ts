@@ -109,9 +109,21 @@ this.isLoading = true;
   }
 
   public onEvent(event: any): void {
-    const results = event as ScannerQRCodeResult[]; 
+    const results = event as ScannerQRCodeResult[];
     if (results && results.length) {
-      this.scannedData = results[0].value; 
+      this.scannedData = results[0].value;
+      this.searchText = this.scannedData.trimStart(); // Set the search text to the scanned data
+      this.filteredSearchNames = this.patients.filter(patient =>
+        Object.values(patient).some(value =>
+          value != null && value.toString().toLowerCase().includes(this.scannedData.toLowerCase().trimStart())
+        )
+
+      );
+      if(this.patients.length > 0){
+        this.isModalVisible = false;
+      }
+
+
       console.log('Scanned QR Code:', this.scannedData);
     }
   }
