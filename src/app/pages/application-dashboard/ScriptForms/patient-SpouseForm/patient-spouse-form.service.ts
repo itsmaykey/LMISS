@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
   providedIn: 'root'
 })
 export class PatientSpouseFormService {
-  isSubmitting: boolean = false; 
+  isSubmitting: boolean = false;
 
    existed: any;
    constructor(
@@ -40,7 +40,6 @@ export class PatientSpouseFormService {
            spouseAddress: [existingPatientSpouseData.spouseAddress || '', Validators.required],
            spouseOccupation: [existingPatientSpouseData.spouseOccupation || '' ,Validators.required],
            spouseEmployer: [existingPatientSpouseData.spouseEmployer || '', Validators.required],
-
            spouseIncome: [existingPatientSpouseData.spouseIncome || '', Validators.required],
            spouseLivingArrangement: [existingPatientSpouseData.spouseLivingArrangement || '', Validators.required],
            spouseEduID: [existingPatientSpouseData.spouseEduID || '', Validators.required],
@@ -52,13 +51,13 @@ export class PatientSpouseFormService {
             console.warn("Submission in progress, preventing duplicate requests.");
             return; // Prevent multiple submissions
         }
-    
+
         if (patientSpouseForm.valid) {
             this.isSubmitting = true; // Set isSubmitting to true before making the request
             const patientSpouseFormData = patientSpouseForm.value;
-    
+
             console.log('Submitting patient spouse form:', patientSpouseFormData);
-    
+
             this.applicationdashboardService.postPatientSpouseData(patientSpouseFormData).subscribe({
                 next: (response) => {
                     console.log('Spouse Data Saved successfully:', response);
@@ -77,7 +76,7 @@ export class PatientSpouseFormService {
                 },
                 error: (err) => {
                     console.error('API Error:', err);
-    
+
                     let errorMessage = "Failed to register user. Please try again.";
                     if (err.status === 400) {
                         errorMessage = "Validation failed. Please check your inputs.";
@@ -86,7 +85,7 @@ export class PatientSpouseFormService {
                     } else if (err.status === 500) {
                         errorMessage = "Server error. Please try again later.";
                     }
-    
+
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -105,5 +104,5 @@ export class PatientSpouseFormService {
             });
         }
     }
-    
+
 }
