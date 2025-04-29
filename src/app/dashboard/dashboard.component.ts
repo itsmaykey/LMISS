@@ -120,7 +120,7 @@ this.isLoading = true;
 
       );
       if(this.patients.length > 0){
-        this.isModalVisible = false;
+      this.hideModal();
       }
 
 
