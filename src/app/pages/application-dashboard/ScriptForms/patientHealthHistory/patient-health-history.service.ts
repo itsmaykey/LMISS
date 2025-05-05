@@ -37,6 +37,12 @@ export class PatientHealthHistoryService {
       return this.fb.group({
         patientCode: [ExistedPatientCode, Validators.required],
         patientHealthHistory: [existingPatientHealthHistoryData.patientHealthHistory || '', Validators.required],
+        patientBloodPressure: [existingPatientHealthHistoryData.patientBloodPressure || '', Validators.required],
+        patientHeight: [existingPatientHealthHistoryData.patientHeight || '', Validators.required],
+        patientWeight: [existingPatientHealthHistoryData.patientWeight || '', Validators.required],
+        patientCr: [existingPatientHealthHistoryData.patientCr || '', Validators.required],
+        patientRr: [existingPatientHealthHistoryData.patientRr || '', Validators.required],
+        patientTattooMarks: [existingPatientHealthHistoryData.patientTattooMarks || '', Validators.required],
       });
     }
    submitPatientHealthHistoryForm(patientPersonalHealthForm: FormGroup): void {

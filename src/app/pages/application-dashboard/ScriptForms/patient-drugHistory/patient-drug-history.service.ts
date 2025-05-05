@@ -33,7 +33,7 @@ export class PatientDrugHistoryService {
       latestUse: [drugHistoryData.latestUse || '', Validators.required],
       dosageTaken: [drugHistoryData.dosageTaken || '', Validators.required],
       highestDosageTaken: [drugHistoryData.highestDosageTaken || '', Validators.required],
-      patientDHCode: [drugHistoryData.patientDHCode || '']
+      PatientDhcode: [drugHistoryData.PatientDhcode || '']
     });
   }
 
@@ -66,7 +66,7 @@ export class PatientDrugHistoryService {
         latestUse: drugHistory.latestUse,
         dosageTaken: drugHistory.dosageTaken,
         highestDosageTaken: drugHistory.highestDosageTaken,
-        patientDHCode: drugHistory.patientDHCode === '' ? '' : drugHistory.patientDHCode
+        PatientDhcode: drugHistory.PatientDhcode === '' ? '' : drugHistory.PatientDhcode
       }))
     };
   

@@ -93,7 +93,7 @@
                         <label for="civilStatusId" class="form-label">Civil Status</label>
                         <select formControlName="civilStatusId" class="select2 form-select">
                           <option value="" disabled selected>Select</option>
-                          <option *ngFor="let x of civilStatus" [value]="x.civ_ID">{{x.civ_Name}}</option>
+                          <option *ngFor="let x of civilStatus" [value]="x.civId">{{x.civName}}</option>
                         </select>
                       </div>
                       <div class="col-md-3">
@@ -135,7 +135,7 @@
                         <label for="nationalityId" class="form-label">Nationality</label>
                         <select class="select2 form-select" formControlName="nationalityId">
                           <option value="" selected disabled>Select</option>
-                          <option *ngFor="let x of nationality" [value]="x.citi_ID">{{x.city_Description}}</option>
+                          <option *ngFor="let x of nationality" [value]="x.citiId">{{x.cityDescription}}</option>
                         </select>
                       </div>
                       <div class="col-md-3">
@@ -155,7 +155,7 @@
                         <label for="educationalId" class="form-label">Educational Attainment</label>
                         <select class="select2 form-select" formControlName="educationalId">
                           <option value="" disabled selected>Select</option>
-                          <option *ngFor="let x of educationalAttainment" [value]="x.edu_ID">{{x.edu_Name}}</option>
+                          <option *ngFor="let x of educationalAttainment" [value]="x.eduId">{{x.eduName}}</option>
                         </select>
                       </div>
                       <div class="col-md-2">
@@ -665,11 +665,11 @@
               Personal Health History
             </button>
           </li>
-          <li class="nav-item" role="presentation">
+          <!-- <li class="nav-item" role="presentation">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#navFamilyHealth" role="tab" aria-selected="false">
               Family Health Record
             </button>
-          </li>
+          </li> -->
         </ul>
         <div class="tab-content">
           <div class="tab-pane fade active show" id="navDrugHistory" role="tabpanel">
@@ -901,13 +901,44 @@
                         <label for="lname" class="form-label">Patient Code</label>
                         <input class="form-control" type="text" formControlName="patientCode" placeholder="Enter Last Name">
                       </div>
+                      <div class="col-md-4">
+                        <label for="bp" class="form-label">Blood Pressure</label>
+                        <input class="form-control" type="text" id="bp" formControlName="patientBloodPressure" placeholder="e.g., 120/80">
+                      </div>
+                  
+                      <div class="col-md-4">
+                        <label for="height" class="form-label">Height (cm)</label>
+                        <input class="form-control" type="text" id="height" formControlName="patientHeight" placeholder="Enter Height">
+                      </div>
+                  
+                      <div class="col-md-4">
+                        <label for="weight" class="form-label">Weight (kg)</label>
+                        <input class="form-control" type="text" id="weight" formControlName="patientWeight" placeholder="Enter Weight">
+                      </div>
+                  
+                      <div class="col-md-4">
+                        <label for="rr" class="form-label">Respiratory Rate (RR)</label>
+                        <input class="form-control" type="text" id="rr" formControlName="patientRr" placeholder="Enter RR">
+                      </div>
+                  
+                      <div class="col-md-4">
+                        <label for="cr" class="form-label">Cardiac Rate (CR)</label>
+                        <input class="form-control" type="text" id="cr" formControlName="patientCr" placeholder="Enter CR">
+                      </div>
                       <div class="col-md-12">
                         <label for="personalHealth" class="form-label">Personal Health History</label>
-                        <textarea class="form-control" id="personalHealth" formControlName="patientHealthHistory" rows="4"
+                        <textarea class="form-control" id="personalHealth" formControlName="patientHealthHistory" rows="2"
                           placeholder="Enter Personal Health History"></textarea>
                       </div>
+                      <div class="col-md-12">
+                        <label for="tattoosScars" class="form-label">Tattoo Marks/Scars</label>
+                        <textarea class="form-control" id="tattoosScars" formControlName="patientTattooMarks" rows="2"
+                          placeholder="Describe any tattoo marks or scars"></textarea>
+                      </div>
+                     
                     </div>
                   </div>
+                  
                   <hr>
                   <div class="mt-4">
                     <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="isSubmitting">Save changes</button>
@@ -925,8 +956,7 @@
           </div>
           
 
-          <div class="tab-pane fade" id="navFamilyHealth" role="tabpanel">
-            <!-- Family Health Record Content -->
+          <!-- <div class="tab-pane fade" id="navFamilyHealth" role="tabpanel">
             <div class="card mb-5">
               <div class="card-header">
                 <h4 class="card-header-title">Family Health Record</h4>
@@ -996,7 +1026,7 @@
               </button>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

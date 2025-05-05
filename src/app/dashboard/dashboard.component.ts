@@ -17,7 +17,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   isModalVisible = false;
   scannedData: string = '';
   isCameraActive: boolean = false;
-
+  hasSearched: boolean = false;
   patients: any[] = [];
   filteredSearchNames: any[] = [];
   searchText: string = '';
@@ -41,21 +41,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.filteredSearchNames = [];
     });
   }
+  
   FilteredSearchNames(): void {
-    if (!this.searchText || this.searchText.trim() === '') {
+    this.hasSearched = true; // <-- Mark that a search attempt has happened
+  
+    const search = this.searchText?.trim().toLowerCase();
+  
+    if (!search) {
       this.filteredSearchNames = [];
       return;
     }
-
-    const search = this.searchText.toLowerCase().trim();
-
+  
     this.filteredSearchNames = this.patients.filter(patient =>
       Object.values(patient).some(value =>
-        value != null && value.toString().toLowerCase().includes(search)
+        value?.toString().toLowerCase().includes(search)
       )
     );
   }
-
+  
+  
 
 
   goToAppDashboard() {

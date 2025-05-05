@@ -19,6 +19,8 @@ import { PatientRehabRecordService } from './ScriptForms/PatientRehabRecord/pati
 import { PatientFamHealthService } from './ScriptForms/patientFamHealth/patient-fam-health.service';
 import { PatientStaffAssessmentService } from './ScriptForms/patientStaffAssessment/patient-staff-assessment.service';
 import Swal from 'sweetalert2';
+
+
 import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-application-dashboard',
@@ -129,7 +131,7 @@ export class ApplicationDashboardComponent implements OnInit {
     this.loadExistedPatientDrugEffectData(patientCode);
     this.loadExistedPatientHealthHistoryData(patientCode);
     this.loadExistedPatientRehabRecordData(patientCode);
-    this.loadExistedPatientFamHealthData(patientCode);
+    // this.loadExistedPatientFamHealthData(patientCode);
     this.loadExistedPatientAssessmentData(patientCode);
   }
 
@@ -402,7 +404,7 @@ export class ApplicationDashboardComponent implements OnInit {
   loadExistedPatientAssessmentData(patientCode: string): void {
     forkJoin({
       admissionType: this.service.getAdmissionType(),
-      existingData: this.service.getExistedPatientAssessmentData(patientCode)
+      existingData: this.service.getExistedPatientAssessmentData(patientCode),
     }).subscribe({
       next: ({ admissionType, existingData }) => {
         const existingList = Array.isArray(existingData) ? existingData : [];
@@ -421,7 +423,7 @@ export class ApplicationDashboardComponent implements OnInit {
         } : {
           admissionCode: []
         };
-  
+        
         this.AssessmentForm = this.PatientStaffAssessmentService.createStaffAssessmentForm(patientCode, firstRecord);
       },
       error: (err) => {
@@ -463,23 +465,23 @@ export class ApplicationDashboardComponent implements OnInit {
       },
     });
   }
-  loadExistedPatientFamHealthData(patientCode: string): void {
-    this.service.getExistedPatientFamilyHealth(patientCode).subscribe({
-      next: (response) => {
-        this.ExistedPatientFamHealth = response;
-        console.log(this.ExistedPatientFamHealth);
-        if (this.ExistedPatientFamHealth.length > 0) {
-            this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode, {famHealths: this.ExistedPatientFamHealth});
-          } else {
-            this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode);
-          }
-      },
-      error: (error) => {
-        console.error('Error loading Existed Patient Family Health Data:', error);
-        this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode);
-      },
-    });
-  }
+  // loadExistedPatientFamHealthData(patientCode: string): void {
+  //   this.service.getExistedPatientFamilyHealth(patientCode).subscribe({
+  //     next: (response) => {
+  //       this.ExistedPatientFamHealth = response;
+  //       console.log(this.ExistedPatientFamHealth);
+  //       if (this.ExistedPatientFamHealth.length > 0) {
+  //           this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode, {famHealths: this.ExistedPatientFamHealth});
+  //         } else {
+  //           this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode);
+  //         }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading Existed Patient Family Health Data:', error);
+  //       this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode);
+  //     },
+  //   });
+  // }
   
   fetchAdditionalData(): void {
     this.service.getDrugEffect().subscribe({
