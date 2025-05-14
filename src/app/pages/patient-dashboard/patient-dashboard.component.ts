@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 import pdfMake from 'pdfmake/build/pdfmake';
@@ -16,35 +16,47 @@ pdfMake.vfs = pdfFonts.vfs;
 })
 export class PatientDashboardComponent  {
 
-  ExistedPatient:any;
+
+  ExistedPatient: any = [];
 
 
   constructor(private router: Router,
+     private route: ActivatedRoute,
      private service: PatientDashboardService
   ) {}
 
+
   ngOnInit(): void {
-    this.service.getExistedPatientData('DDNPQR-FLAQLNXMXVT3').subscribe({
-      next: (response) => {
-        this.ExistedPatient = response;
-        if (this.ExistedPatient.length > 0) {
-
-          console.log(this.ExistedPatient);
-
-        } else {
-         console.log("err")
-        }
-      },
-      error: () => {
-
-      },
-    });
-
+    this.getExisted();
   }
 
+getExisted(): void {
+  this.route.paramMap.subscribe((params) => {
+    const patientCode = params.get('patientCode');
+    if (patientCode) {
+      this.service.getExistedPatientData(patientCode).subscribe({
+        next: (response) => {
+          this.ExistedPatient = response;
+          if (this.ExistedPatient.length > 0) {
+            console.log(this.ExistedPatient[0].pFirstName + ' ' + this.ExistedPatient[0].pMiddleName+' ' + this.ExistedPatient[0].pLastName);
+            console.log(this.ExistedPatient);
+          } else {
+           console.log("err")
+          }
+        },
+        error: () => {
 
+        },
+      });
+    }
+
+
+
+
+
+  });
+}
 tryprint(): void{
-
   console.log(this.ExistedPatient[0].patientCode);
   const docDefinition: TDocumentDefinitions = {
     content: [

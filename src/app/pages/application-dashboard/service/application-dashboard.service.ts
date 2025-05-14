@@ -135,6 +135,28 @@ constructor(private http: HttpClient) { }
     return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientAssessment?patientCode=${patientCode}`);
   }
 
+
+
+//DELETE END POINTS
+  removeSiblings(patientCode: string, SiblingCode: string) {
+    return this.http.delete(`${environment.apiUrl}RemovePatientData/RemoveSiblings?patientCode=${patientCode}&SiblingCode=${SiblingCode}`);
+  }
+  removeChildren(patientCode: string, ChildrenCode: string) {
+    return this.http.delete(`${environment.apiUrl}RemovePatientData/RemoveChildren?patientCode=${patientCode}&ChildrenCode=${ChildrenCode}`);
+  }
+  removeEmployment(patientCode: string, EmploymentCode: string) {
+    return this.http.delete(`${environment.apiUrl}RemovePatientData/RemoveEmployment?patientCode=${patientCode}&EmploymentCode=${EmploymentCode}`);
+  }
+  removeDrugHistory(patientCode: string, DHCode: string) {
+    return this.http.delete(`${environment.apiUrl}RemovePatientData/RemoveDrugHistory?patientCode=${patientCode}&DHCode=${DHCode}`);
+  }
+  removeRehabRecord(patientCode: string, PrevCode: string) {
+    return this.http.delete(`${environment.apiUrl}RemovePatientData/RemovePrevRehab?patientCode=${patientCode}&PrevCode=${PrevCode}`);
+  }
+  removeFamilyHealth(patientCode: string, familyCode: string) {
+    return this.http.delete(`${environment.apiUrl}RemovePatientData/RemoveFamilyHealth?patientCode=${patientCode}&familyCode=${familyCode}`);
+  }
+
 }
 
 

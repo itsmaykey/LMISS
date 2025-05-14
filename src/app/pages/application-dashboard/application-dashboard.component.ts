@@ -71,10 +71,10 @@ export class ApplicationDashboardComponent implements OnInit {
   educationalAttainment: any = [];
   onChangeCitymunCode: string = '';
   onChangeBarangay: string = '';
-  initialSelectedCodes: string[] = [];  
-  currentSelectedCodes: string[] = [];  
-  deselectedCodes: string[] = [];       
-  
+  initialSelectedCodes: string[] = [];
+  currentSelectedCodes: string[] = [];
+  deselectedCodes: string[] = [];
+
   ExistedPatientCode = '';
 
   constructor(
@@ -164,7 +164,7 @@ export class ApplicationDashboardComponent implements OnInit {
             const dd = String(birthDateValue.getDate()).padStart(2, '0');
             this.ExistedPatient[0].birthdate = `${yyyy}-${mm}-${dd}`;
           }
-          
+
           this.patientForm = this.patientFormService.createPatientForm(this.userInfo, this.ExistedPatient[0]);
           this.loadBrgyAndPrk(this.ExistedPatient[0].citymunCode, this.ExistedPatient[0].brgyCode);
         } else {
@@ -314,7 +314,7 @@ export class ApplicationDashboardComponent implements OnInit {
       next: (response) => {
         this.ExistedPatientRehabRecord = response;
         console.log('Fetched rehab record:', this.ExistedPatientRehabRecord);
-  
+
         // Confirm the data is an array and has expected structure
         if (Array.isArray(this.ExistedPatientRehabRecord) && this.ExistedPatientRehabRecord.length > 0) {
           console.log('Populating form with rehab data...');
@@ -333,7 +333,7 @@ export class ApplicationDashboardComponent implements OnInit {
       },
     });
   }
-  
+
 
   loadExistedPatientDrugHistoryData(patientCode: string): void {
     this.service.getExistedPatientDrugHistoryData(patientCode).subscribe({
@@ -370,7 +370,7 @@ export class ApplicationDashboardComponent implements OnInit {
         const existingList = Array.isArray(existingData) ? existingData : [];
         console.log(existingList);
         const selectedCodes = existingList.map((item: any) => item.drugEffectCode);
-  
+
         // Filter the drugEffects to include only those with drugEffectStatus == 1
         this.drugEffects = (drugEffects as any[])
           .filter((effect: any) => effect.drugEffectStatus === 1)  // Added filter here
@@ -378,24 +378,24 @@ export class ApplicationDashboardComponent implements OnInit {
             ...effect,
             selected: selectedCodes.includes(effect.drugEffectCode)
           }));
-  
+
         const firstRecord = existingList.length > 0 ? {
           ...existingList[0],
-          drugEffectCode: selectedCodes  
+          drugEffectCode: selectedCodes
         } : {
           drugEffectCode: []
         };
-  
+
         this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(patientCode, firstRecord);
       },
       error: (err) => {
         console.error('Error loading form data:', err);
-  
+
         this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(patientCode);
       }
     });
   }
-  
+
   loadExistedPatientAssessmentData(patientCode: string): void {
     forkJoin({
       admissionType: this.service.getAdmissionType(),
@@ -405,36 +405,36 @@ export class ApplicationDashboardComponent implements OnInit {
         const existingList = Array.isArray(existingData) ? existingData : [];
         console.log(existingList);
         const selectedCodes = existingList.map((item: any) => item.admissionCode);
-  
+
         this.admissionType = (admissionType as any[]).map((admission: any) => ({
           ...admission,
           selected: selectedCodes.includes(admission.admissionCode)
         }));
-        
-  
+
+
         const firstRecord = existingList.length > 0 ? {
           ...existingList[0],
-          admissionCode: selectedCodes  
+          admissionCode: selectedCodes
         } : {
           admissionCode: []
         };
-  
+
         this.AssessmentForm = this.PatientStaffAssessmentService.createStaffAssessmentForm(patientCode, firstRecord);
       },
       error: (err) => {
         console.error('Error loading form data:', err);
-  
+
         this.AssessmentForm = this.PatientStaffAssessmentService.createStaffAssessmentForm(patientCode);
       }
     });
   }
-  
+
   loadExistedPatientDrugReasonData(patientCode: string): void {
     this.service.getExistedPatientDrugReasonData(patientCode).subscribe({
       next: (response) => {
         this.ExistedPatientDrugReason = response;
         if (this.ExistedPatientDrugReason.length > 0) {
-         
+
           this.patientDrugReasonForm = this.PatientDrugReasonService.createPatientDrugReasonForm(this.ExistedPatientCode, this.ExistedPatientDrugReason[0]);
         } else {
           this.patientDrugReasonForm = this.PatientDrugReasonService.createPatientDrugReasonForm(this.ExistedPatientCode);
@@ -477,7 +477,7 @@ export class ApplicationDashboardComponent implements OnInit {
       },
     });
   }
-  
+
   fetchAdditionalData(): void {
     this.service.getDrugEffect().subscribe({
       next: (response) => {
@@ -569,7 +569,7 @@ export class ApplicationDashboardComponent implements OnInit {
   patientSchoolFormSubmit(): void {
     this.schoolFormService.submitPatientSchoolForm(this.patientSchoolForm);
   }
-  
+
   patientPersonalHealthFormSubmit(): void {
     console.log(this.patientPersonalHealthForm);
     this.PatientHealthHistoryService.submitPatientHealthHistoryForm(this.patientPersonalHealthForm);
@@ -592,11 +592,11 @@ export class ApplicationDashboardComponent implements OnInit {
       this.siblingsFormService.submitPatientSiblingForm(this.patientSiblingsForm.value).subscribe({
         next: (response) => {
           console.log('Patient Sibling Form submitted successfully:', response);
-        
+
         },
         error: (error) => {
           console.error('Error submitting Patient Sibling Form:', error);
-          
+
         },
       });
     } else {
@@ -607,7 +607,31 @@ export class ApplicationDashboardComponent implements OnInit {
     return this.patientSiblingsForm.get('siblings') as FormArray;
   }
   removeSibling(index: number): void {
-    this.siblings.removeAt(index);
+    console.log(this.ExistedPatientCode);
+    console.log(this.siblings.value[index].siblingCode)
+    this.service.removeSiblings(this.ExistedPatientCode, this.siblings.value[index].siblingCode).subscribe({
+      next: (response) => {
+        console.log(this.siblings.value[index].siblingName)
+        Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: `Sibling deleted successfully. \n`+ this.siblings.value[index].siblingName,
+                    showConfirmButton: false,
+                    timer: 5000,
+                    timerProgressBar: true,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                  }).then(() => {
+                    this.siblings.removeAt(index);
+                  });
+
+      },
+      error: (error) => {
+        console.error('Error deleting sibling:', error);
+      },
+    });
+
+
   }
   addSibling(): void {
     this.siblings.push(this.siblingsFormService.createSiblingFormGroup());
@@ -630,11 +654,11 @@ export class ApplicationDashboardComponent implements OnInit {
   drughistoriessaddRow(): void {
     this.drugHistorys.push(this.PatientDrugHistoryService.createDrugHistoryFormGroup());
   }
- 
+
   get drugHistorys(): FormArray {
     return this.patientDrugHistoryForm.get('drugHistorys') as FormArray;
   }
-  
+
 
 
   patientChildrenFormSubmit(): void {
@@ -668,7 +692,7 @@ export class ApplicationDashboardComponent implements OnInit {
   patientEmployeeFormSubmit(): void {
   if (this.patientEmploymentForm.valid) { // ✅ Check if form is valid
     console.log("Form Data:", this.patientEmploymentForm.value); // ✅ Debugging
-    
+
     this.employeeFormService.submitPatientEmployeeForm(this.patientEmploymentForm.value).subscribe({
       next: (response) => {
         console.log('Patient employee Form submitted successfully:', response);
@@ -697,7 +721,7 @@ export class ApplicationDashboardComponent implements OnInit {
   patientRehabRecordFormSubmit(): void {
     if (this.patientRehabRecordForm.valid) { // ✅ Check if form is valid
       console.log("Form Data:", this.patientRehabRecordForm.value); // ✅ Debugging
-      
+
       this.PatientRehabRecordService.submitPatientRehabRecordForm(this.patientRehabRecordForm.value).subscribe({
         next: (response) => {
           console.log('Patient Rehab Form submitted successfully:', response);
@@ -720,7 +744,7 @@ export class ApplicationDashboardComponent implements OnInit {
   patientFamHealthFormSubmit(): void {
     if (this.FamHealthHistoryForm.valid) { // ✅ Check if form is valid
       console.log("Form Data:", this.FamHealthHistoryForm.value); // ✅ Debugging
-      
+
       this.PatientFamHealthService.submitPatientFamHealthForm(this.FamHealthHistoryForm.value).subscribe({
         next: (response) => {
           console.log('Patient Family Health Form submitted successfully:', response);
@@ -733,7 +757,7 @@ export class ApplicationDashboardComponent implements OnInit {
       console.error('Patient Family Health Form is invalid', this.FamHealthHistoryForm.errors); // ✅ Show validation errors
     }
   }
-  
+
   get famHealths(): FormArray {
     return this.FamHealthHistoryForm.get('famHealths') as FormArray;
   }
@@ -743,7 +767,7 @@ export class ApplicationDashboardComponent implements OnInit {
     newRow.patchValue({ isNew: true }); // ✅ Add a custom flag to mark this row as new
     this.famHealths.push(newRow);
   }
-  
+
   // Event handlers
   // onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
   //   const checkbox = event.target as HTMLInputElement;
@@ -764,7 +788,7 @@ export class ApplicationDashboardComponent implements OnInit {
   // }
   onAdmissionTypeCheckboxChange(event: any, item: any, form: FormGroup) {
     const admissionCodeArray = form.get('admissionCode') as FormArray;
-  
+
     if (event.target.checked) {
       admissionCodeArray.push(new FormControl(item.admissionCode));
     } else {
@@ -779,49 +803,49 @@ export class ApplicationDashboardComponent implements OnInit {
   onCheckboxChange(event: any, item: any, form: FormGroup) {
     const drugEffectArray = form.get('drugEffectCode') as FormArray;
     const code = item.drugEffectCode;
-  
+
     if (event.target.checked) {
       drugEffectArray.push(new FormControl(code));
       item.selected = true;
-  
+
       // Add to currentSelectedCodes if not present
       if (!this.currentSelectedCodes.includes(code)) {
         this.currentSelectedCodes.push(code);
       }
-  
+
       // Remove from deselected if it was there
       this.deselectedCodes = this.deselectedCodes.filter(c => c !== code);
-  
+
     } else {
       const index = drugEffectArray.controls.findIndex(ctrl => ctrl.value === code);
       if (index >= 0) {
         drugEffectArray.removeAt(index);
       }
       item.selected = false;
-  
+
       // Remove from currentSelectedCodes
       this.currentSelectedCodes = this.currentSelectedCodes.filter(c => c !== code);
-  
+
       // Add to deselectedCodes if not present
       if (!this.deselectedCodes.includes(code)) {
         this.deselectedCodes.push(code);
       }
     }
-  
+
     // 👇 Console the final result
     console.log('✅ Selected (excluding deselected):', this.currentSelectedCodes);
     console.log('❌ Deselected:', this.deselectedCodes);
   }
-  
 
-  
-  
+
+
+
   onMunicipalityChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     this.onChangeCitymunCode = selectElement.value;
-  
+
     console.log('Municipality changed to:', this.onChangeCitymunCode);
-  
+
     if (this.onChangeCitymunCode) {
       this.service.getBrgy(this.onChangeCitymunCode).subscribe({
         next: (response) => {
@@ -836,20 +860,20 @@ export class ApplicationDashboardComponent implements OnInit {
       console.warn('No city municipality code selected.');
     }
   }
-  
+
   onBarangayChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     let selectedBarangay = selectElement.value;
-  
+
     console.log('Barangay changed to:', selectedBarangay);
-  
+
     // Fallback to ExistedPatient if no selection is made
     if (!selectedBarangay && this.ExistedPatient?.length > 0 && this.ExistedPatient[0].brgyCode) {
       selectedBarangay = this.ExistedPatient[0].brgyCode;
     }
-  
+
     this.onChangeBarangay = selectedBarangay;
-  
+
     if (this.onChangeBarangay) {
       this.service.getprk(this.onChangeBarangay).subscribe({
         next: (response) => {
@@ -865,8 +889,8 @@ export class ApplicationDashboardComponent implements OnInit {
       console.warn('No valid barangay selected. Skipping purok fetch.');
     }
   }
-  
-  
+
+
 
   // Navigation methods
   goToSubstanceHisto(): void {
@@ -924,7 +948,7 @@ export class ApplicationDashboardComponent implements OnInit {
       alert(`Selected Patient Code: ${patientCode}`);
     });
 
-   
+
   }
 
   ////navSub
