@@ -10,7 +10,7 @@ export class DashboardServiceService {
 
 
 getPatients() {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetPatientData`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetPatientData`);
   }
 
 }

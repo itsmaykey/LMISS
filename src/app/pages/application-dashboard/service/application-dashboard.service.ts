@@ -40,101 +40,98 @@ constructor(private http: HttpClient) { }
   getDrugEffect(){
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/GetrefDrugEffect`);
   }
-  getAdmissionType(){
-    return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/GetrefAdmissionType`);
-  }
 
+  getApplicationHistory(data: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetApplicationHistory?patientCode=${data}`);
+  }
   //Post
   postPatientData(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientData`, data);
+    return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientData`, data);
   }
   postPatientSchoolData(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSchoolData`, data);
+    return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientSchoolData`, data);
   }
   postPatientParentData(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientParentData`, data);
+    return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientParentData`, data);
   }
   postPatientSpouseData(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSpouseData`, data);
+    return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientSpouseData`, data);
   }
   postPatientSiblingData(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientSiblingData`, data);
+    return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientSiblingData`, data);
     }
   postPatientEmploymentData(data: any) {
-      return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientEmploymentData`, data);
+      return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientEmploymentData`, data);
       }
   postPatientChildrenData(data: any) {
-      return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientChildrenData`, data);
+      return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientChildrenData`, data);
       }
   postPatientDrugHistoryData(data: any) {
-        return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientDrugHistoryData`, data);
+        return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientDrugHistoryData`, data);
         }
   postPatientReasonUsingDrugsData(data: any) {
-        return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientReasonUsingDrugsData`, data);
+        return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientReasonUsingDrugsData`, data);
         }
   postPatientDrugEffectData(data: any) {
-        return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientDrugEffectData`, data);
+        return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientDrugEffectData`, data);
         }
   postPatientHealthHistoryData(data: any) {
-        return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientHealthHistoryData`, data);
+        return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientHealthHistoryData`, data);
         }
   postPatientRehabilitationData(data: any) {
-          return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientRehabilitationData`, data);
+          return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientRehabilitationData`, data);
           }
   postPatientFamilyHistoryData(data: any) {
-          return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientFamilyHistoryData`, data);
+          return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientFamilyHistoryData`, data);
         }
-  postPatientAssessmentData(data: any) {
-          return this.http.post(`${environment.apiUrl}PostPatientDatas/PostPatientAssessmentData`, data);
-        }
-  postAdmissionData(data: any) {
-          return this.http.post(`${environment.apiUrl}PostPatientDatas/PostAdmissionData`, data);
-        }
+
 //forExistedPatientDATA
   getExistedPatientData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatient?patientCode=${patientCode}`);
   }
   getExistedPatientSchoolData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientSchool?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientSchool?patientCode=${patientCode}`);
   }
   getExistedPatientParentData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientParent?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientParent?patientCode=${patientCode}`);
 
   }
   getExistedPatientSpouseData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientSpouse?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientSpouse?patientCode=${patientCode}`);
   }
   getExistedPatientSiblingData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientSiblings?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientSiblings?patientCode=${patientCode}`);
   }
   getExistedPatientEmploymentData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientEmployment?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientEmployment?patientCode=${patientCode}`);
   }
   getExistedPatientChildrenData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientChildren?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientChildren?patientCode=${patientCode}`);
   }
   getExistedPatientDrugHistoryData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientDrugHistory?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientDrugHistory?patientCode=${patientCode}`);
   }
   getExistedPatientDrugReasonData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientReasonUsingDrugs?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientReasonUsingDrugs?patientCode=${patientCode}`);
   }
   getExistedPatientDrugEffectData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientDrugEffect?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientDrugEffect?patientCode=${patientCode}`);
   }
   getExistedPatientHealthHistoryData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientHealthHistory?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientHealthHistory?patientCode=${patientCode}`);
   }
   getExistedPatientRehabilitationRecordData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientPrevRehab?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientPrevRehab?patientCode=${patientCode}`);
   }
   getExistedPatientFamilyHealth(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientFamilyHealth?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientFamilyHealth?patientCode=${patientCode}`);
   }
   getExistedPatientAssessmentData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatientAssessment?patientCode=${patientCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatientAssessment?patientCode=${patientCode}`);
   }
-  
+  getExistedAdmissionData(patientCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedAdmission?patientCode=${patientCode}`);
+  }
   removeSiblings(patientCode: string, SiblingCode: string) {
     return this.http.delete(`${environment.apiUrl}RemovePatientData/RemoveSiblings?patientCode=${patientCode}&SiblingCode=${SiblingCode}`);
   }

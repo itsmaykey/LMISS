@@ -10,6 +10,8 @@ import Swal from 'sweetalert2';
 })
 export class PatientDrugHistoryService {
   isSubmitting: boolean = false; 
+  originalDrugHistories: any[] = []; // Initialize with an empty array or appropriate default value
+
   constructor(
     private fb: FormBuilder,
     private applicationdashboardService: ApplicationDashboardService
@@ -33,7 +35,7 @@ export class PatientDrugHistoryService {
       latestUse: [drugHistoryData.latestUse || '', Validators.required],
       dosageTaken: [drugHistoryData.dosageTaken || '', Validators.required],
       highestDosageTaken: [drugHistoryData.highestDosageTaken || '', Validators.required],
-      PatientDhcode: [drugHistoryData.PatientDhcode || '']
+      patientDhcode: [drugHistoryData.patientDhcode || '']
     });
   }
 
@@ -46,12 +48,21 @@ export class PatientDrugHistoryService {
       });
     }
   
-    // ✅ Check if no records were added
     if (!drugHistoryData.drugHistorys || drugHistoryData.drugHistorys.length === 0) {
       Swal.fire({
         icon: 'warning',
         title: 'No Records',
         text: 'Please add at least one drug history record before submitting.',
+        confirmButtonText: 'OK'
+      });
+      return new Observable(); // Prevent submission
+    }
+  
+    if (JSON.stringify(drugHistoryData.drugHistorys) === JSON.stringify(this.originalDrugHistories)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Changes Detected',
+        text: 'No modifications have been made to the drug history records.',
         confirmButtonText: 'OK'
       });
       return new Observable(); // Prevent submission
@@ -66,7 +77,7 @@ export class PatientDrugHistoryService {
         latestUse: drugHistory.latestUse,
         dosageTaken: drugHistory.dosageTaken,
         highestDosageTaken: drugHistory.highestDosageTaken,
-        PatientDhcode: drugHistory.PatientDhcode === '' ? '' : drugHistory.PatientDhcode
+        patientDhcode: drugHistory.patientDhcode === '' ? '' : drugHistory.patientDhcode
       }))
     };
   
@@ -107,5 +118,4 @@ export class PatientDrugHistoryService {
     });
   }
   
-
 }

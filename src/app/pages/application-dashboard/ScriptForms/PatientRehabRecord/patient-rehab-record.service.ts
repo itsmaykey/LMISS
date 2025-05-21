@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ApplicationDashboardService } from '../../service/application-dashboard.service';
 import Swal from 'sweetalert2';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -10,6 +11,7 @@ export class PatientRehabRecordService {
 
 isSubmitting: boolean = false; 
 patientRehabRecordForm!: FormGroup;
+originalRehabRecords: any[] = []; // Declare the property to store original rehab records
 
   constructor(
     private fb: FormBuilder,
@@ -43,12 +45,22 @@ patientRehabRecordForm!: FormGroup;
       });
     }
   
-    // ✅ Check if no records were added
     if (!rehabRecordFormData.rehabRecords || rehabRecordFormData.rehabRecords.length === 0) {
       Swal.fire({
         icon: 'warning',
         title: 'No Records',
         text: 'Please add at least one rehabilitation record before submitting.',
+        confirmButtonText: 'OK'
+      });
+      return new Observable(); // Prevent submission
+    }
+  
+    // ✅ Check if records are unchanged (compare to original records)
+    if (JSON.stringify(rehabRecordFormData.rehabRecords) === JSON.stringify(this.originalRehabRecords)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Changes Detected',
+        text: 'No modifications have been made to the rehabilitation records.',
         confirmButtonText: 'OK'
       });
       return new Observable(); // Prevent submission
