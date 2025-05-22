@@ -19,7 +19,7 @@ import { PatientRehabRecordService } from './ScriptForms/PatientRehabRecord/pati
 import { PatientFamHealthService } from './ScriptForms/patientFamHealth/patient-fam-health.service';
 import { PatientStaffAssessmentService } from './ScriptForms/patientStaffAssessment/patient-staff-assessment.service';
 import Swal from 'sweetalert2';
-
+import { Base64 } from 'js-base64';
 
 import { forkJoin } from 'rxjs';
 @Component({
@@ -121,7 +121,7 @@ export class ApplicationDashboardComponent implements OnInit {
         console.error('Error:', error);
       },
     });
-    
+  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
     const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
     this.ExistedPatientCode = patientCode;
     
@@ -1015,27 +1015,36 @@ patientSiblingsFormSubmit(): void {
   }
 
   
-    goToPatientDashboard(patientCode: string): void {
-      if (!this.router) {
-        console.error('Router is undefined!'); // Debugging check
-        return;
-      }
-      this.isLoading = true;
-      // Find the assessmentCode for the given patientCode in appHistory
-      let assessmentCode = '';
-      if (Array.isArray(this.appHistory)) {
-        const found = this.appHistory.find((item: any) => item.patientCode === patientCode);
-        assessmentCode = found ? found.assessmentCode : '';
-        console.log('Assessment Code for patient', patientCode, ':', assessmentCode);
-      } else if (this.appHistory && this.appHistory.assessmentCode) {
-        assessmentCode = this.appHistory.assessmentCode;
-          patientCode = this.appHistory.patientCode;
-        console.log('Assessment Code (single object):', assessmentCode);
-      } else {
-        console.log('No assessment code found for patient:', patientCode);
-      }
-      this.router.navigate(['/patientDashboard', patientCode, assessmentCode]);
+goToPatientDashboard(patientCode: string, assessmentCode?: string): void {
+  if (!this.router) {
+    console.error('Router is undefined!');
+    return;
+  }
+
+  this.isLoading = true;
+
+  let finalPatientCode = patientCode;
+  let finalAssessmentCode = assessmentCode || '';
+
+  if (!finalAssessmentCode) {
+    if (Array.isArray(this.appHistory)) {
+      const found = this.appHistory.find((item: any) => item.patientCode === finalPatientCode);
+      finalAssessmentCode = found ? found.assessmentCode : '';
+    } else if (this.appHistory && this.appHistory.assessmentCode) {
+      finalPatientCode = this.appHistory.patientCode;
+      finalAssessmentCode = this.appHistory.assessmentCode;
     }
+  }
+
+  if (finalPatientCode && finalAssessmentCode) {
+    alert('Patient Code: ' + finalPatientCode); // This will now be correct
+    this.router.navigate(['/patientDashboard', finalPatientCode, finalAssessmentCode]);
+  } else {
+    console.warn('Missing patientCode or assessmentCode. Cannot navigate.');
+  }
+}
+
+
   gotoNavReason(): void {
     this.showTab('#navReason');
   }
