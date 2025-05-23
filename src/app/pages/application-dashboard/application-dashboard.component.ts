@@ -1062,7 +1062,6 @@ goToPatientDashboard(patientCode: string, assessmentCode?: string): void {
   }
   goToSelectedApp(patientCode: string): void {
     this.router.navigate(['/application', patientCode]).then(() => {
-      alert(`Selected Patient Code: ${patientCode}`);
     });
 
    
