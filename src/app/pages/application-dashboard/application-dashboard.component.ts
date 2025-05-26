@@ -19,7 +19,7 @@ import { PatientRehabRecordService } from './ScriptForms/PatientRehabRecord/pati
 import { PatientFamHealthService } from './ScriptForms/patientFamHealth/patient-fam-health.service';
 import { PatientStaffAssessmentService } from './ScriptForms/patientStaffAssessment/patient-staff-assessment.service';
 import Swal from 'sweetalert2';
-import { Base64 } from 'js-base64';
+//import { Base64 } from 'js-base64';
 
 import { forkJoin } from 'rxjs';
 @Component({
