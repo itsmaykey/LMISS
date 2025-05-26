@@ -28,7 +28,7 @@ const routes: Routes = [
  canActivate: [AuthGuard],
  children: [
   { path: 'application/:patientCode', component: ApplicationDashboardComponent },
-  { path: 'patientDashboard/:patientCode', component: PatientDashboardComponent}, // Accept dynamic patientCode
+  // { path: 'patientDashboard/:patientCode', component: PatientDashboardComponent}, // Accept dynamic patientCode
   {
     path:'dashboard',
     component:DashboardComponent,
@@ -39,7 +39,7 @@ const routes: Routes = [
     component:UserRegComponent
   },
   {
-    path:'patientDashboard',
+    path:'patientdash',
     component:PatientDashboardComponent
   },
   {

@@ -6,6 +6,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { PatientDashboardService } from './service/patient-dashboard.service';
+import { style } from '@angular/animations';
 
 pdfMake.vfs = pdfFonts.vfs;
 
@@ -31,15 +32,15 @@ export class PatientDashboardComponent  {
   }
 
 getExisted(): void {
-  this.route.paramMap.subscribe((params) => {
-    const patientCode = params.get('patientCode');
-    if (patientCode) {
-      this.service.getExistedPatientData(patientCode).subscribe({
+
+      this.service.getExistedPatientData('DDNPQR-QON9CI2R4HUG').subscribe({
         next: (response) => {
+
           this.ExistedPatient = response;
           if (this.ExistedPatient.length > 0) {
             console.log(this.ExistedPatient[0].pFirstName + ' ' + this.ExistedPatient[0].pMiddleName+' ' + this.ExistedPatient[0].pLastName);
             console.log(this.ExistedPatient);
+            console.log(this.ExistedPatient[0].admissionDate);
           } else {
            console.log("err")
           }
@@ -48,60 +49,75 @@ getExisted(): void {
 
         },
       });
-    }
 
-
-
-
-
-  });
 }
 tryprint(): void{
   console.log(this.ExistedPatient[0].patientCode);
   const docDefinition: TDocumentDefinitions = {
-    content: [
-      // { text: 'Luntiang Paraiso Regional Rehabilitation Center',
-      //    style: 'header',
-      //    alignment: 'center',
-      //    fontSize: 14,
-      //     bold: true,
-      //     margin: [0, 20, 0, 8]
-      //  },
 
-      {
-        table: {
-          body: [
-            [
+    	content: [
+		{
+			style: 'tableExample',
+			table: {
+				body: [
+					['DAVNOR, PHO, LPRRC'],
+          [
+          {
+            qr: '\n \n'+ this.ExistedPatient[0].patientCode,
 
-              {
-                 qr: '\n \n'+ this.ExistedPatient[0].patientCode,
-                 // ← this can be any text or URL
-                 fit: 80, // optional: size of the QR
-               //LEFT TOP  RIGHT BOTTOM
-                 margin: [15, 10, 0, 10],
-                 border: [true, true, false, true], // remove borders
-              },
-              {
-                text: 'Luntiang Paraiso Regional Rehabilitation Center \n \n'
-                + this.ExistedPatient[0].pLastName + ', ' +this.ExistedPatient[0].pFirstName + ' ' + this.ExistedPatient[0].pMiddleName + '\n \n'
-                + 'INPATIENT',
-                 //LEFT TOP BOTTOM RIGHT
-                margin: [0, 10, 0, 10],
-                border: [false, true, true, true], // remove borders
-              },
-
-
-
-            ]
+          }
           ],
+          [
+            {
+              text: this.ExistedPatient[0].admissionDate
+            }
+           ]
+				]
+			}
+		}
+  ],
+  }
+    // content: [
+    //   // { text: 'Luntiang Paraiso Regional Rehabilitation Center',
+    //   //    style: 'header',
+    //   //    alignment: 'center',
+    //   //    fontSize: 14,
+    //   //     bold: true,
+    //   //     margin: [0, 20, 0, 8]
+    //   //  },
 
-        },
-        margin: [10, 10, 10, 10], // Optional: add margin to the table
-        alignment: 'center',
-       // Optional: remove borders around the table
-      },
-      ],
-      }
+    //   {
+    //     table: {
+    //       body: [
+    //         [
+    //           {
+    //              qr: '\n \n'+ this.ExistedPatient[0].patientCode,
+    //              // ← this can be any text or URL
+    //              fit: 80, // optional: size of the QR
+    //            //LEFT TOP  RIGHT BOTTOM
+    //              margin: [15, 10, 0, 10],
+    //              border: [true, true, false, true], // remove borders
+    //           },
+    //           {
+    //             text: 'Luntiang Paraiso Regional Rehabilitation Center \n \n',
+
+    //              //LEFT TOP BOTTOM RIGHT
+    //             margin: [0, 10, 0, 10],
+    //             border: [false, true, true, true], // remove borders
+    //           },
+
+
+
+    //         ]
+    //       ],
+
+    //     },
+    //     margin: [10, 10, 10, 10], // Optional: add margin to the table
+    //     alignment: 'center',
+    //    // Optional: remove borders around the table
+    //   },
+    //   ],
+    //   }
 
 
   pdfMake.createPdf(docDefinition).open();

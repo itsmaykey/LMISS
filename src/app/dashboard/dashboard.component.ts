@@ -34,6 +34,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userInfo = this.authService.getUserInfo();
     this.patientNames();
+    console.log('User Infos:', this.userInfo);
   }
   patientNames(): void {
     this.service.getPatients().subscribe((response: any) => {
