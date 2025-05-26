@@ -122,20 +122,7 @@ userData: any = [];
     }
   });
 }
-  loadExistingUserData(): void {
-    const mockUserData = {
-      firstName: 'John',
-      middleName: 'Doe',
-      lastName: 'Smith',
-      nameExtension: 'Jr.',
-      userType: 'Admin',
-      userName: 'johnsmith',
-      password: 'password123',
-      confirmPassword: 'password123',
-    };
-
-    this.userUpForm.patchValue(mockUserData);
-  }
+ 
 
   onUpdate(): void {
     if (this.userUpForm.valid) {

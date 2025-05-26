@@ -26,7 +26,7 @@ export class EmploymentFormService {
   
   createEmployeeFormGroup(EmployeeData: any = {}): FormGroup {
     return this.fb.group({
-      patientEPeriodDate: [EmployeeData.patientEPeriodDate || '', Validators.required],
+      patientEperiodDate: [EmployeeData.patientEperiodDate || '', Validators.required],
       patientNameofCompany: [EmployeeData.patientNameofCompany || '', Validators.required],
       patientCompanyAddress: [EmployeeData.patientCompanyAddress || '', Validators.required],
       patientCompanyPosition: [EmployeeData.patientCompanyPosition || '', Validators.required],
@@ -61,7 +61,7 @@ export class EmploymentFormService {
       listPatientEmploymentData: employeeFormData.employs.map((employ: any) => ({
         recNo: 0,
         patientCode: employeeFormData.patientCode,
-        patientEPeriodDate: employ.patientEPeriodDate,
+        patientEperiodDate: employ.patientEperiodDate,
         patientNameofCompany: employ.patientNameofCompany,
         patientCompanyAddress: employ.patientCompanyAddress,
         patientCompanyPosition: employ.patientCompanyPosition,

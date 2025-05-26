@@ -34,13 +34,15 @@ onLogin() {
       if (response.status === 200 && response.body?.token) {
         const expiresIn = response.body.expiresIn || 3600; // Assuming the response contains expiresIn in seconds
         this.authService.setToken(response.body.token, expiresIn);
-       // console.log(response.body.token);
         this.authService.setUserInfo({
-          id: response.body.idNo,
+          id: response.body.staffIdNo, 
           name: response.body.firstName + ' ' + response.body.lastName,
           position: response.body.positionCode,
           positionName: response.body.positionName
+          
         });
+        console.log('User info stored:', this.authService.getUserInfo());
+        
         this.router.navigate(['/dashboard']);
       } else {
         alert('Invalid Username or Password');

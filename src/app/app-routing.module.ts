@@ -28,6 +28,9 @@ const routes: Routes = [
  canActivate: [AuthGuard],
  children: [
   { path: 'application/:patientCode', component: ApplicationDashboardComponent },
+  { path: 'patientDashboard/:patientCode/:assessmentCode', component: PatientDashboardComponent },
+ // Accept dynamic patientCode
+  { path: 'application/:patientCode', component: ApplicationDashboardComponent },
   { path: 'patientDashboard/:patientCode', component: PatientDashboardComponent}, // Accept dynamic patientCode
   {
     path:'dashboard',

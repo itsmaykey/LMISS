@@ -1,8 +1,8 @@
 import { PatientFormService } from './ScriptForms/patient-form/patient-form.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ApplicationDashboardService } from './service/application-dashboard.service';
 import { AuthService } from '../../Admin/Auth/AuthService';
-import { Form, FormArray, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SchoolFormService } from './ScriptForms/patient-SchoolForm/school-form.service';
 import { PatientParentFormService } from './ScriptForms/patient-ParentForm/patient-parent-form.service';
@@ -19,6 +19,8 @@ import { PatientRehabRecordService } from './ScriptForms/PatientRehabRecord/pati
 import { PatientFamHealthService } from './ScriptForms/patientFamHealth/patient-fam-health.service';
 import { PatientStaffAssessmentService } from './ScriptForms/patientStaffAssessment/patient-staff-assessment.service';
 import Swal from 'sweetalert2';
+import { Base64 } from 'js-base64';
+
 import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-application-dashboard',
@@ -26,7 +28,8 @@ import { forkJoin } from 'rxjs';
   styleUrls: ['./application-dashboard.component.css'],
 })
 export class ApplicationDashboardComponent implements OnInit {
-    isSubmitting: boolean = false;
+  isSubmitting: boolean = false;
+  isLoading: boolean = false;
   patientParentForm!: FormGroup;
   patientForm!: FormGroup;
   patientSchoolForm!: FormGroup;
@@ -55,11 +58,12 @@ export class ApplicationDashboardComponent implements OnInit {
   ExistedPatientHealthHistory: any = [];
   ExistedPatientRehabRecord: any = [];
   ExistedPatientFamHealth: any = [];
-  ExistedPatientAssessment: any = [];
   userInfo: any;
 
   admissionType: any = [];
-  selectedAdmissionType: any[] = [];
+
+  selectedAdmissionType: { admissionCode: string }[] = []
+
   citymun: any = [];
   brgy: any = [];
   prk: any = [];
@@ -69,14 +73,15 @@ export class ApplicationDashboardComponent implements OnInit {
   religion: any = [];
   drugEffects: any = [];
   educationalAttainment: any = [];
+  appHistory: any = [];
   onChangeCitymunCode: string = '';
   onChangeBarangay: string = '';
   initialSelectedCodes: string[] = [];
   currentSelectedCodes: string[] = [];
   deselectedCodes: string[] = [];
-
+  allPreviouslySelectedCodes: string[] = [];
   ExistedPatientCode = '';
-
+  Existedid ='';
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -96,14 +101,51 @@ export class ApplicationDashboardComponent implements OnInit {
     private PatientRehabRecordService: PatientRehabRecordService,
     private PatientFamHealthService: PatientFamHealthService,
     private PatientStaffAssessmentService: PatientStaffAssessmentService,
-  ) {}
+    private fb: FormBuilder
+  ) {
+  }
 
   ngOnInit(): void {
     this.userInfo = this.authService.getUserInfo();
+    console.log('Staff ID No:', this.userInfo.id);
     this.checkExisted();
     this.fetchAdditionalData();
-  }
+      this.PatientStaffAssessmentService.getAdmissionType().subscribe({
+      next: (response: any) => {
+        this.admissionType = response.map((effect: { admissionCode: string; admissionName: string; }) => ({
+          ...effect,
+          selected: false,
+        }));
+      },
+      error: (error: any) => {
+        console.error('Error:', error);
+      },
+    });
+  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+    const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
+    this.ExistedPatientCode = patientCode;
 
+    this.AssessmentForm = this.fb.group({
+      patientCode: patientCode,
+      admittingStaffAssessment: [''],
+      admittingStaffPlan: [''],
+      patientAssessmentDate: [''],
+      admissionCode: this.fb.array([]) // <-- FormArray for checkboxes
+    });
+
+  }
+ refreshHistoryList(): void {
+  const patientCode = this.ExistedPatientCode || this.route.snapshot.paramMap.get('patientCode') || '';
+  this.service.getApplicationHistory(patientCode).subscribe({
+    next: (response) => {
+      this.appHistory = response;
+      console.log('userData:', this.appHistory);
+    },
+    error: (error) => {
+      console.error('Error:', error);
+    }
+  });
+}
   checkExisted(): void {
     this.route.paramMap.subscribe((params) => {
       const patientCode = params.get('patientCode');
@@ -129,8 +171,7 @@ export class ApplicationDashboardComponent implements OnInit {
     this.loadExistedPatientDrugEffectData(patientCode);
     this.loadExistedPatientHealthHistoryData(patientCode);
     this.loadExistedPatientRehabRecordData(patientCode);
-    this.loadExistedPatientFamHealthData(patientCode);
-    this.loadExistedPatientAssessmentData(patientCode);
+    // this.loadExistedPatientFamHealthData(patientCode);
   }
 
   initializeForms(): void {
@@ -147,7 +188,6 @@ export class ApplicationDashboardComponent implements OnInit {
     this.patientPersonalHealthForm = this.PatientHealthHistoryService.createPatientHealthHistoryForm(this.ExistedPatientCode);
     this.patientRehabRecordForm = this.PatientRehabRecordService.createPatientRehabRecordForm(this.ExistedPatientCode);
     this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode);
-    this.AssessmentForm = this.PatientStaffAssessmentService.createStaffAssessmentForm(this.ExistedPatientCode);
     // this.siblings = this.patientSiblingsForm.get('siblings') as FormArray;
   }
 
@@ -368,12 +408,11 @@ export class ApplicationDashboardComponent implements OnInit {
     }).subscribe({
       next: ({ drugEffects, existingData }) => {
         const existingList = Array.isArray(existingData) ? existingData : [];
-        console.log(existingList);
+        console.log('Existing List:', existingList);
         const selectedCodes = existingList.map((item: any) => item.drugEffectCode);
 
-        // Filter the drugEffects to include only those with drugEffectStatus == 1
         this.drugEffects = (drugEffects as any[])
-          .filter((effect: any) => effect.drugEffectStatus === 1)  // Added filter here
+          .filter((effect: any) => effect.drugEffectStatus === 1)
           .map((effect: any) => ({
             ...effect,
             selected: selectedCodes.includes(effect.drugEffectCode)
@@ -387,44 +426,13 @@ export class ApplicationDashboardComponent implements OnInit {
         };
 
         this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(patientCode, firstRecord);
+
+        this.allPreviouslySelectedCodes = [...selectedCodes];
       },
       error: (err) => {
         console.error('Error loading form data:', err);
 
         this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(patientCode);
-      }
-    });
-  }
-
-  loadExistedPatientAssessmentData(patientCode: string): void {
-    forkJoin({
-      admissionType: this.service.getAdmissionType(),
-      existingData: this.service.getExistedPatientAssessmentData(patientCode)
-    }).subscribe({
-      next: ({ admissionType, existingData }) => {
-        const existingList = Array.isArray(existingData) ? existingData : [];
-        console.log(existingList);
-        const selectedCodes = existingList.map((item: any) => item.admissionCode);
-
-        this.admissionType = (admissionType as any[]).map((admission: any) => ({
-          ...admission,
-          selected: selectedCodes.includes(admission.admissionCode)
-        }));
-
-
-        const firstRecord = existingList.length > 0 ? {
-          ...existingList[0],
-          admissionCode: selectedCodes
-        } : {
-          admissionCode: []
-        };
-
-        this.AssessmentForm = this.PatientStaffAssessmentService.createStaffAssessmentForm(patientCode, firstRecord);
-      },
-      error: (err) => {
-        console.error('Error loading form data:', err);
-
-        this.AssessmentForm = this.PatientStaffAssessmentService.createStaffAssessmentForm(patientCode);
       }
     });
   }
@@ -460,48 +468,47 @@ export class ApplicationDashboardComponent implements OnInit {
       },
     });
   }
-  loadExistedPatientFamHealthData(patientCode: string): void {
-    this.service.getExistedPatientFamilyHealth(patientCode).subscribe({
-      next: (response) => {
-        this.ExistedPatientFamHealth = response;
-        console.log(this.ExistedPatientFamHealth);
-        if (this.ExistedPatientFamHealth.length > 0) {
-            this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode, {famHealths: this.ExistedPatientFamHealth});
-          } else {
-            this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode);
-          }
-      },
-      error: (error) => {
-        console.error('Error loading Existed Patient Family Health Data:', error);
-        this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode);
-      },
-    });
-  }
+  // loadExistedPatientFamHealthData(patientCode: string): void {
+  //   this.service.getExistedPatientFamilyHealth(patientCode).subscribe({
+  //     next: (response) => {
+  //       this.ExistedPatientFamHealth = response;
+  //       console.log(this.ExistedPatientFamHealth);
+  //       if (this.ExistedPatientFamHealth.length > 0) {
+  //           this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode, {famHealths: this.ExistedPatientFamHealth});
+  //         } else {
+  //           this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode);
+  //         }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading Existed Patient Family Health Data:', error);
+  //       this.FamHealthHistoryForm = this.PatientFamHealthService.createPatientFamHealthHistoryForm(this.ExistedPatientCode);
+  //     },
+  //   });
+  // }
 
   fetchAdditionalData(): void {
-    this.service.getDrugEffect().subscribe({
-      next: (response) => {
-        this.drugEffects = (response as any[]).map((effect) => ({
-          ...effect,
-          selected: false,
-        }));
-      },
-      error: (error) => {
-        console.error('Error:', error);
-      },
-    });
+      this.service.getDrugEffect().subscribe({
+        next: (response) => {
+          this.drugEffects = (response as any[]).map((effect) => ({
+            ...effect,
+            selected: false,
+          }));
+        },
+        error: (error) => {
+          console.error('Error:', error);
+        },
+      });
 
-    this.service.getAdmissionType().subscribe({
-      next: (response) => {
-        this.admissionType = (response as any[]).map((effect) => ({
-          ...effect,
-          selected: false,
-        }));
-      },
-      error: (error) => {
-        console.error('Error:', error);
-      },
-    });
+      const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
+      this.service.getApplicationHistory(patientCode).subscribe({
+        next: (response) => {
+          this.appHistory = response;
+          console.log('appHistory:',  this.appHistory);
+        },
+        error: (error) => {
+          console.error('Error:', error);
+        }
+      });
 
     this.service.getEducationalAttainment().subscribe({
       next: (response) => {
@@ -583,26 +590,138 @@ export class ApplicationDashboardComponent implements OnInit {
   patientDrugEffectFormSubmit(): void {
     this.PatientDrugEffectService.submitPatientDrugEffectForm(this.patientDrugEffectForm);
   }
-  AssessmentFormSubmit(): void {
-    this.PatientStaffAssessmentService.submitAssessmentForm(this.AssessmentForm);
+
+
+AssessmentFormSubmit(): void {
+  if (this.isSubmitting) {
+    return; // Prevent rapid re-submission
   }
-  patientSiblingsFormSubmit(): void {
-    if (this.patientSiblingsForm.value) {
 
-      this.siblingsFormService.submitPatientSiblingForm(this.patientSiblingsForm.value).subscribe({
-        next: (response) => {
-          console.log('Patient Sibling Form submitted successfully:', response);
-
-        },
-        error: (error) => {
-          console.error('Error submitting Patient Sibling Form:', error);
-
-        },
-      });
-    } else {
-      console.error('Patient Sibling Form is invalid');
+  const generateCustomAdmissionID = (): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let uuid = 'LMISS-';
+    for (let i = 0; i < 12; i++) {
+      const randomIndex = Math.floor(Math.random() * chars.length);
+      uuid += chars[randomIndex];
     }
+    return uuid;
+  };
+
+  if (this.AssessmentForm.valid) {
+    this.isSubmitting = true; // Lock submission
+
+    const patientCode = this.AssessmentForm.get('patientCode')?.value;
+    const admissionDate = new Date().toISOString();
+
+    // Generate a single ID and reuse it
+    const customAdmissionID = generateCustomAdmissionID();
+
+    const listAdmissionData = this.selectedAdmissionType.map((admission, index) => ({
+      recNo: 0, // Ensure it's treated as new
+      patientCode: patientCode,
+      admissionCode: admission.admissionCode,
+      admissionDate: admissionDate,
+      admissionStatus: 0,
+      admissionTypeCode: customAdmissionID, // Use here
+    }));
+
+    const formData = {
+      recNo: 0, // Set to null to avoid accidental updates
+      patientCode: patientCode,
+      admittingStaffAssessment: this.AssessmentForm.get('admittingStaffAssessment')?.value,
+      admittingStaffPlan: this.AssessmentForm.get('admittingStaffPlan')?.value,
+      patientAssessmentDate: new Date(this.AssessmentForm.get('patientAssessmentDate')?.value).toISOString(),
+      admissionStatus: 1,
+      patientAssessmentStatus: 1,
+      staffIdNo: this.userInfo?.id || 0,
+      assessmentCode: customAdmissionID, // Use the same ID here
+      isActive: true,
+    };
+
+    this.PatientStaffAssessmentService.postPatientAssessmentData(formData).subscribe({
+      next: () => {
+        console.log('Assessment submitted:', formData);
+
+        this.PatientStaffAssessmentService.postAdmissionData({ listAdmissionData }).subscribe({
+          next: () => {
+            console.log('Admission list submitted:', listAdmissionData);
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Patient Assessment data submitted successfully!',
+              timer: 1000,
+              timerProgressBar: true,
+              showConfirmButton: false,
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+            didClose: () => {
+            this.AssessmentForm.reset();
+            (this.AssessmentForm.get('admissionCode') as FormArray).clear();
+                this.refreshHistoryList();
+
+              this.selectedAdmissionType = [];
+
+              this.admissionType.forEach((type: any) => type.selected = false);
+
+              this.AssessmentForm.markAsPristine();
+              this.AssessmentForm.markAsUntouched();
+              this.isSubmitting = false;
+            }
+            });
+          },
+          error: (err) => {
+            this.isSubmitting = false;
+            this.handleError(err, 'admission data');
+          }
+        });
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        this.handleError(err, 'assessment form');
+      }
+    });
+
+  } else {
+    alert('Please fill in all required fields correctly.');
   }
+}
+
+
+
+
+
+
+private handleError(error: any, context: string): void {
+  console.error(`Error submitting ${context} data:`, error);
+
+  if (error.status === 400) {
+    alert('Validation failed. Please check your inputs.');
+  } else if (error.status === 401) {
+    alert('Unauthorized. Please check your permissions.');
+  } else if (error.status === 500) {
+    alert('Server error. Please try again later.');
+  } else {
+    alert(`Failed to submit ${context} data. Please try again.`);
+  }
+}
+
+patientSiblingsFormSubmit(): void {
+  if (this.patientSiblingsForm.valid) {
+    this.siblingsFormService.submitPatientSiblingForm(this.patientSiblingsForm.value).subscribe({
+      next: (response) => {
+        console.log('Patient Sibling Form submitted successfully:', response);
+      },
+      error: (error) => {
+        console.error('Error submitting Patient Sibling Form:', error);
+      },
+    });
+  } else {
+    console.error('Patient Sibling Form is invalid');
+    alert('Please fill in the sibling form correctly.');
+  }
+}
+
   get siblings(): FormArray {
     return this.patientSiblingsForm.get('siblings') as FormArray;
   }
@@ -767,37 +886,34 @@ export class ApplicationDashboardComponent implements OnInit {
     newRow.patchValue({ isNew: true }); // ✅ Add a custom flag to mark this row as new
     this.famHealths.push(newRow);
   }
+  get admissionCodeArray(): FormArray {
+  return this.AssessmentForm.get('admissionCode') as FormArray;
+}
 
-  // Event handlers
-  // onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
-  //   const checkbox = event.target as HTMLInputElement;
-  //   admissionType.selected = checkbox.checked;
+  onAdmissionTypeCheckboxChange(event: Event, admissionType: any): void {
+  const checkbox = event.target as HTMLInputElement;
+  const admissionCodeArray = this.admissionCodeArray;
 
-  //   if (checkbox.checked) {
-  //     this.selectedAdmissionType.push(admissionType);
-  //   } else {
-  //     const index = this.selectedAdmissionType.findIndex(
-  //       (effect) => effect.admissionCode === admissionType.admissionCode
-  //     );
-  //     if (index > -1) {
-  //       this.selectedAdmissionType.splice(index, 1);
-  //     }
-  //   }
-
-  //   console.log('Selected Admission Type:', this.selectedAdmissionType);
-  // }
-  onAdmissionTypeCheckboxChange(event: any, item: any, form: FormGroup) {
-    const admissionCodeArray = form.get('admissionCode') as FormArray;
-
-    if (event.target.checked) {
-      admissionCodeArray.push(new FormControl(item.admissionCode));
-    } else {
-      const index = admissionCodeArray.controls.findIndex(ctrl => ctrl.value === item.admissionCode);
-      if (index >= 0) {
-        admissionCodeArray.removeAt(index);
-      }
+  if (checkbox.checked) {
+    admissionCodeArray.push(this.fb.control(admissionType.admissionCode));
+    this.selectedAdmissionType.push(admissionType); // Add to list
+  } else {
+    const index = admissionCodeArray.controls.findIndex(
+      control => control.value === admissionType.admissionCode
+    );
+    if (index !== -1) {
+      admissionCodeArray.removeAt(index);
     }
+
+    // Remove from selectedAdmissionType
+    this.selectedAdmissionType = this.selectedAdmissionType.filter(
+      (item) => item.admissionCode !== admissionType.admissionCode
+    );
   }
+}
+
+
+
 
 
   onCheckboxChange(event: any, item: any, form: FormGroup) {
@@ -808,12 +924,12 @@ export class ApplicationDashboardComponent implements OnInit {
       drugEffectArray.push(new FormControl(code));
       item.selected = true;
 
-      // Add to currentSelectedCodes if not present
+
       if (!this.currentSelectedCodes.includes(code)) {
         this.currentSelectedCodes.push(code);
       }
 
-      // Remove from deselected if it was there
+
       this.deselectedCodes = this.deselectedCodes.filter(c => c !== code);
 
     } else {
@@ -823,18 +939,15 @@ export class ApplicationDashboardComponent implements OnInit {
       }
       item.selected = false;
 
-      // Remove from currentSelectedCodes
+
       this.currentSelectedCodes = this.currentSelectedCodes.filter(c => c !== code);
 
-      // Add to deselectedCodes if not present
+
       if (!this.deselectedCodes.includes(code)) {
         this.deselectedCodes.push(code);
       }
     }
 
-    // 👇 Console the final result
-    console.log('✅ Selected (excluding deselected):', this.currentSelectedCodes);
-    console.log('❌ Deselected:', this.deselectedCodes);
   }
 
 
@@ -925,9 +1038,37 @@ export class ApplicationDashboardComponent implements OnInit {
     this.showTab('#ApplicationHisto');
   }
 
-  goToPatientDashboard(): void {
-    this.router.navigate(['/patientDashboard']);
+
+goToPatientDashboard(patientCode: string, assessmentCode?: string): void {
+  if (!this.router) {
+    console.error('Router is undefined!');
+    return;
   }
+
+  this.isLoading = true;
+
+  let finalPatientCode = patientCode;
+  let finalAssessmentCode = assessmentCode || '';
+
+  if (!finalAssessmentCode) {
+    if (Array.isArray(this.appHistory)) {
+      const found = this.appHistory.find((item: any) => item.patientCode === finalPatientCode);
+      finalAssessmentCode = found ? found.assessmentCode : '';
+    } else if (this.appHistory && this.appHistory.assessmentCode) {
+      finalPatientCode = this.appHistory.patientCode;
+      finalAssessmentCode = this.appHistory.assessmentCode;
+    }
+  }
+
+  if (finalPatientCode && finalAssessmentCode) {
+    alert('Patient Code: ' + finalPatientCode); // This will now be correct
+    this.router.navigate(['/patientDashboard', finalPatientCode, finalAssessmentCode]);
+  } else {
+    console.warn('Missing patientCode or assessmentCode. Cannot navigate.');
+  }
+}
+
+
   gotoNavReason(): void {
     this.showTab('#navReason');
   }
@@ -945,7 +1086,6 @@ export class ApplicationDashboardComponent implements OnInit {
   }
   goToSelectedApp(patientCode: string): void {
     this.router.navigate(['/application', patientCode]).then(() => {
-      alert(`Selected Patient Code: ${patientCode}`);
     });
 
 
