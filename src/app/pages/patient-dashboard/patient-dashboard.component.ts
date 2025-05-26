@@ -33,6 +33,9 @@ export class PatientDashboardComponent  {
 getExisted(): void {
   this.route.paramMap.subscribe((params) => {
     const patientCode = params.get('patientCode');
+    const assessmentCode = params.get('assessmentCode');
+    console.log('Assessment Code:', assessmentCode);
+    console.log('Patient Code:', patientCode);
     if (patientCode) {
       this.service.getExistedPatientData(patientCode).subscribe({
         next: (response) => {

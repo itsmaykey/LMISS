@@ -503,6 +503,16 @@ export class ApplicationDashboardComponent implements OnInit {
       this.service.getApplicationHistory(patientCode).subscribe({
         next: (response) => {
           this.appHistory = response;
+         const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+this.appHistory.forEach((item: any) => {
+  const date = new Date(item.assessmentDate);
+  const monthName = monthNames[date.getMonth()];
+  item.assessmentDate = `${monthName} ${date.getDate().toString().padStart(2, '0')}, ${date.getFullYear()}`;
+});
           console.log('appHistory:',  this.appHistory);
         },
         error: (error) => {
@@ -1039,7 +1049,7 @@ patientSiblingsFormSubmit(): void {
   }
 
 
-goToPatientDashboard(patientCode: string, assessmentCode?: string): void {
+goToPatientDashboard(assessmentCode: string, patientCode?: string, ): void {
   if (!this.router) {
     console.error('Router is undefined!');
     return;
