@@ -74,9 +74,9 @@
               <th>#</th>
               <!-- <th>Patient ID</th> -->
               <th>Full Name</th>
-              <th>Sex</th>
-              <th>Age</th>
-              <th>Action</th>
+              <th style="text-align: center;">Sex</th>
+              <th style="text-align: center;">Age</th>
+              <th style="text-align: center;">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -84,9 +84,10 @@
               <th>{{ i + 1 }}</th>
               <!-- <th>{{ x.patientCode }}</th> -->
               <th>{{ x.fullName }}</th>
-              <th>{{ x.sex }}</th>
-              <th>{{ x.age }}</th>
-              <th><button type="button" class="btn btn-success btn-sm text-white" (click)="goToSelectedApp(x.patientCode)">Proceed</button>
+              <th style="text-align: center;">{{ x.sex }}</th>
+              <th style="text-align: center;">{{ x.age }}</th>
+              <th style="text-align: center;"><button type="button" class="btn btn-success btn-sm text-white" (click)="goToApplicationDashboard(x.patientCode)">Edit</button> &nbsp;
+                <!-- <button  type="button" class="btn btn-primary btn-sm text-white" (click)="goTopatientDashboard(x.patientCode)">Profile</button> -->
               </th>
               </tr>
             </tbody>

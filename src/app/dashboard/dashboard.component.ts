@@ -64,8 +64,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   goToAppDashboard() {
     this.router.navigate(['/application']);
+
   }
-  goToSelectedApp(patientCode: string): void {
+  goToApplicationDashboard(patientCode: string): void {
     if (!this.router) {
       console.error('Router is undefined!'); // Debugging check
       return;
@@ -75,6 +76,18 @@ this.isLoading = true;
     this.isLoading = false; // Hide loader after 3 seconds
   }, 3000);
     this.router.navigate(['/application', patientCode]);
+  }
+
+  goTopatientDashboard(patientCode: string): void {
+    if (!this.router) {
+      console.error('Router is undefined!'); // Debugging check
+      return;
+    }
+this.isLoading = true;
+  setTimeout(() => {
+    this.isLoading = false; // Hide loader after 3 seconds
+  }, 3000);
+    this.router.navigate(['/patientDashboard', patientCode]);
   }
   ngOnDestroy(): void {
     if (this.scanner && this.isCameraActive) {
