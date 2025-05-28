@@ -19,7 +19,7 @@ import { PatientRehabRecordService } from './ScriptForms/PatientRehabRecord/pati
 import { PatientFamHealthService } from './ScriptForms/patientFamHealth/patient-fam-health.service';
 import { PatientStaffAssessmentService } from './ScriptForms/patientStaffAssessment/patient-staff-assessment.service';
 import Swal from 'sweetalert2';
-//import { Base64 } from 'js-base64';
+import { Base64 } from 'js-base64';
 
 import { forkJoin } from 'rxjs';
 @Component({
@@ -76,9 +76,9 @@ export class ApplicationDashboardComponent implements OnInit {
   appHistory: any = [];
   onChangeCitymunCode: string = '';
   onChangeBarangay: string = '';
-  initialSelectedCodes: string[] = [];
-  currentSelectedCodes: string[] = [];
-  deselectedCodes: string[] = [];
+  initialSelectedCodes: string[] = [];  
+  currentSelectedCodes: string[] = [];  
+  deselectedCodes: string[] = [];       
   allPreviouslySelectedCodes: string[] = [];
   ExistedPatientCode = '';
   Existedid ='';
@@ -124,7 +124,7 @@ export class ApplicationDashboardComponent implements OnInit {
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
     const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
     this.ExistedPatientCode = patientCode;
-
+    
     this.AssessmentForm = this.fb.group({
       patientCode: patientCode,
       admittingStaffAssessment: [''],
@@ -132,7 +132,7 @@ export class ApplicationDashboardComponent implements OnInit {
       patientAssessmentDate: [''],
       admissionCode: this.fb.array([]) // <-- FormArray for checkboxes
     });
-
+ 
   }
  refreshHistoryList(): void {
   const patientCode = this.ExistedPatientCode || this.route.snapshot.paramMap.get('patientCode') || '';
@@ -204,7 +204,7 @@ export class ApplicationDashboardComponent implements OnInit {
             const dd = String(birthDateValue.getDate()).padStart(2, '0');
             this.ExistedPatient[0].birthdate = `${yyyy}-${mm}-${dd}`;
           }
-
+          
           this.patientForm = this.patientFormService.createPatientForm(this.userInfo, this.ExistedPatient[0]);
           this.loadBrgyAndPrk(this.ExistedPatient[0].citymunCode, this.ExistedPatient[0].brgyCode);
         } else {
@@ -354,7 +354,7 @@ export class ApplicationDashboardComponent implements OnInit {
       next: (response) => {
         this.ExistedPatientRehabRecord = response;
         console.log('Fetched rehab record:', this.ExistedPatientRehabRecord);
-
+  
         // Confirm the data is an array and has expected structure
         if (Array.isArray(this.ExistedPatientRehabRecord) && this.ExistedPatientRehabRecord.length > 0) {
           console.log('Populating form with rehab data...');
@@ -373,7 +373,7 @@ export class ApplicationDashboardComponent implements OnInit {
       },
     });
   }
-
+  
 
   loadExistedPatientDrugHistoryData(patientCode: string): void {
     this.service.getExistedPatientDrugHistoryData(patientCode).subscribe({
@@ -410,28 +410,28 @@ export class ApplicationDashboardComponent implements OnInit {
         const existingList = Array.isArray(existingData) ? existingData : [];
         console.log('Existing List:', existingList);
         const selectedCodes = existingList.map((item: any) => item.drugEffectCode);
-
+  
         this.drugEffects = (drugEffects as any[])
           .filter((effect: any) => effect.drugEffectStatus === 1)
           .map((effect: any) => ({
             ...effect,
             selected: selectedCodes.includes(effect.drugEffectCode)
           }));
-
+  
         const firstRecord = existingList.length > 0 ? {
           ...existingList[0],
           drugEffectCode: selectedCodes
         } : {
           drugEffectCode: []
         };
-
+  
         this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(patientCode, firstRecord);
-
-        this.allPreviouslySelectedCodes = [...selectedCodes];
+  
+        this.allPreviouslySelectedCodes = [...selectedCodes]; 
       },
       error: (err) => {
         console.error('Error loading form data:', err);
-
+  
         this.patientDrugEffectForm = this.PatientDrugEffectService.createPatientDrugEffectForm(patientCode);
       }
     });
@@ -442,7 +442,7 @@ export class ApplicationDashboardComponent implements OnInit {
       next: (response) => {
         this.ExistedPatientDrugReason = response;
         if (this.ExistedPatientDrugReason.length > 0) {
-
+         
           this.patientDrugReasonForm = this.PatientDrugReasonService.createPatientDrugReasonForm(this.ExistedPatientCode, this.ExistedPatientDrugReason[0]);
         } else {
           this.patientDrugReasonForm = this.PatientDrugReasonService.createPatientDrugReasonForm(this.ExistedPatientCode);
@@ -485,7 +485,7 @@ export class ApplicationDashboardComponent implements OnInit {
   //     },
   //   });
   // }
-
+  
   fetchAdditionalData(): void {
       this.service.getDrugEffect().subscribe({
         next: (response) => {
@@ -498,21 +498,11 @@ export class ApplicationDashboardComponent implements OnInit {
           console.error('Error:', error);
         },
       });
-
+  
       const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
       this.service.getApplicationHistory(patientCode).subscribe({
         next: (response) => {
           this.appHistory = response;
-         const monthNames = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
-
-this.appHistory.forEach((item: any) => {
-  const date = new Date(item.assessmentDate);
-  const monthName = monthNames[date.getMonth()];
-  item.assessmentDate = `${monthName} ${date.getDate().toString().padStart(2, '0')}, ${date.getFullYear()}`;
-});
           console.log('appHistory:',  this.appHistory);
         },
         error: (error) => {
@@ -586,7 +576,7 @@ this.appHistory.forEach((item: any) => {
   patientSchoolFormSubmit(): void {
     this.schoolFormService.submitPatientSchoolForm(this.patientSchoolForm);
   }
-
+  
   patientPersonalHealthFormSubmit(): void {
     console.log(this.patientPersonalHealthForm);
     this.PatientHealthHistoryService.submitPatientHealthHistoryForm(this.patientPersonalHealthForm);
@@ -667,7 +657,7 @@ AssessmentFormSubmit(): void {
               allowEscapeKey: false,
             didClose: () => {
             this.AssessmentForm.reset();
-            (this.AssessmentForm.get('admissionCode') as FormArray).clear();
+            (this.AssessmentForm.get('admissionCode') as FormArray).clear(); 
                 this.refreshHistoryList();
 
               this.selectedAdmissionType = [];
@@ -736,31 +726,7 @@ patientSiblingsFormSubmit(): void {
     return this.patientSiblingsForm.get('siblings') as FormArray;
   }
   removeSibling(index: number): void {
-    console.log(this.ExistedPatientCode);
-    console.log(this.siblings.value[index].siblingCode)
-    this.service.removeSiblings(this.ExistedPatientCode, this.siblings.value[index].siblingCode).subscribe({
-      next: (response) => {
-        console.log(this.siblings.value[index].siblingName)
-        Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: `Sibling deleted successfully. \n`+ this.siblings.value[index].siblingName,
-                    showConfirmButton: false,
-                    timer: 5000,
-                    timerProgressBar: true,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                  }).then(() => {
-                    this.siblings.removeAt(index);
-                  });
-
-      },
-      error: (error) => {
-        console.error('Error deleting sibling:', error);
-      },
-    });
-
-
+    this.siblings.removeAt(index);
   }
   addSibling(): void {
     this.siblings.push(this.siblingsFormService.createSiblingFormGroup());
@@ -783,11 +749,11 @@ patientSiblingsFormSubmit(): void {
   drughistoriessaddRow(): void {
     this.drugHistorys.push(this.PatientDrugHistoryService.createDrugHistoryFormGroup());
   }
-
+ 
   get drugHistorys(): FormArray {
     return this.patientDrugHistoryForm.get('drugHistorys') as FormArray;
   }
-
+  
 
 
   patientChildrenFormSubmit(): void {
@@ -821,7 +787,7 @@ patientSiblingsFormSubmit(): void {
   patientEmployeeFormSubmit(): void {
   if (this.patientEmploymentForm.valid) { // ✅ Check if form is valid
     console.log("Form Data:", this.patientEmploymentForm.value); // ✅ Debugging
-
+    
     this.employeeFormService.submitPatientEmployeeForm(this.patientEmploymentForm.value).subscribe({
       next: (response) => {
         console.log('Patient employee Form submitted successfully:', response);
@@ -850,7 +816,7 @@ patientSiblingsFormSubmit(): void {
   patientRehabRecordFormSubmit(): void {
     if (this.patientRehabRecordForm.valid) { // ✅ Check if form is valid
       console.log("Form Data:", this.patientRehabRecordForm.value); // ✅ Debugging
-
+      
       this.PatientRehabRecordService.submitPatientRehabRecordForm(this.patientRehabRecordForm.value).subscribe({
         next: (response) => {
           console.log('Patient Rehab Form submitted successfully:', response);
@@ -873,7 +839,7 @@ patientSiblingsFormSubmit(): void {
   patientFamHealthFormSubmit(): void {
     if (this.FamHealthHistoryForm.valid) { // ✅ Check if form is valid
       console.log("Form Data:", this.FamHealthHistoryForm.value); // ✅ Debugging
-
+      
       this.PatientFamHealthService.submitPatientFamHealthForm(this.FamHealthHistoryForm.value).subscribe({
         next: (response) => {
           console.log('Patient Family Health Form submitted successfully:', response);
@@ -886,7 +852,7 @@ patientSiblingsFormSubmit(): void {
       console.error('Patient Family Health Form is invalid', this.FamHealthHistoryForm.errors); // ✅ Show validation errors
     }
   }
-
+  
   get famHealths(): FormArray {
     return this.FamHealthHistoryForm.get('famHealths') as FormArray;
   }
@@ -923,52 +889,52 @@ patientSiblingsFormSubmit(): void {
 }
 
 
-
+ 
 
 
   onCheckboxChange(event: any, item: any, form: FormGroup) {
     const drugEffectArray = form.get('drugEffectCode') as FormArray;
     const code = item.drugEffectCode;
-
+  
     if (event.target.checked) {
       drugEffectArray.push(new FormControl(code));
       item.selected = true;
-
-
+  
+      
       if (!this.currentSelectedCodes.includes(code)) {
         this.currentSelectedCodes.push(code);
       }
-
-
+  
+     
       this.deselectedCodes = this.deselectedCodes.filter(c => c !== code);
-
+  
     } else {
       const index = drugEffectArray.controls.findIndex(ctrl => ctrl.value === code);
       if (index >= 0) {
         drugEffectArray.removeAt(index);
       }
       item.selected = false;
-
-
+  
+      
       this.currentSelectedCodes = this.currentSelectedCodes.filter(c => c !== code);
-
-
+  
+     
       if (!this.deselectedCodes.includes(code)) {
         this.deselectedCodes.push(code);
       }
     }
 
   }
+  
 
-
-
-
+  
+  
   onMunicipalityChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     this.onChangeCitymunCode = selectElement.value;
-
+  
     console.log('Municipality changed to:', this.onChangeCitymunCode);
-
+  
     if (this.onChangeCitymunCode) {
       this.service.getBrgy(this.onChangeCitymunCode).subscribe({
         next: (response) => {
@@ -983,20 +949,20 @@ patientSiblingsFormSubmit(): void {
       console.warn('No city municipality code selected.');
     }
   }
-
+  
   onBarangayChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     let selectedBarangay = selectElement.value;
-
+  
     console.log('Barangay changed to:', selectedBarangay);
-
+  
     // Fallback to ExistedPatient if no selection is made
     if (!selectedBarangay && this.ExistedPatient?.length > 0 && this.ExistedPatient[0].brgyCode) {
       selectedBarangay = this.ExistedPatient[0].brgyCode;
     }
-
+  
     this.onChangeBarangay = selectedBarangay;
-
+  
     if (this.onChangeBarangay) {
       this.service.getprk(this.onChangeBarangay).subscribe({
         next: (response) => {
@@ -1012,8 +978,8 @@ patientSiblingsFormSubmit(): void {
       console.warn('No valid barangay selected. Skipping purok fetch.');
     }
   }
-
-
+  
+  
 
   // Navigation methods
   goToSubstanceHisto(): void {
@@ -1048,8 +1014,8 @@ patientSiblingsFormSubmit(): void {
     this.showTab('#ApplicationHisto');
   }
 
-
-goToPatientDashboard(assessmentCode: string, patientCode?: string, ): void {
+  
+goToPatientDashboard(patientCode: string, assessmentCode?: string): void {
   if (!this.router) {
     console.error('Router is undefined!');
     return;
@@ -1071,7 +1037,6 @@ goToPatientDashboard(assessmentCode: string, patientCode?: string, ): void {
   }
 
   if (finalPatientCode && finalAssessmentCode) {
-    alert('Patient Code: ' + finalPatientCode); // This will now be correct
     this.router.navigate(['/patientDashboard', finalPatientCode, finalAssessmentCode]);
   } else {
     console.warn('Missing patientCode or assessmentCode. Cannot navigate.');
@@ -1098,7 +1063,7 @@ goToPatientDashboard(assessmentCode: string, patientCode?: string, ): void {
     this.router.navigate(['/application', patientCode]).then(() => {
     });
 
-
+   
   }
 
   ////navSub
