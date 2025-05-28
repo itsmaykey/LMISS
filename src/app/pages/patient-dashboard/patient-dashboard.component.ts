@@ -36,21 +36,46 @@ getExisted(): void {
     const assessmentCode = params.get('assessmentCode');
     console.log('Assessment Code:', assessmentCode);
     console.log('Patient Code:', patientCode);
-    if (patientCode) {
-      this.service.getExistedPatientData(patientCode).subscribe({
+    if (patientCode && assessmentCode) {
+      this.service.getExistedPatientData(patientCode, assessmentCode).subscribe({
         next: (response) => {
-          this.ExistedPatient = response;
-          if (this.ExistedPatient.length > 0) {
-            console.log(this.ExistedPatient[0].pFirstName + ' ' + this.ExistedPatient[0].pMiddleName+' ' + this.ExistedPatient[0].pLastName);
-            console.log(this.ExistedPatient);
+          if (response) {
+               this.ExistedPatient = Array.isArray(response) ? response : [response];
+               console.log(this.ExistedPatient);
+                const monthNames = [
+          'January',
+          'February',
+          'March',
+          'April',
+          'May',
+          'June',
+          'July',
+          'August',
+          'September',
+          'October',
+          'November',
+          'December',
+        ];
+
+        this.ExistedPatient.forEach((item: any) => {
+          const date = new Date(item.patientAssessmentDate);
+          const monthName = monthNames[date.getMonth()];
+          item.patientAssessmentDate = `${monthName} ${date
+            .getDate()
+            .toString()
+            .padStart(2, '0')}, ${date.getFullYear()}`;
+        });
+            // console.log(this.ExistedPatient[0].pFirstName + ' ' + this.ExistedPatient[0].pMiddleName+' ' + this.ExistedPatient[0].pLastName);
+            // console.log(this.ExistedPatient);
           } else {
            console.log("err")
           }
         },
         error: () => {
-
         },
       });
+    } else {
+      console.error('Missing patientCode or assessmentCode');
     }
 
 
@@ -61,52 +86,61 @@ getExisted(): void {
 }
 tryprint(): void{
   console.log(this.ExistedPatient[0].patientCode);
+  // const docDefinition: TDocumentDefinitions = {
+  const userData = this.ExistedPatient[0];
+  console.log(userData);
   const docDefinition: TDocumentDefinitions = {
-    content: [
-      // { text: 'Luntiang Paraiso Regional Rehabilitation Center',
-      //    style: 'header',
-      //    alignment: 'center',
-      //    fontSize: 14,
-      //     bold: true,
-      //     margin: [0, 20, 0, 8]
-      //  },
-
-      {
-        table: {
-          body: [
-            [
-
-              {
-                 qr: '\n \n'+ this.ExistedPatient[0].patientCode,
-                 // ← this can be any text or URL
-                 fit: 80, // optional: size of the QR
-               //LEFT TOP  RIGHT BOTTOM
-                 margin: [15, 10, 0, 10],
-                 border: [true, true, false, true], // remove borders
-              },
-              {
-                text: 'Luntiang Paraiso Regional Rehabilitation Center \n \n'
-                + this.ExistedPatient[0].pLastName + ', ' +this.ExistedPatient[0].pFirstName + ' ' + this.ExistedPatient[0].pMiddleName + '\n \n'
-                + 'INPATIENT',
-                 //LEFT TOP BOTTOM RIGHT
-                margin: [0, 10, 0, 10],
-                border: [false, true, true, true], // remove borders
-              },
-
-
-
-            ]
-          ],
-
+  pageSize: 'A7',
+  pageOrientation: 'landscape',
+  pageMargins: [20, 60, 20, 40],
+  header: {
+    text: 'LPRRC - LMISS',
+    style: 'header',
+    alignment: 'center',
+    margin: [0, 10, 0, 20],
+  },
+  content: [
+    {
+      columns: [
+        {
+          qr: userData.patientCode,
+          fit: 100,
+          alignment: 'center',
         },
-        margin: [10, 10, 10, 10], // Optional: add margin to the table
-        alignment: 'center',
-       // Optional: remove borders around the table
-      },
+        // You can add more columns here if needed
       ],
-      }
-
-
+      columnGap: 10,
+    },
+  ],
+  footer: function () {
+    return {
+      columns: [
+        {
+          stack: [
+            { text: `Nickname: ${userData.pNickName}`, style: 'footer' },
+            { text: `Date of Admission: ${userData.patientAssessmentDate} `, style: 'footer' },
+            { text: `Date of Discharged: ${userData.dateofDischarge}`, style: 'footer' },
+          ],
+          alignment: 'center',
+          margin: [0, 0, 0, 10],
+        },
+      ],
+    };
+  },
+  styles: {
+    header: {
+      fontSize: 18,
+      bold: true,
+    },
+    info: {
+      fontSize: 12,
+      margin: [0, 5, 0, 0],
+    },
+    footer: {
+      fontSize: 10,
+    },
+  },
+};
   pdfMake.createPdf(docDefinition).open();
 
 }
