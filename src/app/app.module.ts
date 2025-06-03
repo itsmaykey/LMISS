@@ -13,12 +13,14 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import { UserRegComponent } from './Admin/user-Registration/user-reg.component';
 import { ApplicationDashboardComponent } from './pages/application-dashboard/application-dashboard.component';
+import { PatientDashboardComponent } from './pages/patient-dashboard/patient-dashboard.component';
 import { RouterModule, Routes } from '@angular/router';
 import { LoaderComponent } from './layout/loader/loader.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'application/:patientCode', component: ApplicationDashboardComponent }, // Dynamic route for patientCode
+  { path: 'application/:patientCode', component: ApplicationDashboardComponent },
+  { path: 'patientDashboard/:patientCode/:assessmentCode', component: PatientDashboardComponent }, // Dynamic route for patientCode
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' } // Optional: redirect to dashboard
 ];
 
@@ -31,6 +33,7 @@ const routes: Routes = [
     LoginComponent,
     UserRegComponent,
     ApplicationDashboardComponent,
+    PatientDashboardComponent,
     LoaderComponent
 
 

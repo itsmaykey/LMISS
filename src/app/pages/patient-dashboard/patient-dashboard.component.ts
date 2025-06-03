@@ -1,12 +1,19 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-
+import { ReactiveFormsModule } from '@angular/forms';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { PatientDashboardService } from './service/patient-dashboard.service';
-
+// Update the import path below if the actual path is different
+import { AuthService } from '../../Admin/Auth/AuthService';
+import { FormBuilder, FormArray, Validators, FormGroup } from '@angular/forms';
+import { formatDate } from '@angular/common';
+import { SocialWorkerNotesService } from './ScriptForms/SocialWorkerNotes/social-worker-notes.service';
+import { HttpClient } from '@angular/common/http';
+import Swal from 'sweetalert2';
+import { Modal } from 'bootstrap';
 pdfMake.vfs = pdfFonts.vfs;
 
 @Component({
@@ -14,20 +21,61 @@ pdfMake.vfs = pdfFonts.vfs;
   templateUrl: './patient-dashboard.component.html',
   styleUrl: './patient-dashboard.component.css'
 })
-export class PatientDashboardComponent  {
+export class PatientDashboardComponent  implements OnInit {
+  modalInstance: Modal | null = null;
 
-
+  ExistedPatientCode = '';
   ExistedPatient: any = [];
-
-
-  constructor(private router: Router,
+  AssessmentCode = '';
+  userInfo: any; // <-- Declare userInfo property
+  SocialWorkerNotesForm!: FormGroup; 
+  isSubmitting = false;
+  fb: FormBuilder;
+  modalElementRef: any;
+  constructor(private router: Router,http: HttpClient,
      private route: ActivatedRoute,
-     private service: PatientDashboardService
-  ) {}
+     private service: PatientDashboardService,
+     private authService: AuthService, // <-- Inject AuthService
+     fb: FormBuilder,
+     private SocialWorkerNotesService: SocialWorkerNotesService,
+  ) {
+    this.fb = fb;
+  }
+  
 
+  showModal(): void {
+    const modalElement = document.getElementById('backDropModal');
+    if (!modalElement) {
+      console.error('Modal element not found in DOM');
+      return;
+    }
 
+    this.modalInstance = new Modal(modalElement);
+    this.modalInstance.show();
+  }
+
+  hideModal(): void {
+    this.modalInstance?.hide();
+  }
   ngOnInit(): void {
     this.getExisted();
+     this.userInfo = this.authService.getUserInfo();
+    console.log('Staff ID No:', this.userInfo.id);
+
+   
+    const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+    const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
+    this.ExistedPatientCode = patientCode;
+    
+    this.SocialWorkerNotesForm = this.fb.group({
+      recNo: 0,
+      patientCode: patientCode,
+      interventionCode: assessmentCode,
+      staffIdNo: this.userInfo.id,
+      patientActivies: ['', Validators.required],
+      patientIntervention: ['', Validators.required],
+      interventionDate: ['', Validators.required]
+    });
   }
 
 getExisted(): void {
@@ -41,7 +89,6 @@ getExisted(): void {
         next: (response) => {
           this.ExistedPatient = response;
           if (this.ExistedPatient.length > 0) {
-            console.log(this.ExistedPatient[0].pFirstName + ' ' + this.ExistedPatient[0].pMiddleName+' ' + this.ExistedPatient[0].pLastName);
             console.log(this.ExistedPatient);
           } else {
            console.log("err")
@@ -52,11 +99,6 @@ getExisted(): void {
         },
       });
     }
-
-
-
-
-
   });
 }
 tryprint(): void{
@@ -111,28 +153,55 @@ tryprint(): void{
 
 }
 
-  navigateToDashboard(): void {
-    this.router.navigate(['/applicationDashboard']);
 
+SocialWorkerNotesFormSubmit(): void {
+  if (this.SocialWorkerNotesForm.invalid) {
+    this.SocialWorkerNotesForm.markAllAsTouched(); 
+    return;
   }
+
+  this.isSubmitting = true;
+
+  const formData = this.SocialWorkerNotesForm.value;
+  console.log(formData);
+
+  this.SocialWorkerNotesService.postPatientProgressReport( formData ).subscribe({
+    
+    next: (response) => {
+      console.log('Form saved successfully:', response);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Patient progress report submitted successfully!',
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      });
+      this.hideModal();
+      this.SocialWorkerNotesForm.reset();
+      this.isSubmitting = false;
+    },
+    error: (error) => {
+      console.error('Error saving form:', error);
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to submit patient progress report. Please try again.',
+        showConfirmButton: true,
+        allowOutsideClick: true,
+        allowEscapeKey: true
+      });
+
+      this.isSubmitting = false;
+    }
+  });
 }
-//  { text: 'Scan the QR below:', margin: [0, 10, 0, 10] },
-// {
-//   qr:  this.ExistedPatient[0].patientCode,
-//   alignment: 'center',
-//    // ← this can be any text or URL
-//   fit: 100 // optional: size of the QR
-// },
-// {
-//   text: this.ExistedPatient[0].pLastName + ', ' +this.ExistedPatient[0].pFirstName + ' ' + this.ExistedPatient[0].pMiddleName,
-//   alignment: 'center',
-// }
-// ],
-// styles: {
-// header: {
-//   fontSize: 18,
-//   bold: true,
-//   margin: [0, 0, 0, 10]
-// }
-// }
-// };
+
+}
+  
+
+

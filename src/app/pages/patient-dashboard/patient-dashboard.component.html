@@ -11,13 +11,24 @@
               <i class="bx bx-user-circle d-block w-px-100 h-px-100 text-primary" style="font-size: 100px;"></i>
 
               <div class="user-info text-center pb-2" >
-                <!-- <h5>{{ExistedPatient[0].pFirstName + ' ' +this.ExistedPatient[0].pMiddleName+' '+this.ExistedPatient[0].pLastName}}</h5> -->
-                <span class="badge bg-label-secondary">Status: Inpatient</span>
+               <div *ngIf="ExistedPatient && ExistedPatient[0]">
+                  <h6 class="text-primary">
+                    {{ ExistedPatient[0].pFirstName + ' ' + ExistedPatient[0].pMiddleName + ' ' + ExistedPatient[0].pLastName }}
+                  </h6>
+                </div>
+
+                <label class="badge bg-label-secondary" *ngIf="ExistedPatient && ExistedPatient[0]">
+                    Alyas: {{ ExistedPatient[0].pNickName | uppercase}} | 
+                    {{ ExistedPatient[0].sex == 1 ? 'Male' : ExistedPatient[0].sex == 2 ? 'Female' : 'Unknown' }} |
+                    Age: {{ExistedPatient[0].age}} | {{ExistedPatient[0].birthdate | date:'yyyy-MM-dd'}}
+                  </label>
+
+              <br>
+                <span class="badge bg-label-secondary">Status: OnDev</span>
               </div>
             </div>
           </div>
           <div class="info-container">
-
             <br>
           </div>
           <h6 class="border-top">Attendance Summary</h6>
@@ -139,11 +150,12 @@
             <div class="card-header d-flex align-items-center ">
               <div class="d-flex align-items-center">
                 <h5 class="mb-0">Social Work Progress Notes (SWPN)</h5>
-                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white" data-bs-toggle="modal" data-bs-target="#backDropModal"><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Notes</label></button>
+                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white"  (click)="showModal()"><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Notes</label></button>
 
               </div>
             </div>
            <div class="card-body" style="height: 400px; overflow-y: auto;">
+              <!-- <form [formGroup]="SocialWorkerNotesForm"  (ngSubmit)="SocialWorkerNotesFormSubmit()"> -->
               <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
                 <table class="table table-bordered table-striped table-hover">
                   <thead class="table-dark text-center">
@@ -156,20 +168,21 @@
                     </tr>
                   </thead>
                    <tbody class="table-border-bottom-0">
-                    <tr *ngFor="let s of appHistory; let i = index">
-                      <td class="text-center">{{ i + 1}}</td>
+                    <!-- <tr *ngFor="let s of appHistory; let i = index"> -->
+                      <!-- <td class="text-center">{{ i + 1}}</td> -->
                        <!-- <td>{{ s.assessmentDate | date:'yyyy-MM-dd' }}</td> -->
-                      <td>{{s.type}}</td>
+                      <!-- <td>{{s.type}}</td> -->
                       <td>OnDev</td>
                       <td class="text-center">
                         <!-- <button type="button" class="btn btn-sm btn-primary text-white" title="View Details" (click)="goToPatientDashboard(s.patientCode,s.assessmentCode)" >
                           <i class="bx bx-show"></i> 
                         </button> -->
                       </td>
-                    </tr>
+                    <!-- </tr> -->
                   </tbody>
                 </table>
               </div>
+            <!-- </form> -->
             </div>
           </div>
 
@@ -286,9 +299,55 @@
       </div>
       <!--/ Tab Content -->
     </div>
-
-
-    <!--/ User Content -->
   </div>
-<!-- Modal -->
+  <form [formGroup]="SocialWorkerNotesForm" (ngSubmit)="SocialWorkerNotesFormSubmit()">
+  <div class="modal fade" id="backDropModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content"> 
+        <div class="modal-header">
+          <h5 class="modal-title" id="backDropModalTitle">SWP Notes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12">
+              <label for="personalHealth" class="form-label">Activities</label>
+              <textarea class="form-control" id="personalHealth" formControlName="patientActivies" rows="2"
+                placeholder="Enter Personal Health History"></textarea>
+              <div *ngIf="SocialWorkerNotesForm.get('patientActivies')?.touched && SocialWorkerNotesForm.get('patientActivies')?.invalid" class="text-danger">
+                Activities is required.
+              </div>
+            </div>
+
+            <div class="col-md-12 mt-3">
+              <label for="intervention" class="form-label">Intervention</label>
+              <textarea class="form-control" id="intervention" formControlName="patientIntervention" rows="2"
+                placeholder="Enter Intervention"></textarea>
+              <div *ngIf="SocialWorkerNotesForm.get('patientIntervention')?.touched && SocialWorkerNotesForm.get('patientIntervention')?.invalid" class="text-danger">
+                Intervention is required.
+              </div>
+            </div>
+
+            <div class="col-md-12 mt-3">
+              <label for="appDate" class="form-label">Activity Date</label>
+              <input type="date" id="appDate" formControlName="interventionDate" class="form-control" placeholder="Enter Date">
+              <div *ngIf="SocialWorkerNotesForm.get('interventionDate')?.touched && SocialWorkerNotesForm.get('interventionDate')?.invalid" class="text-danger">
+                Date is required.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="SocialWorkerNotesForm.invalid || isSubmitting">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+
+
+
 
