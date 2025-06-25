@@ -814,8 +814,8 @@ patientSiblingsFormSubmit(): void {
   }
 
   patientRehabRecordFormSubmit(): void {
-    if (this.patientRehabRecordForm.valid) { // ✅ Check if form is valid
-      console.log("Form Data:", this.patientRehabRecordForm.value); // ✅ Debugging
+    if (this.patientRehabRecordForm.valid) { 
+      console.log("Form Data:", this.patientRehabRecordForm.value); 
       
       this.PatientRehabRecordService.submitPatientRehabRecordForm(this.patientRehabRecordForm.value).subscribe({
         next: (response) => {
@@ -1065,8 +1065,6 @@ goToPatientDashboard(patientCode: string, assessmentCode?: string): void {
 
    
   }
-
-  ////navSub
 
   private showTab(selector: string): void {
     const tabElement = document.querySelector(`[data-bs-target="${selector}"]`);

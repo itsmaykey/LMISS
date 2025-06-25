@@ -1117,7 +1117,7 @@
                    <tbody class="table-border-bottom-0">
                     <tr *ngFor="let s of appHistory; let i = index">
                       <td class="text-center">{{ i + 1}}</td>
-                      <td>{{ s.assessmentDate | date:'yyyy-MM-dd' }}</td>
+                      <td>{{ s.assessmentDate | date:'MMMM d, yyyy' }}</td>
                       <td>{{s.type}}</td>
                       <td>OnDev</td>
                       <td class="text-center">

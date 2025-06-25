@@ -5,7 +5,15 @@
       <!-- User Card -->
       <div class="card mb-6" style="height: 590px;">
         <div class="card-body pt-12">
-          <button class="btn btn-secondary btn-sm text-white" (click)="tryprint()">Print QrCode</button>
+         <div class="justify-content-between d-flex align-items-center mb-3">
+            <button class="btn btn-secondary btn-sm text-white" (click)="backToApp()">
+              <i class="bx bx-arrow-back"></i> Return to Application
+            </button>
+
+            <button class="btn btn-primary btn-sm text-white" (click)="tryprint()">
+              Print QrCode
+            </button>
+          </div>
           <div class="user-avatar-section">
             <div class=" d-flex align-items-center flex-column">
               <i class="bx bx-user-circle d-block w-px-100 h-px-100 text-primary" style="font-size: 100px;"></i>
@@ -18,7 +26,7 @@
                 </div>
 
                 <label class="badge bg-label-secondary" *ngIf="ExistedPatient && ExistedPatient[0]">
-                    Alyas: {{ ExistedPatient[0].pNickName | uppercase}} | 
+                    Byname: {{ ExistedPatient[0].pNickName | uppercase}} | 
                     {{ ExistedPatient[0].sex == 1 ? 'Male' : ExistedPatient[0].sex == 2 ? 'Female' : 'Unknown' }} |
                     Age: {{ExistedPatient[0].age}} | {{ExistedPatient[0].birthdate | date:'yyyy-MM-dd'}}
                   </label>
@@ -79,7 +87,7 @@
           </li>
           <li class="nav-item">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#SWPNTab" type="button">
-              <i class="icon-base bx bx-lock-alt icon-sm me-1_5"></i>SWPN
+              <i class="bx bx-group icon-sm me-1_5"></i>SWPN
             </button>
           </li>
           <li class="nav-item">
@@ -89,7 +97,7 @@
           </li>
           <li class="nav-item">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#PPNTab" type="button">
-              <i class="icon-base bx bx-message-detail icon-sm me-1_5"></i>PPN
+              <i class="icon-base bx bx-message-detail icon-sm me-1_5"></i>MPPR
             </button>
           </li>
           <li class="nav-item">
@@ -155,34 +163,34 @@
               </div>
             </div>
            <div class="card-body" style="height: 400px; overflow-y: auto;">
-              <!-- <form [formGroup]="SocialWorkerNotesForm"  (ngSubmit)="SocialWorkerNotesFormSubmit()"> -->
+           <br>
               <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
                 <table class="table table-bordered table-striped table-hover">
                   <thead class="table-dark text-center">
                     <tr >
                       <th style="width: 5%;">#</th>
-                      <th style="width: 10%;">Date</th>
-                      <th style="width: 40%;">ACTIVITIES</th>
-                      <th style="width: 40%;">INTERVENTION</th>
+                      <th style="width: 30%;">Date</th>
+                      <th style="width: 30%;">ACTIVITIES</th>
+                      <th style="width: 30%;">INTERVENTION</th>
                       <th style="width: 5%;">Action</th>
                     </tr>
                   </thead>
                    <tbody class="table-border-bottom-0">
-                    <!-- <tr *ngFor="let s of appHistory; let i = index"> -->
-                      <!-- <td class="text-center">{{ i + 1}}</td> -->
-                       <!-- <td>{{ s.assessmentDate | date:'yyyy-MM-dd' }}</td> -->
-                      <!-- <td>{{s.type}}</td> -->
-                      <td>OnDev</td>
+                    <tr *ngFor="let s of swpnData?.entity; let i = index">
+                      <td class="text-center">{{ i + 1}}</td>
+                      <td>{{ s.interventionDate | date:'MMMM d, yyyy' }}</td>
+                      <td>{{ s.patientActivies?.length > 10 ? (s.patientActivies | slice:0:20) + '...' : s.patientActivies }}</td>
+                      <td>{{ s.patientIntervention?.length > 10 ? (s.patientIntervention | slice:0:20) + '...' : s.patientIntervention }}</td>
                       <td class="text-center">
-                        <!-- <button type="button" class="btn btn-sm btn-primary text-white" title="View Details" (click)="goToPatientDashboard(s.patientCode,s.assessmentCode)" >
+                        <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewNotes(s.recNo)" title="View Details"  >
                           <i class="bx bx-show"></i> 
-                        </button> -->
+                        </button>
                       </td>
-                    <!-- </tr> -->
+                    </tr>
+                    
                   </tbody>
                 </table>
               </div>
-            <!-- </form> -->
             </div>
           </div>
 
@@ -202,12 +210,37 @@
         </div>
         <div class="tab-pane fade" id="PPNTab">
           <div class="card">
-            <h5 class="card-header">Psychological Progress Notes (PPN)</h5>
-            <div class="card-body">
-              <div>
-                <label for="defaultFormControlInput" class="form-label">Name</label>
-                <input type="text" class="form-control" id="defaultFormControlInput" placeholder="John Doe" aria-describedby="defaultFormControlHelp">
+            <div class="card-header d-flex align-items-center ">
+              <div class="d-flex align-items-center">
+                <h5 class="mb-0">Monthly Psychological Progress Report (MPPR)</h5>
+                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white"  (click)="showModalMPPR()"><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Report</label></button>
 
+              </div>
+            </div>
+            <div class="card-body">
+              <br>
+              <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                <table class="table table-bordered table-striped table-hover">
+                  <thead class="table-dark text-center">
+                    <tr >
+                      <th style="width: 5%;">#</th>
+                      <th style="width: 30%;">Month</th>
+                      <th style="width: 5%;">Action</th>
+                    </tr>
+                  </thead>
+                   <tbody class="table-border-bottom-0">
+                    <tr *ngFor="let s of swpnData?.entity; let i = index">
+                      <td class="text-center">{{ i + 1}}</td>
+                      <td class="text-center">{{ s.interventionDate | date:'MMMM d, yyyy' }}</td>
+                      <td class="text-center">
+                        <!-- <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewAddReportBtn(s.recNo)" title="View Details"  >
+                          <i class="bx bx-show"></i> 
+                        </button> -->
+                      </td>
+                    </tr>
+                    
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -346,6 +379,198 @@
     </div>
   </div>
 </form>
+  <div class="modal fade" id="viewNotesModal" tabindex="-1" aria-hidden="true">
+    
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="backDropModalTitle">SWP Notes</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Table view -->
+        <table class="table table-border-bottom-0" *ngIf="isEditingTbleView">
+          <tbody>
+            <ng-container *ngFor="let s of swpnDataEdit?.entity; let i = index">
+              <tr>
+                <td class="align-middle"><small class="text-light fw-medium">Date Noted</small></td>
+                <td class="py-4">
+                  <p class="mb-0">{{ s.interventionDate | date:'MM-dd-yyyy' }}</p>
+                </td>
+              </tr>
+              <tr>
+                <td class="align-middle"><small class="text-light fw-medium">Activity</small></td>
+                <td class="py-6">
+                  <p class="lead mb-0">{{ s.patientActivies }}</p>
+                </td>
+              </tr>
+              <tr>
+                <td class="align-middle"><small class="text-light fw-medium">Intervention</small></td>
+                <td class="py-4">
+                  <p class="lead mb-0">{{ s.patientIntervention }}</p>
+                </td>
+              </tr>
+                <tr>
+                <td class="align-middle"><small class="text-light fw-medium">Added By</small></td>
+                <td class="py-4">
+                  <p class="lead mb-0">{{s.staffFullName}}</p>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+
+        <!-- Edit form view -->
+        <div class="pt-3" *ngIf="isEditing">
+          <div class="col-md-12">
+            <label for="intervention" class="form-label">Intervention</label>
+            <textarea class="form-control" id="intervention" formControlName="patientIntervention" rows="2"
+              placeholder="Enter Intervention"></textarea>
+            <div *ngIf="SocialWorkerNotesForm.get('patientIntervention')?.touched && SocialWorkerNotesForm.get('patientIntervention')?.invalid"
+              class="text-danger">
+              Intervention is required.
+            </div>
+          </div>
+          <div class="col-md-12 mt-3">
+            <label for="personalHealth" class="form-label">Activities</label>
+            <textarea class="form-control" id="personalHealth" formControlName="patientActivies" rows="2"
+              placeholder="Enter Personal Health History"></textarea>
+            <div *ngIf="SocialWorkerNotesForm.get('patientActivies')?.touched && SocialWorkerNotesForm.get('patientActivies')?.invalid"
+              class="text-danger">
+              Activities is required.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary me-3 text-white" (click)="onEditNotes()" *ngIf="isEditingTbleView">
+          <i class="bx bx-edit"></i>
+        </button>
+         <button type="button" class="btn btn-primary me-3 text-white" (click)="onSaveNotes()" *ngIf="isEditing">
+          <i class="bx bx-save"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+    <div class="modal fade" id="viewPMMRModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewPMMRModal" aria-hidden="true">
+
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="backDropModalTitle">Psychological Progress Report</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Nav Tabs -->
+    <ul class="nav nav-pills flex-column flex-md-row custom-nav">
+
+      <li class="nav-item">
+        <a class="nav-link active py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#AppearanceTab" role="tab" aria-selected="false">
+          <i class="bx bx-user bx-sm me-1"></i> Mental Status
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#DailyPatterntab" role="tab" aria-selected="false">
+          <i class="bx bx-calendar bx-sm me-1"></i> Daily Pattern
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#PsychologicalSummary" role="tab" aria-selected="true">
+          <i class="bx bx-book-open bx-sm me-1"></i> Psychological Progress Summary
+        </a>
+      </li>
+
+    </ul>
+
+
+<div class="tab-content">
+  <div class="tab-pane fade " id="PsychologicalSummary" role="tabpanel">
+    <table class="table table-border-bottom-0">
+      <tbody>
+        <tr>
+        </tr>
+        <tr><td><small class="text-light fw-medium">Appearance</small></td><td class="py-4"></td></tr>
+        <tr><td><small class="text-light fw-medium">Sensorium</small></td><td class="py-6"></td></tr>
+        <tr><td><small class="text-light fw-medium">Functioning</small></td><td class="py-4"></td></tr>
+        <tr><td><small class="text-light fw-medium">Speech</small></td><td class="py-4"></td></tr>
+        <tr><td><small class="text-light fw-medium">Behavior</small></td><td class="py-4"></td></tr>
+        <tr><td><small class="text-light fw-medium">Mood/Affect</small></td><td class="py-4"></td></tr>
+        <tr><td><small class="text-light fw-medium">Daily Pattern</small></td><td class="py-4"></td></tr>
+        <tr><td><small class="text-light fw-medium">Thought Content</small></td><td class="py-4"></td></tr>
+        <tr>
+        </tr>
+        <tr><td><small class="text-light fw-medium">Physical Indicators</small></td><td class="py-4"></td></tr>
+        <tr><td><small class="text-light fw-medium">Denial</small></td><td class="py-6"></td></tr>
+        <tr><td><small class="text-light fw-medium">Physical Withdrawal Symptoms</small></td><td class="py-4"></td></tr>
+        <tr><td><small class="text-light fw-medium">Suspension of Activities</small></td><td class="py-4"></td></tr>
+        <tr><td><small class="text-light fw-medium">Cravings</small></td><td class="py-4"></td></tr>
+      </tbody>
+    </table>
+    <div class="mt-3 text-end">
+      <button type="button" class="btn btn-primary text-white">
+        <i class="bx bx-save"></i> Save Mental Status
+      </button>
+    </div>
+  </div>
+
+  <div class="tab-pane fade active show" id="AppearanceTab" role="tabpanel">
+  <div class="card my-3 shadow-sm rounded-3">
+  <div class="card-body pt-4">
+    <form [formGroup]="MentalStatusForm">
+      <div formArrayName="AppearanceId" class="row">
+        <div *ngFor="let x of Appearance" class="form-check mb-2 ms-2 col-md-2">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            [value]="x.AppearanceId"
+            (change)="onAppearanceCheckboxChange($event, x)"
+            [checked]="AppearanceIdArray.value.includes(x.AppearanceId)"
+            [id]="'appearance_' + x.AppearanceId"
+          />
+          <label
+            class="form-check-label ms-1"
+            [for]="'appearance_' + x.AppearanceId"
+          >
+            {{ x.AppearanceDesc }}
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+    <div class="mt-3 text-end">
+      <button type="button" class="btn btn-primary text-white">
+        <i class="bx bx-save"></i> Save Rehab Progress
+      </button>
+    </div>
+  </div>
+    <div class="tab-pane fade" id="SensoriumTab" role="tabpanel">
+ 
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+</div>
+
+    </div>
+  </div>
+</div>
+
+
+
 
 
 

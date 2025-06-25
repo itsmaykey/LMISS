@@ -44,10 +44,9 @@
               "src/assets/css/demo.css",
               "src/assets/vendor/css/core.css",
               "src/styles.css"
-
+              
             ],
             "scripts": [
-
             ]
           },
           "configurations": {

@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
-
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { environment } from '../../../../Environments/environment';
-
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { PatientDashboardService } from '../../service/patient-dashboard.service';
+import Swal from 'sweetalert2';
 @Injectable({
   providedIn: 'root'
 })
 export class SocialWorkerNotesService {
 
- constructor(private http: HttpClient) { }
- postPatientProgressReport(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatasB/PostPatientProgressReport`, data);
-  }
+   constructor(
+     private fb: FormBuilder,
+     private patientDashboardService: PatientDashboardService
+   ) {}
+ 
+    
 }
