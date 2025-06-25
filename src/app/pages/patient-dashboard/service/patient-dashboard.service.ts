@@ -9,8 +9,8 @@ export class PatientDashboardService {
 
   constructor(private http: HttpClient) { }
 
- getExistedPatientData(patientCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatient?patientCode=${patientCode}`);
+ getExistedPatientData(patientCode: string, assessmentCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatient?patientCode=${patientCode}&assessmentCode=${assessmentCode}`);
   }
   postPatientProgressReport(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatasB/PostPatientProgressReport`, data);

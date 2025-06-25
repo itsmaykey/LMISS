@@ -8,7 +8,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { NgxScannerQrcodeModule } from 'ngx-scanner-qrcode';
 import { LoginComponent } from './Admin/Auth/Login/login.component';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import {ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import { UserRegComponent } from './Admin/user-Registration/user-reg.component';
@@ -16,6 +16,7 @@ import { ApplicationDashboardComponent } from './pages/application-dashboard/app
 import { PatientDashboardComponent } from './pages/patient-dashboard/patient-dashboard.component';
 import { RouterModule, Routes } from '@angular/router';
 import { LoaderComponent } from './layout/loader/loader.component';
+import { AuthInterceptor } from './Admin/Auth/auth.interceptor';
 
 const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
@@ -51,7 +52,7 @@ const routes: Routes = [
 
   ],
   exports: [RouterModule],
-  providers: [],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
