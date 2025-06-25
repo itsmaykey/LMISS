@@ -13,6 +13,8 @@ export class LoginGuard implements CanActivate {
     if (this.authService.isLoggedIn()) {
       this.router.navigate(['/dashboard']);
       return false;
+      const token = this.authService.getToken();
+      console.log(token)
     }
     return true;
   }
