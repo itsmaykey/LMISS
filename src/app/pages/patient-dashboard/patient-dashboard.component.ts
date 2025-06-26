@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
@@ -47,7 +47,7 @@ export class PatientDashboardComponent  implements OnInit {
   isEditingTbleView = true;
    isEditing : any;
  isEditingMPPRView = true;
-    Appearance: any = [];
+    Appearance: any[] = [];
   Sensorium: any = [];
   Functioning: any = [];
   Speech: any = [];
@@ -60,7 +60,26 @@ export class PatientDashboardComponent  implements OnInit {
   WithdSymptoms: any = [];
   SuspenActivities: any = [];
   Cravings: any = [];
-    selectedAppearance: { AppearanceId: string }[] = []
+  reportData = {
+    recNo: 0,
+    patientCode: "string",
+    code: "string",
+    sensoriumId: 0,
+    functioningId: 0,
+    speechId: 0,
+    behaviorId: 0,
+    moodAffectId: 0,
+    dailyPatternsId: 0,
+    thoughtContentId: 0,
+    physicalIndicatorsId: 0,
+    denialId: 0,
+    physicalWsymptomsId: 0,
+    suspensionofActivitiesId: 0,
+    cravingsId: 0,
+    otherObservations: "string",
+    dateSubmitted: new Date().toISOString(),  // current date in ISO format
+  };
+   listPatientMonthlyPReport: any[] = [];
   onEditNotes() {
     this.isEditing = true;
      this.isEditingTbleView = false;
@@ -203,11 +222,18 @@ showModalMPPR(): void {
       interventionDate: ['', Validators.required]
     });
     this.MentalStatusForm = this.fb.group({
-      AppearanceId: this.fb.array([]) // <-- FormArray for checkboxes
+      appearanceId: this.fb.array([]),
+      sensoriumId: this.fb.array([]),
+      functioningId: this.fb.array([]),
+      speechId: this.fb.array([]),
+      behaviorId: this.fb.array([]),
+      moodAffectId: this.fb.array([]),
+      dailyPatternsId: this.fb.array([]),
+      thoughtContentId: this.fb.array([])
     });
     this.service.getrefAppearance().subscribe({
       next: (response) => {
-        this.Appearance = response;
+        this.Appearance = response as any[];
         console.log(this.Appearance);
       },
       error: (error) => {
@@ -216,7 +242,7 @@ showModalMPPR(): void {
     });
     this.service.getrefSensorium().subscribe({
       next: (response) => {
-        this.Sensorium = response;
+        this.Sensorium = response as any[];
       },
       error: (error) => {
         console.error('Error:', error);
@@ -224,7 +250,7 @@ showModalMPPR(): void {
     });
     this.service.getrefFunctioning().subscribe({
       next: (response) => {
-        this.Functioning = response;
+        this.Functioning = response as any[];
       },
       error: (error) => {
         console.error('Error:', error);
@@ -232,7 +258,7 @@ showModalMPPR(): void {
     });
     this.service.getrefSpeech().subscribe({
       next: (response) => {
-        this.Speech = response;
+        this.Speech = response as any[];
       },
       error: (error) => {
         console.error('Error:', error);
@@ -240,7 +266,7 @@ showModalMPPR(): void {
     });
     this.service.getrefBehavior().subscribe({
       next: (response) => {
-        this.Behavior = response;
+        this.Behavior = response as any[];
       },
       error: (error) => {
         console.error('Error:', error);
@@ -248,7 +274,7 @@ showModalMPPR(): void {
     });
     this.service.getrefMoodAffect().subscribe({
       next: (response) => {
-        this.MoodAffect = response;
+        this.MoodAffect = response as any[];
       },
       error: (error) => {
         console.error('Error:', error);
@@ -256,7 +282,7 @@ showModalMPPR(): void {
     });
     this.service.getrefDailyPatterns().subscribe({
       next: (response) => {
-        this.DailyPattern = response;
+        this.DailyPattern = response as any[];
       },
       error: (error) => {
         console.error('Error:', error);
@@ -264,7 +290,7 @@ showModalMPPR(): void {
     });
     this.service.getrefThoughtContent().subscribe({
       next: (response) => {
-        this.ThoughtContent = response;
+        this.ThoughtContent = response as any[];
       },
       error: (error) => {
         console.error('Error:', error);
@@ -508,33 +534,218 @@ refreshSwpnData(): void {
   console.error('Missing patientCode or interventionCode in route parameters.');
 }
 }
+  get appearanceId() {
+    return this.MentalStatusForm.get('appearanceId') as FormArray;
+  }
+  get sensoriumId() {
+    return this.MentalStatusForm.get('sensoriumId') as FormArray;
+  }
+  get functioningId() {
+    return this.MentalStatusForm.get('functioningId') as FormArray;
+  }
+   get speechId() {
+    return this.MentalStatusForm.get('speechId') as FormArray;
+  }
+  get behaviorId() {
+    return this.MentalStatusForm.get('behaviorId') as FormArray;
+  }
+  get moodAffectId() {
+    return this.MentalStatusForm.get('moodAffectId') as FormArray;
+  }
+  get dailyPatternsId() {
+    return this.MentalStatusForm.get('dailyPatternsId') as FormArray;
+  }
+  get thoughtContentId() {
+    return this.MentalStatusForm.get('thoughtContentId') as FormArray;
+  }
+  
+   onAppearanceCheckboxChange(event: any, item: any): void {
+  const appearanceArray = this.appearanceId;
+  const isChecked = event.target.checked;
 
- get AppearanceIdArray(): FormArray {
-  return this.MentalStatusForm.get('AppearanceId') as FormArray;
-}
-
-  onAppearanceCheckboxChange(event: Event, Appearance: any): void {
-  const checkbox = event.target as HTMLInputElement;
-  const AppearanceIdArray = this.AppearanceIdArray;
-
-  if (checkbox.checked) {
-    AppearanceIdArray.push(this.fb.control(Appearance.AppearanceId));
-    this.selectedAppearance.push(Appearance); // Add to list
+  if (isChecked) {
+    // Avoid duplicates
+    if (!appearanceArray.value.includes(item.appearanceId)) {
+      appearanceArray.push(this.fb.control(item.appearanceId));
+    }
   } else {
-    const index = AppearanceIdArray.controls.findIndex(
-      control => control.value === Appearance.AppearanceId
+    const index = appearanceArray.controls.findIndex(
+      control => control.value === item.appearanceId
     );
     if (index !== -1) {
-      AppearanceIdArray.removeAt(index);
+      appearanceArray.removeAt(index);
     }
-
-    // Remove from selectedAppearance
-    this.selectedAppearance = this.selectedAppearance.filter(
-      (item) => item.AppearanceId !== Appearance.AppearanceId
-    );
   }
 
+  this.updateMonthlyReport(); 
 }
+
+onSensoriumCheckboxChange(event: any, item: any): void {
+  const sensoriumArray = this.sensoriumId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!sensoriumArray.value.includes(item.sensoriumId)) {
+      sensoriumArray.push(this.fb.control(item.sensoriumId));
+    }
+  } else {
+    const index = sensoriumArray.controls.findIndex(
+      control => control.value === item.sensoriumId
+    );
+    if (index !== -1) {
+      sensoriumArray.removeAt(index);
+    }
+  }
+
+  this.updateMonthlyReport(); 
+}
+onFunctioningCheckboxChange(event: any, item: any): void {
+  const functioningArray = this.functioningId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!functioningArray.value.includes(item.functioningId)) {
+      functioningArray.push(this.fb.control(item.functioningId));
+    }
+  } else {
+    const index = functioningArray.controls.findIndex(
+      control => control.value === item.functioningId
+    );
+    if (index !== -1) {
+      functioningArray.removeAt(index);
+    }
+  }
+
+  this.updateMonthlyReport(); 
+}
+onSpeechCheckboxChange(event: any, item: any): void {
+  const speechIdArray = this.speechId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!speechIdArray.value.includes(item.speechId)) {
+      speechIdArray.push(this.fb.control(item.speechId));
+    }
+  } else {
+    const index = speechIdArray.controls.findIndex(
+      control => control.value === item.speechId
+    );
+    if (index !== -1) {
+      speechIdArray.removeAt(index);
+    }
+  }
+
+  this.updateMonthlyReport(); 
+}
+  onBehaviorCheckboxChange(event: any, item: any): void {
+  const behaviorIdArray = this.behaviorId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!behaviorIdArray.value.includes(item.behaviorId)) {
+      behaviorIdArray.push(this.fb.control(item.behaviorId));
+    }
+  } else {
+    const index = behaviorIdArray.controls.findIndex(
+      control => control.value === item.behaviorId
+    );
+    if (index !== -1) {
+      behaviorIdArray.removeAt(index);
+    }
+  }
+
+  this.updateMonthlyReport(); 
+}
+  onMoodAffectCheckboxChange(event: any, item: any): void {
+  const moodAffectIdArray = this.moodAffectId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!moodAffectIdArray.value.includes(item.moodAffectId)) {
+      moodAffectIdArray.push(this.fb.control(item.moodAffectId));
+    }
+  } else {
+    const index = moodAffectIdArray.controls.findIndex(
+      control => control.value === item.moodAffectId
+    );
+    if (index !== -1) {
+      moodAffectIdArray.removeAt(index);
+    }
+  }
+
+  this.updateMonthlyReport(); 
+}
+  onDailyPatternCheckboxChange(event: any, item: any): void {
+  const dailyPatternsIdArray = this.dailyPatternsId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!dailyPatternsIdArray.value.includes(item.dailyPatternsId)) {
+      dailyPatternsIdArray.push(this.fb.control(item.dailyPatternsId));
+    }
+  } else {
+    const index = dailyPatternsIdArray.controls.findIndex(
+      control => control.value === item.dailyPatternsId
+    );
+    if (index !== -1) {
+      dailyPatternsIdArray.removeAt(index);
+    }
+  }
+
+  this.updateMonthlyReport(); 
+}
+
+  onThoughtContentCheckboxChange(event: any, item: any): void {
+  const thoughtContentIdArray = this.thoughtContentId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!thoughtContentIdArray.value.includes(item.thoughtContentId)) {
+      thoughtContentIdArray.push(this.fb.control(item.thoughtContentId));
+    }
+  } else {
+    const index = thoughtContentIdArray.controls.findIndex(
+      control => control.value === item.thoughtContentId
+    );
+    if (index !== -1) {
+      thoughtContentIdArray.removeAt(index);
+    }
+  }
+
+  this.updateMonthlyReport(); 
+}
+  // Method to save data (you can customize this as needed)
+  onSaveMental(): void {
+    const fullReport = {
+      listPatientMonthlyPReport: this.listPatientMonthlyPReport
+    };
+    console.log('Full Report:', JSON.stringify(fullReport, null, 2));
+  }
+    updateMonthlyReport(): void {
+      const appearanceIds = this.appearanceId.value;
+      const sensoriumIds = this.sensoriumId.value;
+
+      const selectedAppearances = this.Appearance
+        .filter(a => appearanceIds.includes(a.appearanceId))
+        .map(a => ({ id: a.appearanceId, desc: a.appearanceDesc }));
+
+      const selectedSensorium = this.Sensorium
+        .filter((s: any) => sensoriumIds.includes(s.sensoriumId))
+        .map((s: any) => ({ id: s.sensoriumId, desc: s.sensoriumDesc }));
+
+      // Only keep one record in the report
+      this.listPatientMonthlyPReport = [{
+        ...this.reportData,
+        appearance: selectedAppearances,
+        sensorium: selectedSensorium
+      }];
+
+      console.log('Updated Monthly Report:', this.listPatientMonthlyPReport);
+    }
+
+
+
+
 // AssessmentFormSubmit(): void {
 //   if (this.isSubmitting) {
 //     return; // Prevent rapid re-submission

@@ -523,40 +523,149 @@
     </div>
   </div>
 
-  <div class="tab-pane fade active show" id="AppearanceTab" role="tabpanel">
+ <div class="tab-pane fade active show" id="AppearanceTab" role="tabpanel">
   <div class="card my-3 shadow-sm rounded-3">
-  <div class="card-body pt-4">
-    <form [formGroup]="MentalStatusForm">
-      <div formArrayName="AppearanceId" class="row">
-        <div *ngFor="let x of Appearance" class="form-check mb-2 ms-2 col-md-2">
-          <input
-            type="checkbox"
-            class="form-check-input"
-            [value]="x.AppearanceId"
-            (change)="onAppearanceCheckboxChange($event, x)"
-            [checked]="AppearanceIdArray.value.includes(x.AppearanceId)"
-            [id]="'appearance_' + x.AppearanceId"
-          />
-          <label
-            class="form-check-label ms-1"
-            [for]="'appearance_' + x.AppearanceId"
-          >
-            {{ x.AppearanceDesc }}
-          </label>
+      <div class="card-body pt-4 custom-font" style="max-height: 300px; overflow-y: auto;">
+      <form [formGroup]="MentalStatusForm">
+        <div class="d-flex align-items-start flex-wrap mb-3">
+          <h4 class="mb-2 me-3">Appearance:</h4>
+          <div formArrayName="appearanceId" class="row flex-grow-1">
+            <div *ngFor="let x of Appearance; let i = index" class="form-check mb-1 ms-2 col-md-2">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [value]="x.appearanceId"
+                [checked]="(MentalStatusForm.get('appearanceId')?.value || []).includes(x.appearanceId)"
+                (change)="onAppearanceCheckboxChange($event, x)">
+              {{ x.appearanceDesc }}
+            </div>
+          </div>
         </div>
+          <hr>
+        <div class="d-flex align-items-start flex-wrap mb-3">
+          <h4 class="mb-2 me-3">Sensorium:</h4>
+
+          <div formArrayName="sensoriumId" class="row flex-grow-1">
+            <div *ngFor="let x of Sensorium; let i = index" class="form-check mb-1 ms-2 col-md-2">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [value]="x.sensoriumId"
+                [checked]="(MentalStatusForm.get('sensoriumId')?.value || []).includes(x.sensoriumId)"
+                (change)="onSensoriumCheckboxChange($event, x)">
+              {{ x.sensoriumDesc }}
+            </div>
+          </div>
       </div>
-    </form>
+
+      <hr>
+        <div class="d-flex align-items-start flex-wrap mb-3">
+          <h4 class="mb-2 me-3">Functioning:</h4>
+
+          <div formArrayName="functioningId" class="row flex-grow-1">
+            <div *ngFor="let x of Functioning; let i = index" class="form-check mb-1 ms-2 col-md-2">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [value]="x.functioningId"
+                [checked]="(MentalStatusForm.get('functioningId')?.value || []).includes(x.functioningId)"
+                (change)="onFunctioningCheckboxChange($event, x)">
+              {{ x.functioningDesc }}
+            </div>
+          </div>
+      </div>
+         <hr>
+      <div class="d-flex align-items-start flex-wrap mb-3">
+          <h4 class="mb-2 me-3">Speech:</h4>
+
+          <div formArrayName="speechId" class="row flex-grow-1">
+            <div *ngFor="let x of Speech; let i = index" class="form-check mb-1 ms-2 col-md-2">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [value]="x.speechId"
+                [checked]="(MentalStatusForm.get('speechId')?.value || []).includes(x.speechId)"
+                (change)="onSpeechCheckboxChange($event, x)">
+              {{ x.speechDesc }}
+            </div>
+          </div>
+      </div>
+       <hr>
+      <div class="d-flex align-items-start flex-wrap mb-3">
+          <h4 class="mb-2 me-3">Behavior:</h4>
+
+          <div formArrayName="behaviorId" class="row flex-grow-1">
+            <div *ngFor="let x of Behavior; let i = index" class="form-check mb-1 ms-2 col-md-2">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [value]="x.behaviorId"
+                [checked]="(MentalStatusForm.get('behaviorId')?.value || []).includes(x.behaviorId)"
+                (change)="onBehaviorCheckboxChange($event, x)">
+              {{ x.behaviorDesc }}
+            </div>
+          </div>
+      </div>
+       <hr>
+      <div class="d-flex align-items-start flex-wrap mb-3">
+          <h4 class="mb-2 me-3">Mood/Affect:</h4>
+
+          <div formArrayName="moodAffectId" class="row flex-grow-1">
+            <div *ngFor="let x of MoodAffect; let i = index" class="form-check mb-1 ms-2 col-md-2">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [value]="x.moodAffectId"
+                [checked]="(MentalStatusForm.get('moodAffectId')?.value || []).includes(x.moodAffectId)"
+                (change)="onMoodAffectCheckboxChange($event, x)">
+              {{ x.moodAffectDesc }}
+            </div>
+          </div>
+      </div>
+      <hr>
+      <div class="d-flex align-items-start flex-wrap mb-3">
+          <h4 class="mb-2 me-3">Daily Patterns:</h4>
+
+          <div formArrayName="dailyPatternsId" class="row flex-grow-1">
+            <div *ngFor="let x of DailyPattern; let i = index" class="form-check mb-1 ms-2 col-md-2">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [value]="x.dailyPatternsId"
+                [checked]="(MentalStatusForm.get('dailyPatternsId')?.value || []).includes(x.dailyPatternsId)"
+                (change)="onDailyPatternCheckboxChange($event, x)">
+              {{ x.dailyPatternsDesc }}
+            </div>
+          </div>
+      </div>
+      <hr>
+      <div class="d-flex align-items-start flex-wrap mb-3">
+          <h4 class="mb-2 me-3">Daily Patterns:</h4>
+
+          <div formArrayName="thoughtContentId" class="row flex-grow-1">
+            <div *ngFor="let x of ThoughtContent; let i = index" class="form-check mb-1 ms-2 col-md-2">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [value]="x.thoughtContentId"
+                [checked]="(MentalStatusForm.get('thoughtContentId')?.value || []).includes(x.thoughtContentId)"
+                (change)="onThoughtContentCheckboxChange($event, x)">
+              {{ x.thoughtContentDesc }}
+            </div>
+          </div>
+      </div>
+
+      </form>
+      </div>
+    </div>
+  </div>
+  <div class="mt-3 text-end">
+    <button type="button" class="btn btn-primary text-white" (click)="onSaveMental()">
+      <i class="bx bx-save"></i>
+    </button>
   </div>
 </div>
 
-
-
-    <div class="mt-3 text-end">
-      <button type="button" class="btn btn-primary text-white">
-        <i class="bx bx-save"></i> Save Rehab Progress
-      </button>
-    </div>
-  </div>
     <div class="tab-pane fade" id="SensoriumTab" role="tabpanel">
  
   </div>
