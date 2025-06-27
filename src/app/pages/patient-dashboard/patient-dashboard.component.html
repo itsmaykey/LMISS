@@ -19,20 +19,18 @@
               <i class="bx bx-user-circle d-block w-px-100 h-px-100 text-primary" style="font-size: 100px;"></i>
              <h5></h5>
               <div class="user-info text-center pb-2" >
-               <div *ngIf="ExistedPatient && ExistedPatient[0]">
                   <h6 class="text-primary">
-                    {{ ExistedPatient[0].pFirstName + ' ' + ExistedPatient[0].pMiddleName + ' ' + ExistedPatient[0].pLastName }}
+                    {{ ExistedPatient.fullName }}
                   </h6>
-                </div>
 
-                <label class="badge bg-label-secondary" *ngIf="ExistedPatient && ExistedPatient[0]">
-                    Byname: {{ ExistedPatient[0].pNickName | uppercase}} | 
-                    {{ ExistedPatient[0].sex == 1 ? 'Male' : ExistedPatient[0].sex == 2 ? 'Female' : 'Unknown' }} |
-                    Age: {{ExistedPatient[0].age}} | {{ExistedPatient[0].birthdate | date:'yyyy-MM-dd'}}
+                <label class="badge bg-label-secondary">
+                    Byname: {{ ExistedPatient.pNickName | uppercase }} | 
+                   {{ ExistedPatient.sex == 1 ? 'Male' : ExistedPatient.sex == 2 ? 'Female' : 'Unknown' }} |
+                    Age: {{ ExistedPatient.age }} | {{ ExistedPatient.birthdate | date:'yyyy-MM-dd' }}
                   </label>
 
               <br>
-                <span class="badge bg-label-secondary">Status: OnDev</span>
+                <span class="badge bg-label-secondary">Status: {{ExistedPatient.admissionType}}</span>
               </div>
             </div>
           </div>
@@ -479,8 +477,8 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#DailyPatterntab" role="tab" aria-selected="false">
-          <i class="bx bx-calendar bx-sm me-1"></i> Daily Pattern
+        <a class="nav-link py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#RehabProgress" role="tab" aria-selected="false">
+          <i class="bx bx-calendar bx-sm me-1"></i> Rehabilitation Progress
         </a>
       </li>
 
@@ -640,7 +638,7 @@
       </div>
       <hr>
       <div class="d-flex align-items-start flex-wrap mb-3">
-          <h4 class="mb-2 me-3">Daily Patterns:</h4>
+          <h4 class="mb-2 me-3">Thought Content:</h4>
 
           <div formArrayName="thoughtContentId" class="row flex-grow-1">
             <div *ngFor="let x of ThoughtContent; let i = index" class="form-check mb-1 ms-2 col-md-2">
@@ -654,7 +652,9 @@
             </div>
           </div>
       </div>
-
+          <div class="tab-pane fade" id="RehabProgress" role="tabpanel">
+        
+          </div>
       </form>
       </div>
     </div>
@@ -666,9 +666,7 @@
   </div>
 </div>
 
-    <div class="tab-pane fade" id="SensoriumTab" role="tabpanel">
- 
-  </div>
+  
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>

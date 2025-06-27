@@ -8,15 +8,15 @@ import { Observable } from 'rxjs';
 export class PatientDashboardService {
 
   constructor(private http: HttpClient) { }
-  getExistedPatientData(patientCode: string) {
-      return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatient?patientCode=${patientCode}`);
-    }
- 
+  
+ getExistedPatientData(patientCode: string, assessmentCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatient?patientCode=${patientCode}&assessmentCode=${assessmentCode}`);
+  }
   postPatientProgressReport(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatasB/PostPatientProgressReport`, data);
   }
-  getPatientProgressReport(patientCode: string, interventionCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientDatasB/GetExistedPatientProgressReports?patientCode=${patientCode}&interventionCode=${interventionCode}`);
+  getPatientProgressReport(patientCode: string, assessmentCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientDatasB/GetExistedPatientProgressReports?patientCode=${patientCode}&code=${assessmentCode}`);
   }
   gettrefMPPRQuestionaire() {
     return this.http.get(`${environment.apiUrl}getrefAppearance/GettrefMPPRQuestionaire`);

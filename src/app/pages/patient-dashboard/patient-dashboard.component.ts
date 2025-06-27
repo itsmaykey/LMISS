@@ -60,25 +60,7 @@ export class PatientDashboardComponent  implements OnInit {
   WithdSymptoms: any = [];
   SuspenActivities: any = [];
   Cravings: any = [];
-  reportData = {
-    recNo: 0,
-    patientCode: "string",
-    code: "string",
-    sensoriumId: 0,
-    functioningId: 0,
-    speechId: 0,
-    behaviorId: 0,
-    moodAffectId: 0,
-    dailyPatternsId: 0,
-    thoughtContentId: 0,
-    physicalIndicatorsId: 0,
-    denialId: 0,
-    physicalWsymptomsId: 0,
-    suspensionofActivitiesId: 0,
-    cravingsId: 0,
-    otherObservations: "string",
-    dateSubmitted: new Date().toISOString(),  // current date in ISO format
-  };
+  
    listPatientMonthlyPReport: any[] = [];
   onEditNotes() {
     this.isEditing = true;
@@ -368,25 +350,33 @@ getExisted(): void {
   this.route.paramMap.subscribe((params) => {
     const patientCode = params.get('patientCode');
     const assessmentCode = params.get('assessmentCode');
-    console.log('assessmentCode Code:', assessmentCode);
+    console.log('Assessment Code:', assessmentCode);
     console.log('Patient Code:', patientCode);
-    if (patientCode) {
-      this.service.getExistedPatientData(patientCode).subscribe({
-        next: (response) => {
-          this.ExistedPatient = response;
-          if (this.ExistedPatient.length > 0) {
-            console.log(this.ExistedPatient);
+
+    if (patientCode && assessmentCode) {
+      this.service.getExistedPatientData(patientCode, assessmentCode).subscribe({
+        next: (response: { patientCode?: string; assessmentCode?: string; [key: string]: any }) => {
+          console.log('API Response:', response);  // Log the entire response for debugging
+          
+          // Since the API response is an object, not an array, we directly assign it
+          if (response && response.patientCode && response.assessmentCode) {
+            this.ExistedPatient = response;
+            console.log('Existed Patient Data:', this.ExistedPatient);  // Log the assigned data
           } else {
-           console.log("err")
+            console.log("Invalid or missing data in the response.");
+            this.ExistedPatient = null;  // Handle invalid or incomplete response
           }
         },
-        error: () => {
-
+        error: (err) => {
+          console.error('Error fetching Existed Patient Data:', err);
         },
       });
+    } else {
+      console.log("Missing patientCode or assessmentCode in route parameters.");
     }
   });
 }
+
 checkExisted(): void {
     this.route.paramMap.subscribe((params) => {
       const patientCode = params.get('patientCode');
@@ -722,28 +712,61 @@ onSpeechCheckboxChange(event: any, item: any): void {
     console.log('Full Report:', JSON.stringify(fullReport, null, 2));
   }
     updateMonthlyReport(): void {
-      const appearanceIds = this.appearanceId.value;
-      const sensoriumIds = this.sensoriumId.value;
+  const appearanceIds = this.appearanceId.value;
+  const sensoriumIds = this.sensoriumId.value;
+  const functioningIds = this.functioningId.value;
+  const speechIds = this.speechId.value;
+  const behaviorIds = this.behaviorId.value;
+  const moodAffectIds = this.moodAffectId.value;
+  const dailyPatternsIds = this.dailyPatternsId.value;
+  const thoughtContentIds = this.thoughtContentId.value;
 
-      const selectedAppearances = this.Appearance
-        .filter(a => appearanceIds.includes(a.appearanceId))
-        .map(a => ({ id: a.appearanceId, desc: a.appearanceDesc }));
+  const selectedAppearances = this.Appearance
+    .filter(a => appearanceIds.includes(a.appearanceId))
+    .map(a => ({ id: a.appearanceId}));
 
-      const selectedSensorium = this.Sensorium
-        .filter((s: any) => sensoriumIds.includes(s.sensoriumId))
-        .map((s: any) => ({ id: s.sensoriumId, desc: s.sensoriumDesc }));
+  const selectedSensorium = this.Sensorium
+    .filter((s: any) => sensoriumIds.includes(s.sensoriumId))
+    .map((s: any) => ({ id: s.sensoriumId }));
 
-      // Only keep one record in the report
-      this.listPatientMonthlyPReport = [{
-        ...this.reportData,
-        appearance: selectedAppearances,
-        sensorium: selectedSensorium
-      }];
+  const selectedFunctioning = this.Functioning
+    .filter((s: any) => functioningIds.includes(s.functioningId))
+    .map((s: any) => ({ id: s.functioningId}));
 
-      console.log('Updated Monthly Report:', this.listPatientMonthlyPReport);
-    }
+  const selectedSpeech = this.Speech
+    .filter((s: any) => speechIds.includes(s.speechId))
+    .map((s: any) => ({ id: s.speechId}));
 
+  const selectedBehavior = this.Behavior
+    .filter((s: any) => behaviorIds.includes(s.behaviorId))
+    .map((s: any) => ({ id: s.behaviorId}));
 
+  const selectedMoodAffect = this.MoodAffect
+    .filter((s: any) => moodAffectIds.includes(s.moodAffectId))
+    .map((s: any) => ({ id: s.moodAffectId}));
+
+  const selectedDailyPattern = this.DailyPattern
+    .filter((s: any) => dailyPatternsIds.includes(s.dailyPatternsId))
+    .map((s: any) => ({ id: s.dailyPatternsId}));
+
+  const selectedThoughtContent = this.ThoughtContent
+    .filter((s: any) => thoughtContentIds.includes(s.thoughtContentId))
+    .map((s: any) => ({ id: s.thoughtContentId}));
+
+  this.listPatientMonthlyPReport = [{
+   
+    appearanceId: appearanceIds,
+    sensoriumId: sensoriumIds,
+    functioningId: functioningIds,
+    speechId: speechIds,
+    behaviorId: behaviorIds,
+    moodAffectId: moodAffectIds,
+    dailyPatternsId: dailyPatternsIds,
+    thoughtContentId: thoughtContentIds
+  }];
+
+  console.log('Updated Monthly Report:', this.listPatientMonthlyPReport);
+}
 
 
 // AssessmentFormSubmit(): void {
