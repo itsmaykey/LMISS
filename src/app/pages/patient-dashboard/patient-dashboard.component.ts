@@ -13,7 +13,7 @@ import { formatDate } from '@angular/common';
 import { SocialWorkerNotesService } from './ScriptForms/SocialWorkerNotes/social-worker-notes.service';
 import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
-import { Modal, Offcanvas } from 'bootstrap';
+//import { Modal, Offcanvas } from 'bootstrap';
 
 pdfMake.vfs = pdfFonts.vfs;
 
@@ -26,12 +26,12 @@ pdfMake.vfs = pdfFonts.vfs;
 export class PatientDashboardComponent  implements OnInit {
   [x: string]: any;
   @ViewChild('offcanvasRef') offcanvasElementRef!: ElementRef;
-  modalInstance: Modal | null = null;
+  //modalInstance: Modal | null = null;
   ExistedPatientCode = '';
   ExistedPatient: any = [];
   ExistedAssessmentCode = '';
   userInfo: any; // <-- Declare userInfo property
-  SocialWorkerNotesForm!: FormGroup; 
+  SocialWorkerNotesForm!: FormGroup;
   MentalStatusForm!: FormGroup;
   isSubmitting = false;
   fb: FormBuilder;
@@ -97,15 +97,15 @@ physicalFields = [
   constructor(private router: Router,http: HttpClient,
      private route: ActivatedRoute,
      private service: PatientDashboardService,
-     private authService: AuthService, 
+     private authService: AuthService,
      fb: FormBuilder,
      private SocialWorkerNotesService: SocialWorkerNotesService,
-     
+
   ) {
     this.fb = fb;
-    
+
   }
-  
+
   viewNotes(recNo: string): void {
   const patientCode = this.route.snapshot.paramMap.get('patientCode');
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
@@ -131,7 +131,7 @@ physicalFields = [
         return;
       }
 
-      this.viewNotesModal = new Modal(modalElement);
+    //  this.viewNotesModal = new Modal(modalElement);
       this.viewNotesModal.show();
 
         console.log('Filtered entity for recNo:', this.swpnData.entity);
@@ -145,16 +145,16 @@ physicalFields = [
   }
 }
 
-showModal(): void {
-  const modalElement = document.getElementById('backDropModal');
-  if (!modalElement) {
-    console.error('Modal element not found in DOM');
-    return;
-  }
+// showModal(): void {
+//   const modalElement = document.getElementById('backDropModal');
+//   if (!modalElement) {
+//     console.error('Modal element not found in DOM');
+//     return;
+//   }
 
-  this.backDropModalInstance = new Modal(modalElement);
-  this.backDropModalInstance.show();
-}
+//   this.backDropModalInstance = new Modal(modalElement);
+//   this.backDropModalInstance.show();
+// }
 showModalMPPR(): void {
   const modalElement = document.getElementById('viewPMMRModal');
   if (!modalElement) {
@@ -162,7 +162,7 @@ showModalMPPR(): void {
     return;
   }
 
-  this.bacDropMPPRReport = new Modal(modalElement);
+ // this.bacDropMPPRReport = new Modal(modalElement);
   this.bacDropMPPRReport.show();
 }
   hideModal(): void {
@@ -182,11 +182,11 @@ showModalMPPR(): void {
 
   const sub = this.router.events.subscribe((event) => {
     if (event instanceof NavigationEnd) {
-      sub.unsubscribe(); 
+      sub.unsubscribe();
 
       setTimeout(() => {
         this.showTab('#ApplicationHisto');
-      }, 100); 
+      }, 100);
     }
   });
 
@@ -209,11 +209,11 @@ showModalMPPR(): void {
      this.userInfo = this.authService.getUserInfo();
     console.log('Staff ID No:', this.userInfo.id);
 
-   
+
     const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
     const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
     this.ExistedPatientCode = patientCode;
-    
+
     this.SocialWorkerNotesForm = this.fb.group({
       recNo: 0,
       patientCode: patientCode,
@@ -243,7 +243,7 @@ showModalMPPR(): void {
       this.requireAtLeastOnePhysicalValidator.bind(this)
     ]
   });
-   
+
     this.service.getrefAppearance().subscribe({
       next: (response) => {
         this.Appearance = response as any[];
@@ -358,7 +358,7 @@ if (patientCode && assessmentCode) {
   this.service.getPatientProgressReport(patientCode, assessmentCode).subscribe({
     next: (response) => {
   if (Array.isArray(response) && response.length > 0) {
-    this.swpnData = response[0]; 
+    this.swpnData = response[0];
   }
 
   if (this.swpnData && this.swpnData.entity && !Array.isArray(this.swpnData.entity)) {
@@ -371,7 +371,7 @@ if (patientCode && assessmentCode) {
       console.error('Error fetching patient progress report:', error);
     }
   });
-  
+
 } else {
   console.error('Missing patientCode or interventionCode in route parameters.');
 }
@@ -388,7 +388,7 @@ getExisted(): void {
       this.service.getExistedPatientData(patientCode, assessmentCode).subscribe({
         next: (response: { patientCode?: string; assessmentCode?: string; [key: string]: any }) => {
           console.log('API Response:', response);  // Log the entire response for debugging
-          
+
           // Since the API response is an object, not an array, we directly assign it
           if (response && response.patientCode && response.assessmentCode) {
             this.ExistedPatient = response;
@@ -420,13 +420,13 @@ checkExisted(): void {
     });
   }
  loadExistedPatientData(patientCode: string): void {
- 
+
     // this.loadExistedPatientFamHealthData(patientCode);
   }
   initializeForms(): void {
-   
+
     // this.SocialWorkerNotesForm = this.SocialWorkerNotesService.createPatientSchoolForm(this.ExistedPatientCode);
-   
+
   }
 tryprint(): void{
   console.log(this.ExistedPatient[0].patientCode);
@@ -485,7 +485,7 @@ tryprint(): void{
 //   }
 SocialWorkerNotesFormSubmit(): void {
   if (this.SocialWorkerNotesForm.invalid) {
-    this.SocialWorkerNotesForm.markAllAsTouched(); 
+    this.SocialWorkerNotesForm.markAllAsTouched();
     return;
   }
 
@@ -495,7 +495,7 @@ SocialWorkerNotesFormSubmit(): void {
   console.log(formData);
 
   this.service.postPatientProgressReport( formData ).subscribe({
-    
+
     next: (response) => {
       console.log('Form saved successfully:', response);
 
@@ -538,7 +538,7 @@ refreshSwpnData(): void {
   this.service.getPatientProgressReport(patientCode, assessmentCode).subscribe({
     next: (response) => {
   if (Array.isArray(response) && response.length > 0) {
-    this.swpnData = response[0]; 
+    this.swpnData = response[0];
   }
 
   if (this.swpnData && this.swpnData.entity && !Array.isArray(this.swpnData.entity)) {
@@ -594,7 +594,7 @@ refreshSwpnData(): void {
   get cravingsId() {
     return this.MentalStatusForm.get('cravingsId') as FormArray;
   }
-  
+
    onAppearanceCheckboxChange(event: any, item: any): void {
   const appearanceArray = this.appearanceId;
   const isChecked = event.target.checked;
@@ -613,7 +613,7 @@ refreshSwpnData(): void {
     }
   }
 
-  this.updateMonthlyReport(); 
+  this.updateMonthlyReport();
 }
 
 onSensoriumCheckboxChange(event: any, item: any): void {
@@ -633,7 +633,7 @@ onSensoriumCheckboxChange(event: any, item: any): void {
     }
   }
 
-  this.updateMonthlyReport(); 
+  this.updateMonthlyReport();
 }
 onFunctioningCheckboxChange(event: any, item: any): void {
   const functioningArray = this.functioningId;
@@ -652,7 +652,7 @@ onFunctioningCheckboxChange(event: any, item: any): void {
     }
   }
 
-  this.updateMonthlyReport(); 
+  this.updateMonthlyReport();
 }
 onSpeechCheckboxChange(event: any, item: any): void {
   const speechIdArray = this.speechId;
@@ -671,7 +671,7 @@ onSpeechCheckboxChange(event: any, item: any): void {
     }
   }
 
-  this.updateMonthlyReport(); 
+  this.updateMonthlyReport();
 }
   onBehaviorCheckboxChange(event: any, item: any): void {
   const behaviorIdArray = this.behaviorId;
@@ -690,7 +690,7 @@ onSpeechCheckboxChange(event: any, item: any): void {
     }
   }
 
-  this.updateMonthlyReport(); 
+  this.updateMonthlyReport();
 }
   onMoodAffectCheckboxChange(event: any, item: any): void {
   const moodAffectIdArray = this.moodAffectId;
@@ -709,7 +709,7 @@ onSpeechCheckboxChange(event: any, item: any): void {
     }
   }
 
-  this.updateMonthlyReport(); 
+  this.updateMonthlyReport();
 }
   onDailyPatternCheckboxChange(event: any, item: any): void {
   const dailyPatternsIdArray = this.dailyPatternsId;
@@ -728,7 +728,7 @@ onSpeechCheckboxChange(event: any, item: any): void {
     }
   }
 
-  this.updateMonthlyReport(); 
+  this.updateMonthlyReport();
 }
 
   onThoughtContentCheckboxChange(event: any, item: any): void {
@@ -747,9 +747,9 @@ onSpeechCheckboxChange(event: any, item: any): void {
       thoughtContentIdArray.removeAt(index);
     }
   }
-  
 
-  this.updateMonthlyReport(); 
+
+  this.updateMonthlyReport();
 }
   onPhysicaIndicatorCheckboxChange(event: any, item: any): void {
   const physicaIndicatorsIdArray = this.physicaIndicatorsId;
@@ -767,9 +767,9 @@ onSpeechCheckboxChange(event: any, item: any): void {
       physicaIndicatorsIdArray.removeAt(index);
     }
   }
-  
 
-  this.updateMonthlyReport(); 
+
+  this.updateMonthlyReport();
 }
  onDenialIdCheckboxChange(event: any, item: any): void {
   const denialIddArray = this.denialId;
@@ -787,9 +787,9 @@ onSpeechCheckboxChange(event: any, item: any): void {
       denialIddArray.removeAt(index);
     }
   }
-  
 
-  this.updateMonthlyReport(); 
+
+  this.updateMonthlyReport();
 }
 onPhysicalWsympCheckboxChange(event: any, item: any): void {
   const physicalWsymptomsIddArray = this.physicalWsymptomsId;
@@ -807,9 +807,9 @@ onPhysicalWsympCheckboxChange(event: any, item: any): void {
       physicalWsymptomsIddArray.removeAt(index);
     }
   }
-  
 
-  this.updateMonthlyReport(); 
+
+  this.updateMonthlyReport();
 }
 onSuspensionofActCheckboxChange(event: any, item: any): void {
   const suspensionofActivitiesIddArray = this.suspensionofActivitiesId;
@@ -827,9 +827,9 @@ onSuspensionofActCheckboxChange(event: any, item: any): void {
       suspensionofActivitiesIddArray.removeAt(index);
     }
   }
-  
 
-  this.updateMonthlyReport(); 
+
+  this.updateMonthlyReport();
 }
   onCravingsCheckboxChange(event: any, item: any): void {
   const cravingsIddArray = this.cravingsId;
@@ -847,13 +847,13 @@ onSuspensionofActCheckboxChange(event: any, item: any): void {
       cravingsIddArray.removeAt(index);
     }
   }
-  
 
-  this.updateMonthlyReport(); 
+
+  this.updateMonthlyReport();
 }
   // Method to save data (you can customize this as needed)
   onSaveNext(): void {
-    
+
     const fullReport = {
       listPatientMonthlyPReport: this.listPatientMonthlyPReport
     };
@@ -925,7 +925,7 @@ onSuspensionofActCheckboxChange(event: any, item: any): void {
     .map((s: any) => ({ id: s.cravingsId}));
 
   this.listPatientMonthlyPReport = [{
-   
+
     appearanceId: appearanceIds,
     sensoriumId: sensoriumIds,
     functioningId: functioningIds,
@@ -959,7 +959,7 @@ onSuspensionofActCheckboxChange(event: any, item: any): void {
   this.showTab('#PsychologicalSummary');
 }
 
-  
+
 
   markFieldsAsTouchedMentalFields(fields: string[]): void {
   fields.forEach(mentalFields => {
@@ -998,7 +998,7 @@ requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | nul
       invalidFields.push(field);
     }
   }
-  
+
   if (invalidFields.length > 0) {
     // Build an error object like: { appearanceId: true, speechId: true }
     const errors: ValidationErrors = {};
@@ -1035,14 +1035,14 @@ requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | nul
 //   if (this.isSubmitting) {
 //     return; // Prevent rapid re-submission
 //   }
-  
+
 
 //   if (this.MentalStatusForm.valid) {
 //     this.isSubmitting = true; // Lock submission
 
 //     const patientCode = this.MentalStatusForm.get('patientCode')?.value;
 //     const admissionDate = new Date().toISOString();
-    
+
 
 //     const listAdmissionData = this.selectedAppearance.map((admission, index) => ({
 //       recNo: 0, // Ensure it's treated as new
@@ -1054,7 +1054,7 @@ requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | nul
 //     const formData = {
 //       recNo: 0, // Set to null to avoid accidental updates
 //       patientCode: patientCode,
-    
+
 //       admissionStatus: 1,
 //       patientAssessmentStatus: 1,
 //       staffIdNo: this.userInfo?.id || 0,
@@ -1080,7 +1080,7 @@ requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | nul
 //               allowEscapeKey: false,
 //             didClose: () => {
 //             this.MentalStatusForm.reset();
-//             (this.MentalStatusForm.get('AppearanceId') as FormArray).clear(); 
+//             (this.MentalStatusForm.get('AppearanceId') as FormArray).clear();
 
 //               this.selectedAppearance = [];
 
