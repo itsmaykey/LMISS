@@ -515,16 +515,19 @@
       </tbody>
     </table>
     <div class="mt-3 text-end">
-      <button type="button" class="btn btn-primary text-white">
-        <i class="bx bx-save"></i> Save Mental Status
-      </button>
+       <button type="button" class="btn btn-primary text-white" (click)="onSaveNext()">
+      <i class="bx bx-save"></i>
+    </button>
     </div>
+   
   </div>
 
  <div class="tab-pane fade active show" id="AppearanceTab" role="tabpanel">
   <div class="card my-3 shadow-sm rounded-3">
       <div class="card-body pt-4 custom-font" style="max-height: 300px; overflow-y: auto;">
+         
       <form [formGroup]="MentalStatusForm">
+      
         <div class="d-flex align-items-start flex-wrap mb-3">
           <h4 class="mb-2 me-3">Appearance:</h4>
           <div formArrayName="appearanceId" class="row flex-grow-1">
@@ -537,6 +540,7 @@
                 (change)="onAppearanceCheckboxChange($event, x)">
               {{ x.appearanceDesc }}
             </div>
+            
           </div>
         </div>
           <hr>
@@ -553,6 +557,7 @@
                 (change)="onSensoriumCheckboxChange($event, x)">
               {{ x.sensoriumDesc }}
             </div>
+            
           </div>
       </div>
 
@@ -570,6 +575,7 @@
                 (change)="onFunctioningCheckboxChange($event, x)">
               {{ x.functioningDesc }}
             </div>
+             
           </div>
       </div>
          <hr>
@@ -587,6 +593,7 @@
               {{ x.speechDesc }}
             </div>
           </div>
+           
       </div>
        <hr>
       <div class="d-flex align-items-start flex-wrap mb-3">
@@ -603,6 +610,7 @@
               {{ x.behaviorDesc }}
             </div>
           </div>
+          
       </div>
        <hr>
       <div class="d-flex align-items-start flex-wrap mb-3">
@@ -619,6 +627,7 @@
               {{ x.moodAffectDesc }}
             </div>
           </div>
+          
       </div>
       <hr>
       <div class="d-flex align-items-start flex-wrap mb-3">
@@ -635,6 +644,7 @@
               {{ x.dailyPatternsDesc }}
             </div>
           </div>
+            
       </div>
       <hr>
       <div class="d-flex align-items-start flex-wrap mb-3">
@@ -651,19 +661,154 @@
               {{ x.thoughtContentDesc }}
             </div>
           </div>
+          
       </div>
-          <div class="tab-pane fade" id="RehabProgress" role="tabpanel">
-        
-          </div>
       </form>
       </div>
     </div>
+    
+      <div *ngIf="MentalStatusForm.errors?.['appearanceId'] && MentalStatusForm.touched" class="text-danger">
+        Please select at least one appearance option.
+      </div>
+       <div *ngIf="MentalStatusForm.errors?.['sensoriumId'] && MentalStatusForm.touched" class="text-danger">
+        Please select at least one Sensorium option.
+      </div>
+        <div *ngIf="MentalStatusForm.errors?.['functioningId'] && MentalStatusForm.touched" class="text-danger">
+        Please select at least one Functioning option.
+      </div>
+      <div *ngIf="MentalStatusForm.errors?.['speechId'] && MentalStatusForm.touched" class="text-danger">
+          Please select at least one Speech option.
+      </div>
+      <div *ngIf="MentalStatusForm.errors?.['behaviorId'] && MentalStatusForm.touched" class="text-danger">
+       Please select at least one Behavior option.
+      </div>
+      <div *ngIf="MentalStatusForm.errors?.['moodAffectId'] && MentalStatusForm.touched" class="text-danger">
+      Please select at least one Mood/Affect option.
+      </div>
+      <div *ngIf="MentalStatusForm.errors?.['dailyPatternsId'] && MentalStatusForm.touched" class="text-danger">
+       Please select at least one Daily Pattern option.
+       </div>
+      <div *ngIf="MentalStatusForm.errors?.['thoughtContentId'] && MentalStatusForm.touched" class="text-danger">
+       Please select at least one Thought Content option.
+      </div>
+        <div class="mt-3 text-end">
+          <button type="button" (click)="goToSubstanceHisto()" class="btn btn-primary text-white">
+            <i class="bx bx-save"></i> Next
+          </button>
+        </div>
   </div>
-  <div class="mt-3 text-end">
-    <button type="button" class="btn btn-primary text-white" (click)="onSaveMental()">
-      <i class="bx bx-save"></i>
-    </button>
+  <div class="tab-pane fade" id="RehabProgress" role="tabpanel">
+    
+     <div class="card my-3 shadow-sm rounded-3">
+      <div class="card-body pt-4 custom-font" style="max-height: 300px; overflow-y: auto;">
+
+      <form [formGroup]="MentalStatusForm">
+        <div class="mb-3">
+          <h4 class="mb-2">Physical Indicators:</h4>
+          <div formArrayName="physicaIndicatorsId">
+            <div *ngFor="let x of PhysicIndicators; let i = index" class="form-check mb-1 col-12">
+              <label class="form-check-label w-100">
+                <input
+                  class="form-check-input me-2"
+                  type="checkbox"
+                  [value]="x.physicaIndicatorsId"
+                  [checked]="(MentalStatusForm.get('physicaIndicatorsId')?.value || []).includes(x.physicaIndicatorsId)"
+                  (change)="onPhysicaIndicatorCheckboxChange($event, x)">
+                {{ x.physicaIndicatorsDesc }}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <h4 class="mb-2">Denial:</h4>
+          <div formArrayName="denialId">
+            <div *ngFor="let x of Denial; let i = index" class="form-check mb-1 col-12">
+              <label class="form-check-label w-100">
+                <input
+                  class="form-check-input me-2"
+                  type="checkbox"
+                  [value]="x.denialId"
+                  [checked]="(MentalStatusForm.get('denialId')?.value || []).includes(x.denialId)"
+                  (change)="onDenialIdCheckboxChange($event, x)">
+                {{ x.denialDesc }}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <h4 class="mb-2">Physical Withdrawal Symptoms:</h4>
+          <div formArrayName="physicalWsymptomsId">
+            <div *ngFor="let x of WithdSymptoms; let i = index" class="form-check mb-1 col-12">
+              <label class="form-check-label w-100">
+                <input
+                  class="form-check-input me-2"
+                  type="checkbox"
+                  [value]="x.physicalWsymptomsId"
+                  [checked]="(MentalStatusForm.get('physicalWsymptomsId')?.value || []).includes(x.physicalWsymptomsId)"
+                  (change)="onPhysicalWsympCheckboxChange($event, x)">
+                {{ x.physicalWsymptomsDesc }}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <h4 class="mb-2">Suspension of Activities:</h4>
+          <div formArrayName="suspensionofActivitiesId">
+            <div *ngFor="let x of SuspenActivities; let i = index" class="form-check mb-1 col-12">
+              <label class="form-check-label w-100">
+                <input
+                  class="form-check-input me-2"
+                  type="checkbox"
+                  [value]="x.suspensionofActivitiesId"
+                  [checked]="(MentalStatusForm.get('suspensionofActivitiesId')?.value || []).includes(x.suspensionofActivitiesId)"
+                  (change)="onSuspensionofActCheckboxChange($event, x)">
+                {{ x.suspensionofActivitiesDesc }}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <h4 class="mb-2">Cravings:</h4>
+          <div formArrayName="cravingsId">
+            <div *ngFor="let x of Cravings; let i = index" class="form-check mb-1 col-12">
+              <label class="form-check-label w-100">
+                <input
+                  class="form-check-input me-2"
+                  type="checkbox"
+                  [value]="x.cravingsId"
+                  [checked]="(MentalStatusForm.get('cravingsId')?.value || []).includes(x.cravingsId)"
+                  (change)="onCravingsCheckboxChange($event, x)">
+                {{ x.cravingsDesc }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </form>
+      </div>
+</div>
+
+      <div *ngIf="MentalStatusForm.errors?.['physicaIndicatorsId'] && MentalStatusForm.touched" class="text-danger">
+        Please select at least one Physical Indicators option.
+      </div>
+       <div *ngIf="MentalStatusForm.errors?.['denialId'] && MentalStatusForm.touched" class="text-danger">
+        Please select at least one Denial option.
+      </div>
+        <div *ngIf="MentalStatusForm.errors?.['suspensionofActivitiesId'] && MentalStatusForm.touched" class="text-danger">
+        Please select at least one Suspension of Activities option.
+      </div>
+      <div *ngIf="MentalStatusForm.errors?.['cravingsId'] && MentalStatusForm.touched" class="text-danger">
+          Please select at least one Cravings option.
+      </div>
+      <div *ngIf="MentalStatusForm.errors?.['physicalWsymptomsId'] && MentalStatusForm.touched" class="text-danger">
+       Please select at least one Physical Withdrawal Symptoms option.
+      </div>
+         <div class="mt-3 text-end">
+      <button type="button" (click)="goToPsychologicalSummary()" class="btn btn-primary text-white">
+        <i class="bx bx-save"></i> Next
+      </button>
+    </div>
   </div>
+  
 </div>
 
   
@@ -673,6 +818,7 @@
 </div>
 
     </div>
+    
   </div>
 </div>
 

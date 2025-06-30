@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, ValidationErrors } from '@angular/forms';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
@@ -60,8 +60,28 @@ export class PatientDashboardComponent  implements OnInit {
   WithdSymptoms: any = [];
   SuspenActivities: any = [];
   Cravings: any = [];
-  
+  keys: any = [];
    listPatientMonthlyPReport: any[] = [];
+
+   mentalFields = [
+  'appearanceId',
+  'sensoriumId',
+  'functioningId',
+  'speechId',
+  'behaviorId',
+  'moodAffectId',
+  'dailyPatternsId',
+  'thoughtContentId'
+];
+
+physicalFields = [
+  'physicaIndicatorsId',
+  'denialId',
+  'physicalWsymptomsId',
+  'suspensionofActivitiesId',
+  'cravingsId'
+];
+
   onEditNotes() {
     this.isEditing = true;
      this.isEditingTbleView = false;
@@ -204,15 +224,26 @@ showModalMPPR(): void {
       interventionDate: ['', Validators.required]
     });
     this.MentalStatusForm = this.fb.group({
-      appearanceId: this.fb.array([]),
-      sensoriumId: this.fb.array([]),
-      functioningId: this.fb.array([]),
-      speechId: this.fb.array([]),
-      behaviorId: this.fb.array([]),
-      moodAffectId: this.fb.array([]),
-      dailyPatternsId: this.fb.array([]),
-      thoughtContentId: this.fb.array([])
-    });
+    appearanceId: this.fb.array([]),
+    sensoriumId: this.fb.array([]),
+    functioningId: this.fb.array([]),
+    speechId: this.fb.array([]),
+    behaviorId: this.fb.array([]),
+    moodAffectId: this.fb.array([]),
+    dailyPatternsId: this.fb.array([]),
+    thoughtContentId: this.fb.array([]),
+    physicaIndicatorsId: this.fb.array([]),
+    denialId: this.fb.array([]),
+    physicalWsymptomsId: this.fb.array([]),
+    suspensionofActivitiesId: this.fb.array([]),
+    cravingsId: this.fb.array([])
+  }, {
+    validators: [
+      this.requireAtLeastOnePerFieldValidator.bind(this),
+      this.requireAtLeastOnePhysicalValidator.bind(this)
+    ]
+  });
+   
     this.service.getrefAppearance().subscribe({
       next: (response) => {
         this.Appearance = response as any[];
@@ -548,6 +579,21 @@ refreshSwpnData(): void {
   get thoughtContentId() {
     return this.MentalStatusForm.get('thoughtContentId') as FormArray;
   }
+    get physicaIndicatorsId() {
+    return this.MentalStatusForm.get('physicaIndicatorsId') as FormArray;
+  }
+  get denialId() {
+    return this.MentalStatusForm.get('denialId') as FormArray;
+  }
+  get physicalWsymptomsId() {
+    return this.MentalStatusForm.get('physicalWsymptomsId') as FormArray;
+  }
+  get suspensionofActivitiesId() {
+    return this.MentalStatusForm.get('suspensionofActivitiesId') as FormArray;
+  }
+  get cravingsId() {
+    return this.MentalStatusForm.get('cravingsId') as FormArray;
+  }
   
    onAppearanceCheckboxChange(event: any, item: any): void {
   const appearanceArray = this.appearanceId;
@@ -701,11 +747,113 @@ onSpeechCheckboxChange(event: any, item: any): void {
       thoughtContentIdArray.removeAt(index);
     }
   }
+  
+
+  this.updateMonthlyReport(); 
+}
+  onPhysicaIndicatorCheckboxChange(event: any, item: any): void {
+  const physicaIndicatorsIdArray = this.physicaIndicatorsId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!physicaIndicatorsIdArray.value.includes(item.physicaIndicatorsId)) {
+      physicaIndicatorsIdArray.push(this.fb.control(item.physicaIndicatorsId));
+    }
+  } else {
+    const index = physicaIndicatorsIdArray.controls.findIndex(
+      control => control.value === item.physicaIndicatorsId
+    );
+    if (index !== -1) {
+      physicaIndicatorsIdArray.removeAt(index);
+    }
+  }
+  
+
+  this.updateMonthlyReport(); 
+}
+ onDenialIdCheckboxChange(event: any, item: any): void {
+  const denialIddArray = this.denialId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!denialIddArray.value.includes(item.denialId)) {
+      denialIddArray.push(this.fb.control(item.denialId));
+    }
+  } else {
+    const index = denialIddArray.controls.findIndex(
+      control => control.value === item.denialId
+    );
+    if (index !== -1) {
+      denialIddArray.removeAt(index);
+    }
+  }
+  
+
+  this.updateMonthlyReport(); 
+}
+onPhysicalWsympCheckboxChange(event: any, item: any): void {
+  const physicalWsymptomsIddArray = this.physicalWsymptomsId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!physicalWsymptomsIddArray.value.includes(item.physicalWsymptomsId)) {
+      physicalWsymptomsIddArray.push(this.fb.control(item.physicalWsymptomsId));
+    }
+  } else {
+    const index = physicalWsymptomsIddArray.controls.findIndex(
+      control => control.value === item.physicalWsymptomsId
+    );
+    if (index !== -1) {
+      physicalWsymptomsIddArray.removeAt(index);
+    }
+  }
+  
+
+  this.updateMonthlyReport(); 
+}
+onSuspensionofActCheckboxChange(event: any, item: any): void {
+  const suspensionofActivitiesIddArray = this.suspensionofActivitiesId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!suspensionofActivitiesIddArray.value.includes(item.suspensionofActivitiesId)) {
+      suspensionofActivitiesIddArray.push(this.fb.control(item.suspensionofActivitiesId));
+    }
+  } else {
+    const index = suspensionofActivitiesIddArray.controls.findIndex(
+      control => control.value === item.suspensionofActivitiesId
+    );
+    if (index !== -1) {
+      suspensionofActivitiesIddArray.removeAt(index);
+    }
+  }
+  
+
+  this.updateMonthlyReport(); 
+}
+  onCravingsCheckboxChange(event: any, item: any): void {
+  const cravingsIddArray = this.cravingsId;
+  const isChecked = event.target.checked;
+
+  if (isChecked) {
+    if (!cravingsIddArray.value.includes(item.cravingsId)) {
+      cravingsIddArray.push(this.fb.control(item.cravingsId));
+    }
+  } else {
+    const index = cravingsIddArray.controls.findIndex(
+      control => control.value === item.cravingsId
+    );
+    if (index !== -1) {
+      cravingsIddArray.removeAt(index);
+    }
+  }
+  
 
   this.updateMonthlyReport(); 
 }
   // Method to save data (you can customize this as needed)
-  onSaveMental(): void {
+  onSaveNext(): void {
+    
     const fullReport = {
       listPatientMonthlyPReport: this.listPatientMonthlyPReport
     };
@@ -720,6 +868,11 @@ onSpeechCheckboxChange(event: any, item: any): void {
   const moodAffectIds = this.moodAffectId.value;
   const dailyPatternsIds = this.dailyPatternsId.value;
   const thoughtContentIds = this.thoughtContentId.value;
+  const physicaIndicatorsIds = this.physicaIndicatorsId.value;
+  const denialIds = this.denialId.value;
+  const physicalWsymptomsIds = this.physicalWsymptomsId.value;
+  const suspensionofActivitiesIds = this.suspensionofActivitiesId.value;
+  const cravingsIds = this.cravingsId.value;
 
   const selectedAppearances = this.Appearance
     .filter(a => appearanceIds.includes(a.appearanceId))
@@ -752,6 +905,24 @@ onSpeechCheckboxChange(event: any, item: any): void {
   const selectedThoughtContent = this.ThoughtContent
     .filter((s: any) => thoughtContentIds.includes(s.thoughtContentId))
     .map((s: any) => ({ id: s.thoughtContentId}));
+  const selectedPhysicInd = this.PhysicIndicators
+    .filter((s: any) => physicaIndicatorsIds.includes(s.physicaIndicatorsId))
+    .map((s: any) => ({ id: s.physicaIndicatorsId}));
+ const selectedDenial = this.Denial
+    .filter((s: any) => denialIds.includes(s.denialId))
+    .map((s: any) => ({ id: s.denialId}));
+
+  const selectedPhysicalWsymp = this.WithdSymptoms
+    .filter((s: any) => physicalWsymptomsIds.includes(s.physicalWsymptomsId))
+    .map((s: any) => ({ id: s.physicalWsymptomsId}));
+
+  const selectedTSuspensionofActi = this.SuspenActivities
+    .filter((s: any) => suspensionofActivitiesIds.includes(s.suspensionofActivitiesId))
+    .map((s: any) => ({ id: s.suspensionofActivitiesId}));
+
+  const selectedTCraving = this.Cravings
+    .filter((s: any) => cravingsIds.includes(s.cravingsId))
+    .map((s: any) => ({ id: s.cravingsId}));
 
   this.listPatientMonthlyPReport = [{
    
@@ -762,13 +933,104 @@ onSpeechCheckboxChange(event: any, item: any): void {
     behaviorId: behaviorIds,
     moodAffectId: moodAffectIds,
     dailyPatternsId: dailyPatternsIds,
-    thoughtContentId: thoughtContentIds
+    thoughtContentId: thoughtContentIds,
+    physicaIndicatorsId: physicaIndicatorsIds,
+    denialId: denialIds,
+    physicalWsymptomsId: physicalWsymptomsIds,
+    suspensionofActivitiesId: suspensionofActivitiesIds,
+    cravingsId: cravingsIds,
   }];
 
   console.log('Updated Monthly Report:', this.listPatientMonthlyPReport);
 }
+ goToSubstanceHisto(): void {
+  // Run just mental field validation
+  this.markFieldsAsTouchedMentalFields(this.mentalFields);
 
 
+  this.showTab('#RehabProgress'); // or your navigation logic
+}
+
+
+  goToPsychologicalSummary(): void {
+  this.markFieldsAsTouchedphysicalFields(this.physicalFields);
+
+
+  this.showTab('#PsychologicalSummary');
+}
+
+  
+
+  markFieldsAsTouchedMentalFields(fields: string[]): void {
+  fields.forEach(mentalFields => {
+    const control = this.MentalStatusForm.get(mentalFields);
+    if (control) {
+      control.markAsTouched();
+    }
+  });
+}
+markFieldsAsTouchedphysicalFields(fields: string[]): void {
+  fields.forEach(physicalFields => {
+    const control = this.MentalStatusForm.get(physicalFields);
+    if (control) {
+      control.markAsTouched();
+    }
+  });
+}
+
+requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | null {
+   const requiredFields = [
+    'appearanceId',
+    'sensoriumId',
+    'functioningId',
+    'speechId',
+    'behaviorId',
+    'moodAffectId',
+    'dailyPatternsId',
+    'thoughtContentId'
+  ];
+
+  const invalidFields: string[] = [];
+
+  for (const field of requiredFields) {
+    const value = formGroup.get(field)?.value;
+    if (!Array.isArray(value) || value.length === 0) {
+      invalidFields.push(field);
+    }
+  }
+  
+  if (invalidFields.length > 0) {
+    // Build an error object like: { appearanceId: true, speechId: true }
+    const errors: ValidationErrors = {};
+    invalidFields.forEach(field => {
+      errors[field] = true;
+    });
+    return errors;
+  }
+
+  return null; // All good
+
+}
+  requireAtLeastOnePhysicalValidator(formGroup: FormGroup): ValidationErrors | null {
+    const requiredFields = [
+      'physicaIndicatorsId',
+      'denialId',
+      'physicalWsymptomsId',
+      'suspensionofActivitiesId',
+      'cravingsId'
+    ];
+
+    const errors: any = {};
+
+    for (const field of requiredFields) {
+      const value = formGroup.get(field)?.value;
+      if (!value || value.length === 0) {
+        errors[field] = true;
+      }
+    }
+
+    return Object.keys(errors).length > 0 ? errors : null;
+  }
 // AssessmentFormSubmit(): void {
 //   if (this.isSubmitting) {
 //     return; // Prevent rapid re-submission
