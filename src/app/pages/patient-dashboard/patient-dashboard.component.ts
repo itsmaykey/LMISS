@@ -41,6 +41,7 @@ export class PatientDashboardComponent  implements OnInit {
   viewNotesModal: any;
   viewPMMRModal: any;
   swpnData: any;
+  monthlyProgressData :any;
   swpnDataEdit: any;
   isLoading: boolean | undefined;
   swpnFormArray: any = [];
@@ -377,7 +378,30 @@ if (patientCode && assessmentCode) {
 } else {
   console.error('Missing patientCode or interventionCode in route parameters.');
 }
-
+  if (patientCode && assessmentCode) {
+      this.service.getExistedPatientMonthlyProgressReports(patientCode, assessmentCode)
+        .subscribe({
+          next: (response) => {
+            if (Array.isArray(response) && response.length > 0) {
+              this.monthlyProgressData = response[0];
+              console.log('Monthly Progress Data:', this.monthlyProgressData);
+              // If entity is object instead of array, convert it
+              if (
+                this.monthlyProgressData &&
+                this.monthlyProgressData.entity &&
+                !Array.isArray(this.monthlyProgressData.entity)
+              ) {
+                this.monthlyProgressData.entity = Object.values(this.monthlyProgressData.entity);
+              }
+            }
+          },
+          error: (err) => {
+            console.error('Error loading monthly progress:', err);
+          }
+        });
+    } else {
+      console.error('Missing patientCode or assessmentCode in route.');
+    }
     }
 getExisted(): void {
   this.route.paramMap.subscribe((params) => {
@@ -925,9 +949,8 @@ onSaveNext(): void {
 
   console.log('Submitting:', formData);
 
-  this.service.postPatientProgressReport(formData).subscribe({
+  this.service.postPatientMonthlyProgressReport(formData).subscribe({
     next: () => {
-      this.hideModaviewPMMRModal();
 
       Swal.fire({
         icon: 'success',
@@ -937,10 +960,11 @@ onSaveNext(): void {
         timerProgressBar: true,
         showConfirmButton: false
       });
-
+      this.hideModaviewPMMRModal();
       this.MentalStatusForm.reset();
       this.isSubmitting = false;
       this.refreshSwpnData();
+       this.listPatientMonthlyPReport = [];
     },
     error: (err) => {
       console.error('Submission failed:', err);
@@ -976,7 +1000,6 @@ onSaveNext(): void {
   const patientCode = this.route.snapshot.paramMap.get('patientCode');
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
    const otherObservations = this.MentalStatusForm.get('otherObservations')?.value;
-  console.log('otherObservations:', otherObservations);
   const selectedAppearances = this.Appearance
     .filter(a => appearanceIds.includes(a.appearanceId))
     .map(a => ({ id: a.appearanceId}));
