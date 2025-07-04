@@ -111,9 +111,18 @@
 
       <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
         <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
-          <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)" data-bs-toggle="collapse" data-bs-target="#navbar-collapse">
+         <button
+            class="nav-item nav-link btn px-0 me-xl-6"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbar-collapse"
+            aria-controls="navbar-collapse"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
             <i class="bx bx-menu bx-md"></i>
-          </a>
+          </button>
+
         </div>
 
         <div class="collapse navbar-collapse" id="navbar-collapse">
@@ -134,44 +143,38 @@
 
             <!-- User -->
               <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
+                <a class="nav-link dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown">
                   <div class="avatar avatar-online">
                     <img src="../assets/img/avatars/1.png" alt="" class="w-px-40 h-auto rounded-circle">
                   </div>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li>
-                    <a class="dropdown-item" href="#">
-                      <div class="d-flex">
-                        <div class="flex-shrink-0 me-3">
-                          <div class="avatar avatar-online">
-                            <img src="../assets/img/avatars/1.png" alt="" class="w-px-40 h-auto rounded-circle">
-                          </div>
-                        </div>
-                        <div class="flex-grow-1">
-                          <h6 class="mb-0">{{userInfo.name}}</h6>
-                          <small class="text-muted">{{userInfo.positionName}}</small>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <div class="dropdown-divider my-1"></div>
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="#">
-                      <i class="bx bx-user bx-md me-3"></i><span>My Profile</span>
-                    </a>
-                  </li>
-                  <li>
-                    <div class="dropdown-divider my-1"></div>
-                  </li>
-                  <li>
-                    <a class="dropdown-item" style="cursor: pointer;" (click)="logout()">
-                      <i class="bx bx-power-off bx-md me-3" ></i><span>Log Out</span>
-                    </a>
-                  </li>
-                </ul>
+               <ul class="navbar-nav ms-auto">
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle no-caret p-0"
+              href="#"
+              id="dropdownMenuButton"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+            </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+            <li>
+              <div class="d-flex align-items-center px-3 py-2">
+                <div class="text-center w-100">
+                  <h6 class="mb-0">{{userInfo.name}}</h6>
+                  <small class="text-muted">{{userInfo.positionName}}</small>
+                </div>
+              </div>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item" href="#" (click)="logout(); $event.preventDefault()">Logout</a></li>
+          </ul>
+
+          </li>
+        </ul>
               </li>
             <!--/ User -->
           </ul>

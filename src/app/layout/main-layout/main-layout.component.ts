@@ -16,6 +16,7 @@ logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
 }
+
 isMenuOpen = false;
 
  userInfo:any;

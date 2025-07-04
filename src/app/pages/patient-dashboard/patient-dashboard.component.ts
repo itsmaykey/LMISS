@@ -6,14 +6,14 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { PatientDashboardService } from './service/patient-dashboard.service';
-// Update the import path below if the actual path is different
+
 import { AuthService } from '../../Admin/Auth/AuthService';
 import { FormBuilder, FormArray, Validators, FormGroup } from '@angular/forms';
 import { formatDate } from '@angular/common';
 import { SocialWorkerNotesService } from './ScriptForms/SocialWorkerNotes/social-worker-notes.service';
 import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
-//import { Modal, Offcanvas } from 'bootstrap';
+import { Modal, Offcanvas } from 'bootstrap';
 
 pdfMake.vfs = pdfFonts.vfs;
 
@@ -26,7 +26,7 @@ pdfMake.vfs = pdfFonts.vfs;
 export class PatientDashboardComponent  implements OnInit {
   [x: string]: any;
   @ViewChild('offcanvasRef') offcanvasElementRef!: ElementRef;
-  //modalInstance: Modal | null = null;
+  modalInstance: Modal | null = null;
   ExistedPatientCode = '';
   ExistedPatient: any = [];
   ExistedAssessmentCode = '';
@@ -62,26 +62,23 @@ export class PatientDashboardComponent  implements OnInit {
   Cravings: any = [];
   keys: any = [];
    listPatientMonthlyPReport: any[] = [];
-
-   mentalFields = [
-  'appearanceId',
-  'sensoriumId',
-  'functioningId',
-  'speechId',
-  'behaviorId',
-  'moodAffectId',
-  'dailyPatternsId',
-  'thoughtContentId'
-];
-
-physicalFields = [
-  'physicaIndicatorsId',
-  'denialId',
-  'physicalWsymptomsId',
-  'suspensionofActivitiesId',
-  'cravingsId'
-];
-
+    listPatientMonthlyPReportToSave: any[] = [];
+  physicalFields = [
+    'physicaIndicatorsId',
+    'denialId',
+    'physicalWsymptomsId',
+    'suspensionofActivitiesId',
+    'cravingsId',
+    'appearanceId',
+    'sensoriumId',
+    'functioningId',
+    'speechId',
+    'behaviorId',
+    'moodAffectId',
+    'dailyPatternsId',
+    'thoughtContentId',
+    'otherObservations'
+  ];
   onEditNotes() {
     this.isEditing = true;
      this.isEditingTbleView = false;
@@ -131,7 +128,7 @@ physicalFields = [
         return;
       }
 
-    //  this.viewNotesModal = new Modal(modalElement);
+     this.viewNotesModal = new Modal(modalElement);
       this.viewNotesModal.show();
 
         console.log('Filtered entity for recNo:', this.swpnData.entity);
@@ -145,16 +142,16 @@ physicalFields = [
   }
 }
 
-// showModal(): void {
-//   const modalElement = document.getElementById('backDropModal');
-//   if (!modalElement) {
-//     console.error('Modal element not found in DOM');
-//     return;
-//   }
+showModal(): void {
+  const modalElement = document.getElementById('backDropModal');
+  if (!modalElement) {
+    console.error('Modal element not found in DOM');
+    return;
+  }
 
-//   this.backDropModalInstance = new Modal(modalElement);
-//   this.backDropModalInstance.show();
-// }
+  this.backDropModalInstance = new Modal(modalElement);
+  this.backDropModalInstance.show();
+}
 showModalMPPR(): void {
   const modalElement = document.getElementById('viewPMMRModal');
   if (!modalElement) {
@@ -162,12 +159,16 @@ showModalMPPR(): void {
     return;
   }
 
- // this.bacDropMPPRReport = new Modal(modalElement);
+ this.bacDropMPPRReport = new Modal(modalElement);
   this.bacDropMPPRReport.show();
 }
   hideModal(): void {
     this.backDropModalInstance?.hide();
   }
+   hideModaviewPMMRModal(): void {
+    this.bacDropMPPRReport?.hide();
+  }
+  
   backToApp(): void {
   if (!this.router) {
     console.error('Router is undefined!');
@@ -236,7 +237,8 @@ showModalMPPR(): void {
     denialId: this.fb.array([]),
     physicalWsymptomsId: this.fb.array([]),
     suspensionofActivitiesId: this.fb.array([]),
-    cravingsId: this.fb.array([])
+    cravingsId: this.fb.array([]),
+     otherObservations: ['', Validators.required],
   }, {
     validators: [
       this.requireAtLeastOnePerFieldValidator.bind(this),
@@ -594,6 +596,11 @@ refreshSwpnData(): void {
   get cravingsId() {
     return this.MentalStatusForm.get('cravingsId') as FormArray;
   }
+  get otherObservations() {
+  return this.MentalStatusForm.get('otherObservations') as FormControl;
+}
+
+
 
    onAppearanceCheckboxChange(event: any, item: any): void {
   const appearanceArray = this.appearanceId;
@@ -851,14 +858,107 @@ onSuspensionofActCheckboxChange(event: any, item: any): void {
 
   this.updateMonthlyReport();
 }
-  // Method to save data (you can customize this as needed)
-  onSaveNext(): void {
+onSaveNext(): void {
+  this.isSubmitting = true;
 
-    const fullReport = {
-      listPatientMonthlyPReport: this.listPatientMonthlyPReport
-    };
-    console.log('Full Report:', JSON.stringify(fullReport, null, 2));
+  const appearanceIds = this.appearanceId.value;
+  const sensoriumIds = this.sensoriumId.value;
+  const functioningIds = this.functioningId.value;
+  const speechIds = this.speechId.value;
+  const behaviorIds = this.behaviorId.value;
+  const moodAffectIds = this.moodAffectId.value;
+  const dailyPatternsIds = this.dailyPatternsId.value;
+  const thoughtContentIds = this.thoughtContentId.value;
+  const physicaIndicatorsIds = this.physicaIndicatorsId.value;
+  const denialIds = this.denialId.value;
+  const physicalWsymptomsIds = this.physicalWsymptomsId.value;
+  const suspensionofActivitiesIds = this.suspensionofActivitiesId.value;
+  const cravingsIds = this.cravingsId.value;
+  const otherObservations = this.otherObservations.value || '';
+  const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
+  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode') || '';
+  const dateSubmitted = new Date().toISOString();
+  this.listPatientMonthlyPReportToSave = [];
+
+  const maxLength = Math.max(
+    appearanceIds.length,
+    sensoriumIds.length,
+    functioningIds.length,
+    speechIds.length,
+    behaviorIds.length,
+    moodAffectIds.length,
+    dailyPatternsIds.length,
+    thoughtContentIds.length,
+    physicaIndicatorsIds.length,
+    denialIds.length,
+    physicalWsymptomsIds.length,
+    suspensionofActivitiesIds.length,
+    
+  );
+
+  for (let i = 0; i < maxLength; i++) {
+    this.listPatientMonthlyPReportToSave.push({
+      recNo: 0,
+      patientCode: patientCode,
+      code: assessmentCode,
+      appearanceId: appearanceIds[i] || 0,
+      sensoriumId: sensoriumIds[i] || 0,
+      functioningId: functioningIds[i] || 0,
+      speechId: speechIds[i] || 0,
+      behaviorId: behaviorIds[i] || 0,
+      moodAffectId: moodAffectIds[i] || 0,
+      dailyPatternsId: dailyPatternsIds[i] || 0,
+      thoughtContentId: thoughtContentIds[i] || 0,
+      physicalIndicatorsId: physicaIndicatorsIds[i] || 0,
+      denialId: denialIds[i] || 0,
+      physicalWsymptomsId: physicalWsymptomsIds[i] || 0,
+      suspensionofActivitiesId: suspensionofActivitiesIds[i] || 0,
+      cravingsId: cravingsIds[i] || 0,
+      otherObservations: otherObservations?.trim() || '',
+      dateSubmitted: dateSubmitted
+    });
   }
+
+  const formData = {
+    listPatientMonthlyPReport: this.listPatientMonthlyPReportToSave
+  };
+
+  console.log('Submitting:', formData);
+
+  this.service.postPatientProgressReport(formData).subscribe({
+    next: () => {
+      this.hideModaviewPMMRModal();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Patient progress report submitted successfully!',
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
+
+      this.MentalStatusForm.reset();
+      this.isSubmitting = false;
+      this.refreshSwpnData();
+    },
+    error: (err) => {
+      console.error('Submission failed:', err);
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to submit report. Please try again.',
+        showConfirmButton: true
+      });
+
+      this.isSubmitting = false;
+    }
+  });
+}
+
+
+
     updateMonthlyReport(): void {
   const appearanceIds = this.appearanceId.value;
   const sensoriumIds = this.sensoriumId.value;
@@ -873,7 +973,10 @@ onSuspensionofActCheckboxChange(event: any, item: any): void {
   const physicalWsymptomsIds = this.physicalWsymptomsId.value;
   const suspensionofActivitiesIds = this.suspensionofActivitiesId.value;
   const cravingsIds = this.cravingsId.value;
-
+  const patientCode = this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+   const otherObservations = this.MentalStatusForm.get('otherObservations')?.value;
+  console.log('otherObservations:', otherObservations);
   const selectedAppearances = this.Appearance
     .filter(a => appearanceIds.includes(a.appearanceId))
     .map(a => ({ id: a.appearanceId}));
@@ -924,59 +1027,163 @@ onSuspensionofActCheckboxChange(event: any, item: any): void {
     .filter((s: any) => cravingsIds.includes(s.cravingsId))
     .map((s: any) => ({ id: s.cravingsId}));
 
-  this.listPatientMonthlyPReport = [{
+  this.listPatientMonthlyPReport = [
+  {
+    section: 'Appearance',
+    values: this.Appearance
+      .filter(a => appearanceIds.includes(a.appearanceId))
+      .map(a => ({ id: a.appearanceId, label: a.appearanceDesc }))
+  },
+  {
+    section: 'Sensorium',
+    values: this.Sensorium
+      .filter((s: any) => sensoriumIds.includes(s.sensoriumId))
+      .map((s: any) => ({ id: s.sensoriumId, label: s.sensoriumDesc }))
+  },
+  {
+    section: 'Functioning',
+    values: this.Functioning
+      .filter((s: any) => functioningIds.includes(s.functioningId))
+      .map((s: any) => ({ id: s.functioningId, label: s.functioningDesc }))
+  },
+  {
+    section: 'Speech',
+    values: this.Speech
+      .filter((s: any) => speechIds.includes(s.speechId))
+      .map((s: any) => ({ id: s.speechId, label: s.speechDesc }))
+  },
+  {
+    section: 'Behavior',
+    values: this.Behavior
+      .filter((s: any) => behaviorIds.includes(s.behaviorId))
+      .map((s: any) => ({ id: s.behaviorId, label: s.behaviorDesc }))
+  },
+  {
+    section: 'Mood/Affect',
+    values: this.MoodAffect
+      .filter((s: any) => moodAffectIds.includes(s.moodAffectId))
+      .map((s: any) => ({ id: s.moodAffectId, label: s.moodAffectDesc }))
+  },
+  {
+    section: 'Daily Patterns',
+    values: this.DailyPattern
+      .filter((s: any) => dailyPatternsIds.includes(s.dailyPatternsId))
+      .map((s: any) => ({ id: s.dailyPatternsId, label: s.dailyPatternsDesc }))
+  },
+  {
+    section: 'Thought Content',
+    values: this.ThoughtContent
+      .filter((s: any) => thoughtContentIds.includes(s.thoughtContentId))
+      .map((s: any) => ({ id: s.thoughtContentId, label: s.thoughtContentDesc }))
+  },
+  {
+    section: 'Physical Indicators',
+    values: this.PhysicIndicators
+      .filter((s: any) => physicaIndicatorsIds.includes(s.physicaIndicatorsId))
+      .map((s: any) => ({ id: s.physicaIndicatorsId, label: s.physicaIndicatorsDesc }))
+  },
+  {
+    section: 'Denial',
+    values: this.Denial
+      .filter((s: any) => denialIds.includes(s.denialId))
+      .map((s: any) => ({ id: s.denialId, label: s.denialDesc }))
+  },
+  {
+    section: 'Withdrawal Symptoms',
+    values: this.WithdSymptoms
+      .filter((s: any) => physicalWsymptomsIds.includes(s.physicalWsymptomsId))
+      .map((s: any) => ({ id: s.physicalWsymptomsId, label: s.physicalWsymptomsDesc }))
+  },
+  {
+    section: 'Suspension of Activities',
+    values: this.SuspenActivities
+      .filter((s: any) => suspensionofActivitiesIds.includes(s.suspensionofActivitiesId))
+      .map((s: any) => ({ id: s.suspensionofActivitiesId, label: s.suspensionofActivitiesDesc }))
+  },
+  {
+    section: 'Cravings',
+    values: this.Cravings
+      .filter((s: any) => cravingsIds.includes(s.cravingsId))
+      .map((s: any) => ({ id: s.cravingsId, label: s.cravingsDesc }))
+  },
+ {
+  section: 'Other Observations',
+ values: (otherObservations?.trim())
+    ? [{ label: otherObservations.trim() }]
+    : []
+}
 
-    appearanceId: appearanceIds,
-    sensoriumId: sensoriumIds,
-    functioningId: functioningIds,
-    speechId: speechIds,
-    behaviorId: behaviorIds,
-    moodAffectId: moodAffectIds,
-    dailyPatternsId: dailyPatternsIds,
-    thoughtContentId: thoughtContentIds,
-    physicaIndicatorsId: physicaIndicatorsIds,
-    denialId: denialIds,
-    physicalWsymptomsId: physicalWsymptomsIds,
-    suspensionofActivitiesId: suspensionofActivitiesIds,
-    cravingsId: cravingsIds,
-  }];
+];
+
+ const maxLength = Math.max(
+    appearanceIds.length, sensoriumIds.length, functioningIds.length,
+    speechIds.length, behaviorIds.length, moodAffectIds.length,
+    dailyPatternsIds.length, thoughtContentIds.length, physicaIndicatorsIds.length,
+    denialIds.length, physicalWsymptomsIds.length, suspensionofActivitiesIds.length,
+    cravingsIds.length
+  );
+
+  this.listPatientMonthlyPReportToSave = [];
+
+  // Define dateSubmitted before using it
+  const dateSubmitted = new Date().toISOString();
+
+  for (let i = 0; i < maxLength; i++) {
+    this.listPatientMonthlyPReportToSave.push({
+      recNo: 0,
+      patientCode: patientCode,
+      code: assessmentCode,
+      appearanceId: appearanceIds[i] || 0,
+      sensoriumId: sensoriumIds[i] || 0,
+      functioningId: functioningIds[i] || 0,
+      speechId: speechIds[i] || 0,
+      behaviorId: behaviorIds[i] || 0,
+      moodAffectId: moodAffectIds[i] || 0,
+      dailyPatternsId: dailyPatternsIds[i] || 0,
+      thoughtContentId: thoughtContentIds[i] || 0,
+      physicalIndicatorsId: physicaIndicatorsIds[i] || 0,
+      denialId: denialIds[i] || 0,
+      physicalWsymptomsId: physicalWsymptomsIds[i] || 0,
+      suspensionofActivitiesId: suspensionofActivitiesIds[i] || 0,
+      cravingsId: cravingsIds[i] || 0,
+      otherObservations: otherObservations?.trim() || '',
+      dateSubmitted: dateSubmitted
+    });
+  }
+
+  console.log('Updated Monthly Report:', this.listPatientMonthlyPReport);
+  console.log('To Save:', this.listPatientMonthlyPReportToSave);
+
 
   console.log('Updated Monthly Report:', this.listPatientMonthlyPReport);
 }
  goToSubstanceHisto(): void {
-  // Run just mental field validation
-  this.markFieldsAsTouchedMentalFields(this.mentalFields);
-
-
-  this.showTab('#RehabProgress'); // or your navigation logic
+  this.showTab('#RehabProgress'); 
 }
-
-
   goToPsychologicalSummary(): void {
-  this.markFieldsAsTouchedphysicalFields(this.physicalFields);
+  this.markFieldsAsTouched(this.physicalFields);
 
+  const hasInvalid = this.physicalFields.some(field => {
+    const control = this.MentalStatusForm.get(field);
+    return !control?.touched || (control?.value?.length || 0) === 0;
+  });
+
+  if (hasInvalid) {
+    return; 
+  }
 
   this.showTab('#PsychologicalSummary');
 }
 
-
-
-  markFieldsAsTouchedMentalFields(fields: string[]): void {
-  fields.forEach(mentalFields => {
-    const control = this.MentalStatusForm.get(mentalFields);
+ markFieldsAsTouched(fields: string[]): void {
+  fields.forEach(field => {
+    const control = this.MentalStatusForm.get(field);
     if (control) {
       control.markAsTouched();
     }
   });
 }
-markFieldsAsTouchedphysicalFields(fields: string[]): void {
-  fields.forEach(physicalFields => {
-    const control = this.MentalStatusForm.get(physicalFields);
-    if (control) {
-      control.markAsTouched();
-    }
-  });
-}
+
 
 requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | null {
    const requiredFields = [
@@ -987,7 +1194,8 @@ requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | nul
     'behaviorId',
     'moodAffectId',
     'dailyPatternsId',
-    'thoughtContentId'
+    'thoughtContentId',
+    'otherObservations'
   ];
 
   const invalidFields: string[] = [];

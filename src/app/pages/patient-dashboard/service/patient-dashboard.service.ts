@@ -12,6 +12,7 @@ export class PatientDashboardService {
  getExistedPatientData(patientCode: string, assessmentCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatient?patientCode=${patientCode}&assessmentCode=${assessmentCode}`);
   }
+  
   postPatientProgressReport(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDatasB/PostPatientProgressReport`, data);
   }
@@ -59,5 +60,8 @@ export class PatientDashboardService {
   }
   getrefCravings() {
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/getrefCravings`);
+  }
+  postPatientMonthlyProgressReport(patientCode: string, assessmentCode: string) {
+    return this.http.get(`${environment.apiUrl}PostPatientDatasD/PostPatientMonthlyProgressReport?patientCode=${patientCode}&assessmentCode=${assessmentCode}`);
   }
 }
