@@ -227,13 +227,13 @@
                     </tr>
                   </thead>
                    <tbody class="table-border-bottom-0">
-                    <tr *ngFor="let item of monthlyProgressData?.entity; let i = index">
+                    <tr *ngFor="let item of monthlyProgressData; let i = index">
                       <td class="text-center">{{ i + 1}}</td>
-                      <td class="text-center">{{ item.dateSubmitted | date:'MMMM' }}</td>
+                      <td class="text-center">{{ item.monthName}}</td>
                       <td class="text-center">
-                        <!-- <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewAddReportBtn(s.recNo)" title="View Details"  >
+                        <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewPerMonth(item.monthName)" title="View Details"  >
                           <i class="bx bx-show"></i> 
-                        </button> -->
+                        </button>
                       </td>
                     </tr>
                     
@@ -836,7 +836,44 @@
     
   </div>
 </div>
+ <div class="modal fade" id="viewMonthlyProgressPerMonth" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+      <div class="modal-content"> 
+        <div class="modal-header">
+          <h5 class="modal-title" id="backDropModalTitle">Psychological Progress Report</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <div class="card-body pt-4 custom-font" style="max-height: 400px; overflow-y: auto;">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Section</th>
+                <th>Selected Progress</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let section of listPatientMonthlyPReportView">
+                <td>{{ section.section }}</td>
+                <td>
+                  <ul class="mb-0" *ngIf="section.values && section.values.length > 0; else noData">
+                    <li *ngFor="let item of section.values">{{ item.label }}</li>
+                  </ul>
+                  <ng-template #noData><i>No data</i></ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+</div>
 
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 

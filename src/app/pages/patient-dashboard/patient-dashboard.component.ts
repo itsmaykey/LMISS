@@ -37,6 +37,7 @@ export class PatientDashboardComponent  implements OnInit {
   fb: FormBuilder;
   viewNotesModalInstance: any;
   backDropModalInstance: any;
+   backDropModalPerMonth: any;
   bacDropMPPRReport: any;
   viewNotesModal: any;
   viewPMMRModal: any;
@@ -63,6 +64,7 @@ export class PatientDashboardComponent  implements OnInit {
   Cravings: any = [];
   keys: any = [];
    listPatientMonthlyPReport: any[] = [];
+   listPatientMonthlyPReportView: any[] = [];
     listPatientMonthlyPReportToSave: any[] = [];
   physicalFields = [
     'physicaIndicatorsId',
@@ -103,6 +105,99 @@ export class PatientDashboardComponent  implements OnInit {
     this.fb = fb;
 
   }
+  viewPerMonth(monthName: string): void {
+  const patientCode = this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+
+  this.showModalPerMonth(); // Show modal
+
+  if (patientCode && assessmentCode) {
+    this.service.getExistedPatientMonthlyProgressReports(patientCode, assessmentCode).subscribe({
+      next: (response) => {
+        if (Array.isArray(response) && response.length > 0) {
+          const filtered = response.find((item: any) => item.monthName === monthName);
+
+          if (filtered) {
+            // Save month & year (for display purposes)
+            this['selectedMonthName'] = filtered.monthName;
+            this['selectedYear'] = filtered.year;
+
+            // Transform data into a format for table rendering
+            this.listPatientMonthlyPReportView = [
+              {
+                section: 'Appearances',
+                values: filtered.appearances?.map((a: any) => ({ label: a.appearanceDesc })) || []
+              },
+              {
+                section: 'Sensoriums',
+                values: filtered.sensoriums?.map((s: any) => ({ label: s.sensoriumDesc })) || []
+              },
+              {
+                section: 'Functioning',
+                values: filtered.functioning?.map((f: any) => ({ label: f.functioningDesc })) || []
+              },
+              {
+                section: 'Speech',
+                values: filtered.speech?.map((s: any) => ({ label: s.speechDesc })) || []
+              },
+              {
+                section: 'Behavior',
+                values: filtered.behavior?.map((b: any) => ({ label: b.behaviorDesc })) || []
+              },
+              {
+                section: 'Mood/Affect',
+                values: filtered.moodAffect?.map((m: any) => ({ label: m.moodAffectDesc })) || []
+              },
+              {
+                section: 'Daily Pattern',
+                values: filtered.dailyPattern?.map((d: any) => ({ label: d.dailyPatternsDesc })) || []
+              },
+              {
+                section: 'Thought Content',
+                values: filtered.thoughtContent?.map((t: any) => ({ label: t.thoughtContentDesc })) || []
+              },
+              {
+                section: 'Physical Indicator',
+                values: filtered.physicalIndicator?.map((p: any) => ({ label: p.physicaIndicatorsDesc })) || []
+              },
+              {
+                section: 'Denial',
+                values: filtered.denial?.map((d: any) => ({ label: d.denialDesc })) || []
+              },
+              {
+                section: 'Physical Withdrawal Symptoms',
+                values: filtered.physicalWSymptoms?.map((p: any) => ({ label: p.physicalWsymptomsDesc })) || []
+              },
+              {
+                section: 'Suspension of Activity',
+                values: filtered.suspensionofActivity?.map((s: any) => ({ label: s.suspensionofActivitiesDesc })) || []
+              },
+              {
+                section: 'Cravings',
+                values: filtered.cravings?.map((c: any) => ({ label: c.cravingsDesc })) || []
+              },
+              {
+                section: 'Other Observation',
+                values: filtered.otherObservation ? [{ label: filtered.otherObservation }] : []
+              }
+            ];
+
+            console.log('Monthly Progress Table Data:', this.listPatientMonthlyPReportView);
+          } else {
+            console.warn('No data found for month:', monthName);
+          }
+        } else {
+          console.warn('No progress data found.');
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching monthly progress report:', error);
+      }
+    });
+  } else {
+    console.error('Missing patientCode or assessmentCode in route parameters.');
+  }
+}
 
   viewNotes(recNo: string): void {
   const patientCode = this.route.snapshot.paramMap.get('patientCode');
@@ -142,7 +237,16 @@ export class PatientDashboardComponent  implements OnInit {
     console.error('Missing patientCode or assessmentCode in route parameters.');
   }
 }
+showModalPerMonth(): void {
+  const modalElement = document.getElementById('viewMonthlyProgressPerMonth');
+  if (!modalElement) {
+    console.error('Modal element not found in DOM');
+    return;
+  }
 
+  this.backDropModalPerMonth = new Modal(modalElement);
+  this.backDropModalPerMonth.show();
+}
 showModal(): void {
   const modalElement = document.getElementById('backDropModal');
   if (!modalElement) {
@@ -378,30 +482,28 @@ if (patientCode && assessmentCode) {
 } else {
   console.error('Missing patientCode or interventionCode in route parameters.');
 }
-  if (patientCode && assessmentCode) {
-      this.service.getExistedPatientMonthlyProgressReports(patientCode, assessmentCode)
-        .subscribe({
-          next: (response) => {
-            if (Array.isArray(response) && response.length > 0) {
-              this.monthlyProgressData = response[0];
-              console.log('Monthly Progress Data:', this.monthlyProgressData);
-              // If entity is object instead of array, convert it
-              if (
-                this.monthlyProgressData &&
-                this.monthlyProgressData.entity &&
-                !Array.isArray(this.monthlyProgressData.entity)
-              ) {
-                this.monthlyProgressData.entity = Object.values(this.monthlyProgressData.entity);
-              }
-            }
-          },
-          error: (err) => {
-            console.error('Error loading monthly progress:', err);
-          }
-        });
-    } else {
-      console.error('Missing patientCode or assessmentCode in route.');
-    }
+ if (patientCode && assessmentCode) {
+  this.service.getExistedPatientMonthlyProgressReports(patientCode, assessmentCode)
+    .subscribe({
+      next: (response) => {
+        if (Array.isArray(response) && response.length > 0) {
+          // store the entire array (all months)
+          this.monthlyProgressData = response;
+          console.log('Monthly Progress Data:', this.monthlyProgressData);
+        } else if ((response as any)?.entity && typeof (response as any).entity === 'object') {
+          // fallback if it's an object instead of array
+          this.monthlyProgressData = Object.values((response as any).entity);
+        } else {
+          console.warn('Unexpected response format', response);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading monthly progress:', err);
+      }
+    });
+} else {
+  console.error('Missing patientCode or assessmentCode in route.');
+}
     }
 getExisted(): void {
   this.route.paramMap.subscribe((params) => {
