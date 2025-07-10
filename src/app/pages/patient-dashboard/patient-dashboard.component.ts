@@ -33,22 +33,29 @@ export class PatientDashboardComponent  implements OnInit {
   userInfo: any; // <-- Declare userInfo property
   SocialWorkerNotesForm!: FormGroup;
   MentalStatusForm!: FormGroup;
+  NursingNotesForm!: FormGroup;
   isSubmitting = false;
   fb: FormBuilder;
   viewNotesModalInstance: any;
   backDropModalInstance: any;
+  backDropModalNursing: any;
    backDropModalPerMonth: any;
   bacDropMPPRReport: any;
   viewNotesModal: any;
   viewPMMRModal: any;
   swpnData: any;
   monthlyProgressData :any;
+  nursingNotesData :any;
   swpnDataEdit: any;
+  nursingNotesDataEdit: any;
   isLoading: boolean | undefined;
   swpnFormArray: any = [];
   isEditingTbleView = true;
-   isEditing : any;
- isEditingMPPRView = true;
+  isEditing : any;
+  isEditingNurseNotes : any;
+  isEditingNursingTbleView = true;
+  isEditingMPPRView = true;
+
     Appearance: any[] = [];
   Sensorium: any = [];
   Functioning: any = [];
@@ -63,6 +70,9 @@ export class PatientDashboardComponent  implements OnInit {
   SuspenActivities: any = [];
   Cravings: any = [];
   keys: any = [];
+  currentRecNo: number | null = null;
+  currentNursingRecNo: number | null = null;
+  isLoadingNotes: boolean = false;  
    listPatientMonthlyPReport: any[] = [];
    listPatientMonthlyPReportView: any[] = [];
     listPatientMonthlyPReportToSave: any[] = [];
@@ -80,17 +90,146 @@ export class PatientDashboardComponent  implements OnInit {
     'moodAffectId',
     'dailyPatternsId',
     'thoughtContentId',
-    'otherObservations'
+    'otherObservations',
+    'dateSubmitted'
   ];
-  onEditNotes() {
-    this.isEditing = true;
-     this.isEditingTbleView = false;
+onEditNotes(recNo: number, interventionDate: Date): void {
+  console.log('Editing record with recNo:', recNo);
+  console.log('Intervention Date:', interventionDate);
+  this.isEditing = true;
+  this.isEditingTbleView = false;
+   this.currentRecNo = recNo;
+   this['currentInterventionDate'] = interventionDate;
+  // Optional: find the full note object if needed
+  const note = this.swpnDataEdit?.entity?.find((n: any) => n.recNo === recNo);
+  if (note) {
+    this.SocialWorkerNotesForm.patchValue({
+      patientIntervention: note.patientIntervention,
+      patientActivies: note.patientActivies
+    });
   }
-  onSaveNotes(){
+}
+BackonEditNotes(): void {
+  this.isEditing = false;
+  this.isEditingTbleView = true;
+}
+onSaveNotes(): void {
      this.isEditing = false;
      this.isEditingTbleView = true;
-  }
+     this.isSubmitting = true;
 
+  const formData = {
+  ...this.SocialWorkerNotesForm.value,
+  recNo: this.currentRecNo,
+  interventionDate: this['currentInterventionDate'] ? formatDate(this['currentInterventionDate'], 'yyyy-MM-dd', 'en-US') : ''
+};
+
+  console.log(formData);
+
+  this.service.postPatientProgressReport( formData ).subscribe({
+
+    next: (response) => {
+      console.log('Form saved successfully:', response);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Patient progress report submitted successfully!',
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      });
+      this.hideModal();
+      this.SocialWorkerNotesForm.reset();
+      this.isSubmitting = false;
+      this.refreshSwpnData();
+    },
+    error: (error) => {
+      console.error('Error saving form:', error);
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to submit patient progress report. Please try again.',
+        showConfirmButton: true,
+        allowOutsideClick: true,
+        allowEscapeKey: true
+      });
+
+      this.isSubmitting = false;
+    }
+  });
+  }
+onEditNursingNotes(recNo: number, dateSubmitted: Date): void {
+  console.log('Editing record with recNo:', recNo);
+  console.log('Nursing Date:', dateSubmitted);
+  this.isEditingNurseNotes = true;
+  this.isEditingNursingTbleView = false;
+   this.currentNursingRecNo = recNo;
+   this['currentDateSubmitted'] = dateSubmitted;
+  // Optional: find the full note object if needed
+  const note = this.nursingNotesData?.entity?.find((n: any) => n.recNo === recNo);
+  if (note) {
+    this.NursingNotesForm.patchValue({
+      remarks: note.remarks
+    });
+  }
+}
+BackonEditNursingNotes(): void {
+  this.isEditingNurseNotes = false;
+  this.isEditingNursingTbleView = true;
+}
+onSaveNursingNotes(): void {
+     this.isEditingNurseNotes = false;
+     this.isEditingNursingTbleView = true;
+     this.isSubmitting = true;
+
+  const formData = {
+  ...this.NursingNotesForm.value,
+  recNo: this.currentNursingRecNo,
+  dateSubmitted: this['currentDateSubmitted'] ? formatDate(this['currentDateSubmitted'], 'yyyy-MM-dd', 'en-US') : ''
+};
+
+  console.log(formData);
+
+  this.service.postPatientNursingNotes( formData ).subscribe({
+
+    next: (response) => {
+      console.log('Form saved successfully:', response);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Nursing notes report submitted successfully!',
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      });
+       this.hideModalNursing();
+        this.NursingNotesForm.reset();
+        this.isSubmitting = false;
+        this.refreshNursingNotesData();
+    },
+    error: (error) => {
+      console.error('Error saving form:', error);
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to submit Nursing Notes. Please try again.',
+        showConfirmButton: true,
+        allowOutsideClick: true,
+        allowEscapeKey: true
+      });
+
+      this.isSubmitting = false;
+    }
+  });
+  }
   onSaveMPRR(){
      this.isEditingMPPRView = true;
   }
@@ -198,14 +337,54 @@ export class PatientDashboardComponent  implements OnInit {
     console.error('Missing patientCode or assessmentCode in route parameters.');
   }
 }
-
-  viewNotes(recNo: string): void {
+viewNursingNotes(recNo: string): void {
   const patientCode = this.route.snapshot.paramMap.get('patientCode');
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
 
   if (patientCode && assessmentCode) {
+    this.service.getExistedPatientNursingNotes(patientCode, assessmentCode).subscribe({
+      next: (response) => {
+        if (Array.isArray(response) && response.length > 0) {
+          this.nursingNotesDataEdit = response[0];
+        }
+
+        if (this.nursingNotesDataEdit && this.nursingNotesDataEdit.entity && !Array.isArray(this.nursingNotesDataEdit.entity)) {
+          this.nursingNotesDataEdit.entity = Object.values(this.nursingNotesDataEdit.entity);
+        }
+
+        if (recNo && this.nursingNotesDataEdit?.entity) {
+          this.nursingNotesDataEdit.entity = this.nursingNotesDataEdit.entity.filter((item: any) => item.recNo == recNo);
+        }
+
+        const modalElement = document.getElementById('viewEditNursingNotesModal');
+        if (!modalElement) {
+        console.error('Modal element not found in DOM');
+        return;
+      }
+
+     this['viewEditNursingNotesModal'] = new Modal(modalElement);
+      this['viewEditNursingNotesModal'].show();
+
+        console.log('Filtered entity for recNo:', this.nursingNotesDataEdit.entity);
+      },
+      error: (error) => {
+        console.error('Error fetching patient progress report:', error);
+      }
+    });
+  } else {
+    console.error('Missing patientCode or assessmentCode in route parameters.');
+  }
+}
+  viewNotes(recNo: string): void {
+  const patientCode = this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  this.isEditing = false;
+  this.isEditingTbleView = true;
+   this.isLoadingNotes = true;
+  if (patientCode && assessmentCode) {
     this.service.getPatientProgressReport(patientCode, assessmentCode).subscribe({
       next: (response) => {
+         this.isLoadingNotes = false;
         if (Array.isArray(response) && response.length > 0) {
           this.swpnDataEdit = response[0];
         }
@@ -253,9 +432,19 @@ showModal(): void {
     console.error('Modal element not found in DOM');
     return;
   }
-
+  this.SocialWorkerNotesForm.reset();
   this.backDropModalInstance = new Modal(modalElement);
   this.backDropModalInstance.show();
+}
+showNursingModal(): void {
+  const modalElement = document.getElementById('viewNusingNotesModal');
+  if (!modalElement) {
+    console.error('Modal element not found in DOM');
+    return;
+  }
+
+  this.backDropModalNursing = new Modal(modalElement);
+  this.backDropModalNursing.show();
 }
 showModalMPPR(): void {
   const modalElement = document.getElementById('viewPMMRModal');
@@ -269,6 +458,9 @@ showModalMPPR(): void {
 }
   hideModal(): void {
     this.backDropModalInstance?.hide();
+  }
+  hideModalNursing(): void {
+    this.backDropModalNursing?.hide();
   }
    hideModaviewPMMRModal(): void {
     this.bacDropMPPRReport?.hide();
@@ -312,6 +504,7 @@ showModalMPPR(): void {
   ngOnInit(): void {
      this.fetchAdditionalData();
     this.getExisted();
+    
      this.userInfo = this.authService.getUserInfo();
     console.log('Staff ID No:', this.userInfo.id);
 
@@ -323,11 +516,19 @@ showModalMPPR(): void {
     this.SocialWorkerNotesForm = this.fb.group({
       recNo: 0,
       patientCode: patientCode,
-      interventionCode: assessmentCode,
+      code: assessmentCode,
       staffIdNo: this.userInfo.id,
       patientActivies: ['', Validators.required],
       patientIntervention: ['', Validators.required],
       interventionDate: ['', Validators.required]
+    });
+    this.NursingNotesForm = this.fb.group({
+      recNo: 0,
+      patientCode: patientCode,
+      code: assessmentCode,
+      staffIdNo: this.userInfo.id,
+      remarks: ['', Validators.required],
+      dateSubmitted: ['', Validators.required]
     });
     this.MentalStatusForm = this.fb.group({
     appearanceId: this.fb.array([]),
@@ -344,6 +545,7 @@ showModalMPPR(): void {
     suspensionofActivitiesId: this.fb.array([]),
     cravingsId: this.fb.array([]),
      otherObservations: ['', Validators.required],
+     dateSubmitted: ['', Validators.required],
   }, {
     validators: [
       this.requireAtLeastOnePerFieldValidator.bind(this),
@@ -504,7 +706,85 @@ if (patientCode && assessmentCode) {
 } else {
   console.error('Missing patientCode or assessmentCode in route.');
 }
+if (patientCode && assessmentCode) {
+  this.service.getExistedPatientNursingNotes(patientCode, assessmentCode)
+    .subscribe({
+      next: (response) => {
+        if (Array.isArray(response) && response.length > 0) {
+          this.nursingNotesData = response[0];
+          console.log('Monthly nursingNotes Data:', this.nursingNotesData);
+        } else if ((response as any)?.entity && typeof (response as any).entity === 'object') {
+          this.nursingNotesData = Object.values((response as any).entity);
+        } else {
+          console.warn('Unexpected response format', response);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading nursingNotesData', err);
+      }
+    });
+} else {
+  console.error('Missing patientCode or assessmentCode in route.');
+}
     }
+    refreshNursingNotesData(): void {
+      const patientCode = this.route.snapshot.paramMap.get('patientCode');
+      const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+      if (patientCode && assessmentCode) {
+  this.service.getExistedPatientNursingNotes(patientCode, assessmentCode)
+    .subscribe({
+      next: (response) => {
+        if (Array.isArray(response) && response.length > 0) {
+          this.nursingNotesData = response[0];
+          console.log('Monthly nursingNotes Data:', this.nursingNotesData);
+        } else if ((response as any)?.entity && typeof (response as any).entity === 'object') {
+          this.nursingNotesData = Object.values((response as any).entity);
+        } else {
+          console.warn('Unexpected response format', response);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading nursingNotesData', err);
+      }
+    });
+} else {
+  console.error('Missing patientCode or assessmentCode in route.');
+}
+    }
+refreshMonthlyProgressData(): void {
+  const patientCode = this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  if (!patientCode || !assessmentCode) {
+    console.error('Missing patientCode or assessmentCode in route.');
+    return;
+  }
+
+  this.service.getExistedPatientMonthlyProgressReports(patientCode, assessmentCode)
+    .subscribe({
+      next: (response) => {
+        if (Array.isArray(response)) {
+          this.monthlyProgressData = response;
+          console.log('Monthly Progress Data:', this.monthlyProgressData);
+        } else if (response && typeof response === 'object' && 'entity' in response) {
+          const entity = (response as any).entity;
+          if (entity && typeof entity === 'object') {
+            this.monthlyProgressData = Object.values(entity);
+            console.log('Monthly Progress (from entity):', this.monthlyProgressData);
+          } else {
+            console.warn('Entity is not a valid object:', entity);
+            this.monthlyProgressData = [];
+          }
+        } else {
+          console.warn('Unexpected response format:', response);
+          this.monthlyProgressData = [];
+        }
+      },
+      error: (err) => {
+        console.error('Error loading monthly progress:', err);
+      }
+    });
+}
+
 getExisted(): void {
   this.route.paramMap.subscribe((params) => {
     const patientCode = params.get('patientCode');
@@ -611,6 +891,53 @@ tryprint(): void{
 // MPPRFormSubmit(): void {
 //     this.patientFormService.SocialWorkerNotesFormSubmit(this.SocialWorkerNotesForm);
 //   }
+  NursingNotesFormSubmit(): void {
+    if (this.NursingNotesForm.invalid) {
+      this.NursingNotesForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    const formData = this.NursingNotesForm.value;
+    console.log(formData);
+
+    this.service.postPatientNursingNotes( formData ).subscribe({
+
+      next: (response) => {
+        console.log('Form saved successfully:', response);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Patient nursing notes submitted successfully!',
+          timer: 1000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          allowEscapeKey: false
+        });
+        this.hideModalNursing();
+        this.NursingNotesForm.reset();
+        this.isSubmitting = false;
+        this.refreshNursingNotesData();
+      },
+      error: (error) => {
+        console.error('Error saving form:', error);
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to submit nursing notes. Please try again.',
+          showConfirmButton: true,
+          allowOutsideClick: true,
+          allowEscapeKey: true
+        });
+
+        this.isSubmitting = false;
+      }
+    });
+  }
 SocialWorkerNotesFormSubmit(): void {
   if (this.SocialWorkerNotesForm.invalid) {
     this.SocialWorkerNotesForm.markAllAsTouched();
@@ -724,6 +1051,9 @@ refreshSwpnData(): void {
   }
   get otherObservations() {
   return this.MentalStatusForm.get('otherObservations') as FormControl;
+}
+   dateSubmitted() {
+  return this.MentalStatusForm.get('dateSubmitted') as FormControl;
 }
 
 
@@ -1003,8 +1333,16 @@ onSaveNext(): void {
   const otherObservations = this.otherObservations.value || '';
   const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode') || '';
-  const dateSubmitted = new Date().toISOString();
+  const dateSubmitted = this.dateSubmitted().value;
   this.listPatientMonthlyPReportToSave = [];
+
+  // Compute dateSubmittedValue in the same way as updateMonthlyReport
+  let dateSubmittedValue: string | null = null;
+  if (dateSubmitted) {
+    const [year, month] = dateSubmitted.split('-').map(Number);
+    const fullDate = new Date(Date.UTC(year, month - 1, 1));
+    dateSubmittedValue = fullDate.toISOString();
+  }
 
   const maxLength = Math.max(
     appearanceIds.length,
@@ -1041,7 +1379,7 @@ onSaveNext(): void {
       suspensionofActivitiesId: suspensionofActivitiesIds[i] || 0,
       cravingsId: cravingsIds[i] || 0,
       otherObservations: otherObservations?.trim() || '',
-      dateSubmitted: dateSubmitted
+      dateSubmitted: dateSubmittedValue
     });
   }
 
@@ -1065,7 +1403,7 @@ onSaveNext(): void {
       this.hideModaviewPMMRModal();
       this.MentalStatusForm.reset();
       this.isSubmitting = false;
-      this.refreshSwpnData();
+      this.refreshMonthlyProgressData();
        this.listPatientMonthlyPReport = [];
     },
     error: (err) => {
@@ -1101,7 +1439,15 @@ onSaveNext(): void {
   const cravingsIds = this.cravingsId.value;
   const patientCode = this.route.snapshot.paramMap.get('patientCode');
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
-   const otherObservations = this.MentalStatusForm.get('otherObservations')?.value;
+  const otherObservations = this.MentalStatusForm.get('otherObservations')?.value;
+  const monthValue = this.MentalStatusForm.get('dateSubmitted')?.value;
+  let dateSubmittedValue: string | null = null;
+
+    if (monthValue) {
+      const [year, month] = monthValue.split('-').map(Number);
+      const fullDate = new Date(Date.UTC(year, month - 1, 1)); // 1st day, UTC midnight
+      dateSubmittedValue = fullDate.toISOString(); // "2025-07-01T00:00:00.000Z"
+    }
   const selectedAppearances = this.Appearance
     .filter(a => appearanceIds.includes(a.appearanceId))
     .map(a => ({ id: a.appearanceId}));
@@ -1152,93 +1498,109 @@ onSaveNext(): void {
     .filter((s: any) => cravingsIds.includes(s.cravingsId))
     .map((s: any) => ({ id: s.cravingsId}));
 
-  this.listPatientMonthlyPReport = [
-  {
-    section: 'Appearance',
-    values: this.Appearance
-      .filter(a => appearanceIds.includes(a.appearanceId))
-      .map(a => ({ id: a.appearanceId, label: a.appearanceDesc }))
-  },
-  {
-    section: 'Sensorium',
-    values: this.Sensorium
-      .filter((s: any) => sensoriumIds.includes(s.sensoriumId))
-      .map((s: any) => ({ id: s.sensoriumId, label: s.sensoriumDesc }))
-  },
-  {
-    section: 'Functioning',
-    values: this.Functioning
-      .filter((s: any) => functioningIds.includes(s.functioningId))
-      .map((s: any) => ({ id: s.functioningId, label: s.functioningDesc }))
-  },
-  {
-    section: 'Speech',
-    values: this.Speech
-      .filter((s: any) => speechIds.includes(s.speechId))
-      .map((s: any) => ({ id: s.speechId, label: s.speechDesc }))
-  },
-  {
-    section: 'Behavior',
-    values: this.Behavior
-      .filter((s: any) => behaviorIds.includes(s.behaviorId))
-      .map((s: any) => ({ id: s.behaviorId, label: s.behaviorDesc }))
-  },
-  {
-    section: 'Mood/Affect',
-    values: this.MoodAffect
-      .filter((s: any) => moodAffectIds.includes(s.moodAffectId))
-      .map((s: any) => ({ id: s.moodAffectId, label: s.moodAffectDesc }))
-  },
-  {
-    section: 'Daily Patterns',
-    values: this.DailyPattern
-      .filter((s: any) => dailyPatternsIds.includes(s.dailyPatternsId))
-      .map((s: any) => ({ id: s.dailyPatternsId, label: s.dailyPatternsDesc }))
-  },
-  {
-    section: 'Thought Content',
-    values: this.ThoughtContent
-      .filter((s: any) => thoughtContentIds.includes(s.thoughtContentId))
-      .map((s: any) => ({ id: s.thoughtContentId, label: s.thoughtContentDesc }))
-  },
-  {
-    section: 'Physical Indicators',
-    values: this.PhysicIndicators
-      .filter((s: any) => physicaIndicatorsIds.includes(s.physicaIndicatorsId))
-      .map((s: any) => ({ id: s.physicaIndicatorsId, label: s.physicaIndicatorsDesc }))
-  },
-  {
-    section: 'Denial',
-    values: this.Denial
-      .filter((s: any) => denialIds.includes(s.denialId))
-      .map((s: any) => ({ id: s.denialId, label: s.denialDesc }))
-  },
-  {
-    section: 'Withdrawal Symptoms',
-    values: this.WithdSymptoms
-      .filter((s: any) => physicalWsymptomsIds.includes(s.physicalWsymptomsId))
-      .map((s: any) => ({ id: s.physicalWsymptomsId, label: s.physicalWsymptomsDesc }))
-  },
-  {
-    section: 'Suspension of Activities',
-    values: this.SuspenActivities
-      .filter((s: any) => suspensionofActivitiesIds.includes(s.suspensionofActivitiesId))
-      .map((s: any) => ({ id: s.suspensionofActivitiesId, label: s.suspensionofActivitiesDesc }))
-  },
-  {
-    section: 'Cravings',
-    values: this.Cravings
-      .filter((s: any) => cravingsIds.includes(s.cravingsId))
-      .map((s: any) => ({ id: s.cravingsId, label: s.cravingsDesc }))
-  },
- {
-  section: 'Other Observations',
- values: (otherObservations?.trim())
-    ? [{ label: otherObservations.trim() }]
-    : []
-}
+  // Format the dateSubmittedValue as "Month Day, Year" (e.g., "June 1, 2025")
+  let formattedMonth = '';
+  if (dateSubmittedValue) {
+    const dateObj = new Date(dateSubmittedValue);
+    // Always display as the first day of the month
+    formattedMonth = dateObj.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long'
+    });
+  }
 
-];
+  this.listPatientMonthlyPReport = [
+    {
+      section: 'Appearance',
+      values: this.Appearance
+        .filter(a => appearanceIds.includes(a.appearanceId))
+        .map(a => ({ id: a.appearanceId, label: a.appearanceDesc }))
+    },
+    {
+      section: 'Sensorium',
+      values: this.Sensorium
+        .filter((s: any) => sensoriumIds.includes(s.sensoriumId))
+        .map((s: any) => ({ id: s.sensoriumId, label: s.sensoriumDesc }))
+    },
+    {
+      section: 'Functioning',
+      values: this.Functioning
+        .filter((s: any) => functioningIds.includes(s.functioningId))
+        .map((s: any) => ({ id: s.functioningId, label: s.functioningDesc }))
+    },
+    {
+      section: 'Speech',
+      values: this.Speech
+        .filter((s: any) => speechIds.includes(s.speechId))
+        .map((s: any) => ({ id: s.speechId, label: s.speechDesc }))
+    },
+    {
+      section: 'Behavior',
+      values: this.Behavior
+        .filter((s: any) => behaviorIds.includes(s.behaviorId))
+        .map((s: any) => ({ id: s.behaviorId, label: s.behaviorDesc }))
+    },
+    {
+      section: 'Mood/Affect',
+      values: this.MoodAffect
+        .filter((s: any) => moodAffectIds.includes(s.moodAffectId))
+        .map((s: any) => ({ id: s.moodAffectId, label: s.moodAffectDesc }))
+    },
+    {
+      section: 'Daily Patterns',
+      values: this.DailyPattern
+        .filter((s: any) => dailyPatternsIds.includes(s.dailyPatternsId))
+        .map((s: any) => ({ id: s.dailyPatternsId, label: s.dailyPatternsDesc }))
+    },
+    {
+      section: 'Thought Content',
+      values: this.ThoughtContent
+        .filter((s: any) => thoughtContentIds.includes(s.thoughtContentId))
+        .map((s: any) => ({ id: s.thoughtContentId, label: s.thoughtContentDesc }))
+    },
+    {
+      section: 'Physical Indicators',
+      values: this.PhysicIndicators
+        .filter((s: any) => physicaIndicatorsIds.includes(s.physicaIndicatorsId))
+        .map((s: any) => ({ id: s.physicaIndicatorsId, label: s.physicaIndicatorsDesc }))
+    },
+    {
+      section: 'Denial',
+      values: this.Denial
+        .filter((s: any) => denialIds.includes(s.denialId))
+        .map((s: any) => ({ id: s.denialId, label: s.denialDesc }))
+    },
+    {
+      section: 'Withdrawal Symptoms',
+      values: this.WithdSymptoms
+        .filter((s: any) => physicalWsymptomsIds.includes(s.physicalWsymptomsId))
+        .map((s: any) => ({ id: s.physicalWsymptomsId, label: s.physicalWsymptomsDesc }))
+    },
+    {
+      section: 'Suspension of Activities',
+      values: this.SuspenActivities
+        .filter((s: any) => suspensionofActivitiesIds.includes(s.suspensionofActivitiesId))
+        .map((s: any) => ({ id: s.suspensionofActivitiesId, label: s.suspensionofActivitiesDesc }))
+    },
+    {
+      section: 'Cravings',
+      values: this.Cravings
+        .filter((s: any) => cravingsIds.includes(s.cravingsId))
+        .map((s: any) => ({ id: s.cravingsId, label: s.cravingsDesc }))
+    },
+    {
+      section: 'Other Observations',
+      values: (otherObservations?.trim())
+        ? [{ label: otherObservations.trim() }]
+        : []
+    },
+    {
+      section: 'Month Selected',
+      values: (formattedMonth)
+        ? [{ label: formattedMonth }]
+        : []
+    }
+  ];
 
  const maxLength = Math.max(
     appearanceIds.length, sensoriumIds.length, functioningIds.length,
@@ -1250,8 +1612,8 @@ onSaveNext(): void {
 
   this.listPatientMonthlyPReportToSave = [];
 
-  // Define dateSubmitted before using it
-  const dateSubmitted = new Date().toISOString();
+  // Use the value from the form if available, otherwise fallback to current date
+  const dateSubmitted = dateSubmittedValue || new Date().toISOString();
 
   for (let i = 0; i < maxLength; i++) {
     this.listPatientMonthlyPReportToSave.push({
@@ -1320,7 +1682,8 @@ requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | nul
     'moodAffectId',
     'dailyPatternsId',
     'thoughtContentId',
-    'otherObservations'
+    'otherObservations',
+    'dateSubmitted'
   ];
 
   const invalidFields: string[] = [];
