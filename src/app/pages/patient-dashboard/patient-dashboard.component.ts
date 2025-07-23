@@ -34,6 +34,7 @@ export class PatientDashboardComponent  implements OnInit {
   SocialWorkerNotesForm!: FormGroup;
   MentalStatusForm!: FormGroup;
   NursingNotesForm!: FormGroup;
+  PsychEvaluationReportForm!: FormGroup;
   isSubmitting = false;
   fb: FormBuilder;
   viewNotesModalInstance: any;
@@ -41,8 +42,10 @@ export class PatientDashboardComponent  implements OnInit {
   backDropModalNursing: any;
    backDropModalPerMonth: any;
   bacDropMPPRReport: any;
+  bacDropPEReport: any;
   viewNotesModal: any;
   viewPMMRModal: any;
+  viewNursingNotesModal: any;
   swpnData: any;
   monthlyProgressData :any;
   nursingNotesData :any;
@@ -55,7 +58,7 @@ export class PatientDashboardComponent  implements OnInit {
   isEditingNurseNotes : any;
   isEditingNursingTbleView = true;
   isEditingMPPRView = true;
-
+  staffList: any[] = [];
     Appearance: any[] = [];
   Sensorium: any = [];
   Functioning: any = [];
@@ -76,6 +79,7 @@ export class PatientDashboardComponent  implements OnInit {
    listPatientMonthlyPReport: any[] = [];
    listPatientMonthlyPReportView: any[] = [];
     listPatientMonthlyPReportToSave: any[] = [];
+    listPatientPsychEvalReport: any[] = [];
   physicalFields = [
     'physicaIndicatorsId',
     'denialId',
@@ -93,22 +97,41 @@ export class PatientDashboardComponent  implements OnInit {
     'otherObservations',
     'dateSubmitted'
   ];
-onEditNotes(recNo: number, interventionDate: Date): void {
+onEditNotes(
+  recNo: number,
+  interventionDate: Date,
+  code: string,
+  patientCode: string,
+  
+  staffIdNo?: string
+): void {
   console.log('Editing record with recNo:', recNo);
   console.log('Intervention Date:', interventionDate);
+  console.log('Code:', code);
+  console.log('Patient Code:', patientCode);
+  console.log('Staff ID No:', staffIdNo);
+
   this.isEditing = true;
   this.isEditingTbleView = false;
-   this.currentRecNo = recNo;
-   this['currentInterventionDate'] = interventionDate;
-  // Optional: find the full note object if needed
+  this.currentRecNo = recNo;
+  this['currentInterventionDate'] = interventionDate;
+
   const note = this.swpnDataEdit?.entity?.find((n: any) => n.recNo === recNo);
+
   if (note) {
     this.SocialWorkerNotesForm.patchValue({
+      recNo: note.recNo,
+      patientCode: note.patientCode ?? this.route.snapshot.paramMap.get('patientCode') ?? this.ExistedPatientCode,
+      code: note.code ?? this.route.snapshot.paramMap.get('assessmentCode') ?? this.ExistedAssessmentCode,
+      staffIdNo: note.staffIdNo ?? this.userInfo?.id ?? '',
+      patientActivies: note.patientActivies,
       patientIntervention: note.patientIntervention,
-      patientActivies: note.patientActivies
+      interventionDate: note.interventionDate
     });
   }
 }
+
+
 BackonEditNotes(): void {
   this.isEditing = false;
   this.isEditingTbleView = true;
@@ -141,7 +164,7 @@ onSaveNotes(): void {
         allowOutsideClick: false,
         allowEscapeKey: false
       });
-      this.hideModal();
+      this.hideModalSWPNotes();
       this.SocialWorkerNotesForm.reset();
       this.isSubmitting = false;
       this.refreshSwpnData();
@@ -162,13 +185,29 @@ onSaveNotes(): void {
     }
   });
   }
-onEditNursingNotes(recNo: number, dateSubmitted: Date): void {
+onEditNursingNotes(
+  recNo: number,
+  dateSubmitted: Date,
+  code?: string,
+  patientCode?: string,
+  staffIdNo?: string
+): void {
   console.log('Editing record with recNo:', recNo);
   console.log('Nursing Date:', dateSubmitted);
+  console.log('Code:', code);
+  console.log('Patient Code:', patientCode);
+  console.log('Staff ID No:', staffIdNo);
+  
   this.isEditingNurseNotes = true;
   this.isEditingNursingTbleView = false;
-   this.currentNursingRecNo = recNo;
-   this['currentDateSubmitted'] = dateSubmitted;
+  this.currentNursingRecNo = recNo;
+  this['currentDateSubmitted'] = dateSubmitted;
+
+  // Optional: store additional values if needed
+  // this.currentCode = code;
+  // this.currentPatientCode = patientCode;
+  // this.currentStaffIdNo = staffIdNo;
+
   // Optional: find the full note object if needed
   const note = this.nursingNotesData?.entity?.find((n: any) => n.recNo === recNo);
   if (note) {
@@ -177,6 +216,7 @@ onEditNursingNotes(recNo: number, dateSubmitted: Date): void {
     });
   }
 }
+
 BackonEditNursingNotes(): void {
   this.isEditingNurseNotes = false;
   this.isEditingNursingTbleView = true;
@@ -209,7 +249,7 @@ onSaveNursingNotes(): void {
         allowOutsideClick: false,
         allowEscapeKey: false
       });
-       this.hideModalNursing();
+       this.hideModalNursingNotes();
         this.NursingNotesForm.reset();
         this.isSubmitting = false;
         this.refreshNursingNotesData();
@@ -355,16 +395,16 @@ viewNursingNotes(recNo: string): void {
         if (recNo && this.nursingNotesDataEdit?.entity) {
           this.nursingNotesDataEdit.entity = this.nursingNotesDataEdit.entity.filter((item: any) => item.recNo == recNo);
         }
-
-        const modalElement = document.getElementById('viewEditNursingNotesModal');
+         const modalElement = document.getElementById('viewEditNursingNotesModal');
         if (!modalElement) {
         console.error('Modal element not found in DOM');
         return;
       }
 
-     this['viewEditNursingNotesModal'] = new Modal(modalElement);
-      this['viewEditNursingNotesModal'].show();
+     this.viewNursingNotesModal = new Modal(modalElement);
+      this.viewNursingNotesModal.show();
 
+   
         console.log('Filtered entity for recNo:', this.nursingNotesDataEdit.entity);
       },
       error: (error) => {
@@ -442,7 +482,7 @@ showNursingModal(): void {
     console.error('Modal element not found in DOM');
     return;
   }
-
+  this.NursingNotesForm.reset();
   this.backDropModalNursing = new Modal(modalElement);
   this.backDropModalNursing.show();
 }
@@ -456,11 +496,27 @@ showModalMPPR(): void {
  this.bacDropMPPRReport = new Modal(modalElement);
   this.bacDropMPPRReport.show();
 }
+showModalPE(): void {
+  const modalElement = document.getElementById('viewPEModal');
+  if (!modalElement) {
+    console.error('Modal element not found in DOM');
+    return;
+  }
+
+ this.bacDropPEReport = new Modal(modalElement);
+  this.bacDropPEReport.show();
+}
   hideModal(): void {
     this.backDropModalInstance?.hide();
   }
   hideModalNursing(): void {
     this.backDropModalNursing?.hide();
+  }
+  hideModalSWPNotes(): void {
+    this.viewNotesModal?.hide();
+  }
+  hideModalNursingNotes(): void {
+    this.viewNursingNotesModal?.hide();
   }
    hideModaviewPMMRModal(): void {
     this.bacDropMPPRReport?.hide();
@@ -504,7 +560,7 @@ showModalMPPR(): void {
   ngOnInit(): void {
      this.fetchAdditionalData();
     this.getExisted();
-    
+     const today = new Date().toISOString().split('T')[0];
      this.userInfo = this.authService.getUserInfo();
     console.log('Staff ID No:', this.userInfo.id);
 
@@ -512,16 +568,31 @@ showModalMPPR(): void {
     const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
     const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
     this.ExistedPatientCode = patientCode;
+    this.ExistedAssessmentCode = assessmentCode || '';
+    console.log('Existed Patient Code:', this.ExistedPatientCode);
+    console.log('Existed Assessment Code:', this.ExistedAssessmentCode);
+     this.userInfo = this.authService.getUserInfo();
 
-    this.SocialWorkerNotesForm = this.fb.group({
-      recNo: 0,
-      patientCode: patientCode,
-      code: assessmentCode,
-      staffIdNo: this.userInfo.id,
-      patientActivies: ['', Validators.required],
-      patientIntervention: ['', Validators.required],
-      interventionDate: ['', Validators.required]
-    });
+       
+        this.SocialWorkerNotesForm = this.fb.group({
+            recNo: [0],
+            patientCode: [''],
+            code: [''],
+            staffIdNo: [''],
+            patientActivies: ['', Validators.required],
+            patientIntervention: ['', Validators.required],
+            interventionDate: ['', Validators.required]
+          });
+
+          // ✅ PATCH after form creation
+          this.SocialWorkerNotesForm.patchValue({
+            patientCode: patientCode || this.ExistedPatientCode,
+            code: assessmentCode || this.ExistedAssessmentCode,
+            staffIdNo: this.userInfo?.id || ''
+          });
+
+
+
     this.NursingNotesForm = this.fb.group({
       recNo: 0,
       patientCode: patientCode,
@@ -551,8 +622,30 @@ showModalMPPR(): void {
       this.requireAtLeastOnePerFieldValidator.bind(this),
       this.requireAtLeastOnePhysicalValidator.bind(this)
     ]
+    
+  });
+     this.PsychEvaluationReportForm = this.fb.group({
+   
+    dateSubmitted: ['', Validators.required],
+    purposeEval: ['', Validators.required],
+    AssessProced: ['', Validators.required],
+    Complaints: ['', Validators.required],
+    Background: ['', Validators.required],
+    PSYCHOMETRIC: ['', Validators.required],
+    SUMMARY: ['', Validators.required],
+    RECOMMENDATIONS: ['', Validators.required],
+    PreparedBy: ['', Validators.required],
+    ApprovedBy: ['', Validators.required],
+    NotedBy: ['', Validators.required],
+    NotedByBy: ['', Validators.required],
   });
 
+  this.PsychEvaluationReportForm.valueChanges.subscribe(() => {
+    this.updateSummaryTable();
+  });
+
+  // Optional: initialize immediately if form is already filled
+  this.updateSummaryTable();
     this.service.getrefAppearance().subscribe({
       next: (response) => {
         this.Appearance = response as any[];
@@ -815,6 +908,21 @@ getExisted(): void {
     }
   });
 }
+updateSummaryTable() {
+  const formData = this.PsychEvaluationReportForm.value;
+
+  this.listPatientPsychEvalReport = [
+
+    { section: 'Date Submitted', values: [{ label: formData.dateSubmitted || '' }] },
+    { section: 'II. Purpose for Evaluation', values: [{ label: formData.purposeEval || '' }] },
+    { section: 'III. Assessment Procedure', values: [{ label: formData.AssessProced || '' }] },
+    { section: 'IV. Presenting Problems/Complaints', values: [{ label: formData.Complaints || '' }] },
+    { section: 'V. Case Background', values: [{ label: formData.Background || '' }] },
+    { section: 'VI. PsychoMetric Evaluation', values: [{ label: formData.PSYCHOMETRIC || '' }] },
+    { section: 'VII. Summary', values: [{ label: formData.SUMMARY || '' }] },
+    { section: 'VIII. Recommendations', values: [{ label: formData.RECOMMENDATIONS || '' }] },
+  ];
+}
 
 checkExisted(): void {
     this.route.paramMap.subscribe((params) => {
@@ -939,6 +1047,7 @@ tryprint(): void{
     });
   }
 SocialWorkerNotesFormSubmit(): void {
+ 
   if (this.SocialWorkerNotesForm.invalid) {
     this.SocialWorkerNotesForm.markAllAsTouched();
     return;
@@ -946,6 +1055,13 @@ SocialWorkerNotesFormSubmit(): void {
 
   this.isSubmitting = true;
 
+  // Ensure patientCode, code, and staffIdNo are set before submit
+  this.SocialWorkerNotesForm.patchValue({
+    recNo: 0, // Reset recNo to 0 for new submission
+    patientCode: this.route.snapshot.paramMap.get('patientCode') || this.ExistedPatientCode,
+    code: this.route.snapshot.paramMap.get('assessmentCode') || this.ExistedAssessmentCode,
+    staffIdNo: this.userInfo?.id || ''
+  });
   const formData = this.SocialWorkerNotesForm.value;
   console.log(formData);
 
@@ -1644,9 +1760,27 @@ onSaveNext(): void {
 
   console.log('Updated Monthly Report:', this.listPatientMonthlyPReport);
 }
+onSavePE(): void {
+  if (this.PsychEvaluationReportForm.invalid) {
+    this.PsychEvaluationReportForm.markAllAsTouched();
+    console.warn('Form is invalid:', this.PsychEvaluationReportForm.errors);
+    return;
+  }
+
+  const formData = this.PsychEvaluationReportForm.value;
+  console.log('Submitted Psychological Evaluation Form:', formData);
+
+  // Optional: call save service here
+  // this.apiService.savePsychEval(formData).subscribe(...);
+}
+
  goToSubstanceHisto(): void {
   this.showTab('#RehabProgress'); 
 }
+goToEvalSum(): void {
+  this.showTab('#PsychologicalEvalSummary'); 
+}
+
   goToPsychologicalSummary(): void {
   this.markFieldsAsTouched(this.physicalFields);
 
@@ -1815,4 +1949,7 @@ private handleError(error: any, context: string): void {
     alert(`Failed to submit ${context} data. Please try again.`);
   }
 }
+
+   
+
 }
