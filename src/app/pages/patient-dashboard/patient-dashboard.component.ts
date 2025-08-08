@@ -35,6 +35,7 @@ export class PatientDashboardComponent  implements OnInit {
   MentalStatusForm!: FormGroup;
   NursingNotesForm!: FormGroup;
   PsychEvaluationReportForm!: FormGroup;
+  TreatPlanReportForm!: FormGroup;
   isSubmitting = false;
   fb: FormBuilder;
   viewNotesModalInstance: any;
@@ -43,6 +44,7 @@ export class PatientDashboardComponent  implements OnInit {
    backDropModalPerMonth: any;
   bacDropMPPRReport: any;
   bacDropPEReport: any;
+  bacDropPlanReport: any;
   viewNotesModal: any;
   viewPMMRModal: any;
   viewNursingNotesModal: any;
@@ -51,6 +53,9 @@ export class PatientDashboardComponent  implements OnInit {
   nursingNotesData :any;
   swpnDataEdit: any;
   nursingNotesDataEdit: any;
+  peEditData: any;
+  peData: any;
+  planData: any;
   isLoading: boolean | undefined;
   swpnFormArray: any = [];
   isEditingTbleView = true;
@@ -72,14 +77,26 @@ export class PatientDashboardComponent  implements OnInit {
   WithdSymptoms: any = [];
   SuspenActivities: any = [];
   Cravings: any = [];
+  domains: any = [];
+   users: any[] = [];
+    administratives: any[] = [];
+    psychologists: any[] = [];
+    psychometricians: any[] = [];
+    medicalOfficers: any[] = [];
+    nursing: any[] = [];
+     socialWelfare: any[] = [];
   keys: any = [];
   currentRecNo: number | null = null;
+  currentUserID: number | null = null;
   currentNursingRecNo: number | null = null;
+  currentPERecNo: number | null = null;
   isLoadingNotes: boolean = false;  
    listPatientMonthlyPReport: any[] = [];
    listPatientMonthlyPReportView: any[] = [];
     listPatientMonthlyPReportToSave: any[] = [];
     listPatientPsychEvalReport: any[] = [];
+    listTreatmentPlanReport: any[] = [];
+    listPsychologicalEvaluation: any[] = [];
   physicalFields = [
     'physicaIndicatorsId',
     'denialId',
@@ -105,11 +122,6 @@ onEditNotes(
   
   staffIdNo?: string
 ): void {
-  console.log('Editing record with recNo:', recNo);
-  console.log('Intervention Date:', interventionDate);
-  console.log('Code:', code);
-  console.log('Patient Code:', patientCode);
-  console.log('Staff ID No:', staffIdNo);
 
   this.isEditing = true;
   this.isEditingTbleView = false;
@@ -130,6 +142,122 @@ onEditNotes(
     });
   }
 }
+viewPEModalEdit(item: any): void {
+  const record = item.fullData ?? item;
+  const recNo = record.recNo;
+
+  console.log('record.recNo:', recNo);
+  console.log('this.peData:', this.peData);
+
+  // Search properly based on structure
+  const noteWrapper = this.peData?.find((n: any) =>
+    String(n.recNo ?? n.fullData?.recNo) === String(recNo)
+  );
+
+  const note = noteWrapper?.fullData ?? noteWrapper;
+  console.log("NOTE: ", note);
+
+  if (!note) {
+    console.warn('No matching note found for recNo:', recNo);
+    return;
+  }
+
+  this.isEditing = true;
+  this.isEditingTbleView = false;
+  this.currentPERecNo = recNo;
+
+  const formattedDateLog = this.formatDateLogMonthOnly(note.datelog);
+
+  this.PsychEvaluationReportForm.patchValue({
+    recNo: note.recNo,
+    patientCode: note.patientCode ?? this.route.snapshot.paramMap.get('patientCode') ?? this.ExistedPatientCode,
+    code: note.code ?? this.route.snapshot.paramMap.get('assessmentCode') ?? this.ExistedAssessmentCode,
+    datelog: formattedDateLog,
+    purposeForEvaluation: note.purposeForEvaluation,
+    assessmentProcedures: note.assessmentProcedures,
+    presentingProblems: note.presentingProblems,
+    caseBackground: note.caseBackground,
+    psychometricEvaluation: note.psychometricEvaluation,
+    summary: note.summary,
+    recommedation: note.recommedation,
+    preparedBy: note.preparedBy?.staffIdNo ?? '',
+    approvedBy: note.approvedBy?.staffIdNo ?? '',
+    notedByF: note.notedByF?.staffIdNo ?? '',
+    notedByS: note.notedByS?.staffIdNo ?? ''
+  });
+
+  setTimeout(() => {
+    const modalElement = document.getElementById('viewPEModal');
+    if (!modalElement) {
+      console.error('Modal element not found in DOM');
+      return;
+    }
+    this.bacDropPEReport = new Modal(modalElement);
+    this.bacDropPEReport.show();
+  }, 100);
+}
+
+viewPlanModalEdit(item: any): void {
+  const record = item.fullData ?? item;
+  const recNo = record.recNo;
+
+  console.log('record.recNo:', recNo);
+  console.log('this.planData:', this.planData);
+
+  // Search properly based on structure
+  const planWrapper = this.planData?.find((n: any) =>
+    String(n.recNo ?? n.fullData?.recNo) === String(recNo)
+  );
+
+  const plan = planWrapper?.fullData ?? planWrapper;
+  console.log("plan: ", plan);
+
+  if (!plan) {
+    console.warn('No matching note found for recNo:', recNo);
+    return;
+  }
+
+  this.TreatPlanReportForm.patchValue({
+    recNo: plan.recNo,
+    patientCode: plan.patientCode ?? this.route.snapshot.paramMap.get('patientCode') ?? this.ExistedPatientCode,
+    code: plan.code ?? this.route.snapshot.paramMap.get('assessmentCode') ?? this.ExistedAssessmentCode,
+    dateIdentified: this.formatDateTimeLocal(plan.dateIdentified),
+    patientDomainCode: plan.patientDomainCode,
+    patientGoal: plan.patientGoal,
+    patientProblem: plan.patientProblem,
+    patientObjective: plan.patientObjective,
+    patientIntervention: plan.patientIntervention,
+    // preparedBy: plan.staffIdNo ?? this.userInfo?.id ?? '',
+    preparedBy1: plan.approvedBy?.staffIdNo ?? '',
+    preparedBy2: plan.approvedBy?.staffIdNo ?? '',
+    notedBy: plan.notedBy?.staffIdNo ?? '',
+    approvedBy: plan.notedByS?.staffIdNo ?? ''
+  });
+  setTimeout(() => {
+    const modalElement = document.getElementById('viewPlanModal');
+    if (!modalElement) {
+      console.error('Modal element not found in DOM');
+      return;
+    }
+    this.bacDropPlanReport = new Modal(modalElement);
+    this.bacDropPlanReport.show();
+  }, 100);
+}
+formatDateTimeLocal(dateInput: string | Date): string {
+  const date = new Date(dateInput);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+formatDateLogMonthOnly(date: string): string {
+  const d = new Date(date);
+  return `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}`; // "2025-06"
+}
+
 
 
 BackonEditNotes(): void {
@@ -270,6 +398,135 @@ onSaveNursingNotes(): void {
     }
   });
   }
+  onSavePE(): void {
+    const form = this.PsychEvaluationReportForm;
+  const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
+    const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode') || '';
+    this.isSubmitting = true;
+  // Validate form
+  if (form.invalid) {
+    form.markAllAsTouched();
+    console.warn('Form is invalid:', form.errors);
+    return;
+  }
+  
+  const { datelog, ...restValues } = form.value;
+  const formattedDatelog = this.formatDateLog(datelog);
+  const formValues = this.PsychEvaluationReportForm.value;
+  const isNew = !form.value.recNo || form.value.recNo === 0;
+
+const payload = {
+    listPsychologicalEvaluation: [
+      {
+        ...formValues,
+      datelog: formattedDatelog,
+      patientCode,
+      code: assessmentCode,
+      recNo: isNew ? 0 : formValues.recNo
+      }
+    ]
+  };
+  console.log(payload);
+
+  this.service.postPatientPsychologicalEvaluationReport( payload ).subscribe({
+
+    next: (response) => {
+      console.log('Form saved successfully:', response);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+         text: 'Patient psychological evaluation submitted successfully!',
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      });
+       this.hideModalPe();
+        this.PsychEvaluationReportForm.reset();
+        this.isSubmitting = false;
+        this.refreshPEData();
+    },
+    error: (error) => {
+      console.error('Error saving form:', error);
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to submit Psychological Evaluation. Please try again.',
+        showConfirmButton: true,
+        allowOutsideClick: true,
+        allowEscapeKey: true
+      });
+
+      this.isSubmitting = false;
+    }
+  });
+  }
+   onSaveTreatment(): void {
+    const form = this.TreatPlanReportForm;
+  const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
+    const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode') || '';
+    this.isSubmitting = true;
+  // Validate form
+  if (form.invalid) {
+    form.markAllAsTouched();
+    console.warn('Form is invalid:', form.errors);
+    return;
+  }
+  
+  const formValues = this.TreatPlanReportForm.value;
+  const isNew = !form.value.recNo || form.value.recNo === 0;
+
+const payload = {
+    listPatientTreatmentPlan: [
+      {
+        ...formValues,
+      patientCode,
+      code: assessmentCode,
+      recNo: isNew ? 0 : formValues.recNo
+      }
+    ]
+  };
+  console.log(payload);
+
+  this.service.postPatientTreatmentPlan( payload ).subscribe({
+
+    next: (response) => {
+      console.log('Form saved successfully:', response);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+         text: 'Patient Treatment Plan submitted successfully!',
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      });
+       this.hideModalPlan();
+        this.TreatPlanReportForm.reset();
+        this.isSubmitting = false;
+        this.refreshPEData();
+    },
+    error: (error) => {
+      console.error('Error saving form:', error);
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to submit Treatment Plan. Please try again.',
+        showConfirmButton: true,
+        allowOutsideClick: true,
+        allowEscapeKey: true
+      });
+
+      this.isSubmitting = false;
+    }
+  });
+  }
   onSaveMPRR(){
      this.isEditingMPPRView = true;
   }
@@ -287,7 +544,7 @@ onSaveNursingNotes(): void {
   viewPerMonth(monthName: string): void {
   const patientCode = this.route.snapshot.paramMap.get('patientCode');
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
-
+  
   this.showModalPerMonth(); // Show modal
 
   if (patientCode && assessmentCode) {
@@ -415,6 +672,7 @@ viewNursingNotes(recNo: string): void {
     console.error('Missing patientCode or assessmentCode in route parameters.');
   }
 }
+
   viewNotes(recNo: string): void {
   const patientCode = this.route.snapshot.paramMap.get('patientCode');
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
@@ -456,6 +714,7 @@ viewNursingNotes(recNo: string): void {
     console.error('Missing patientCode or assessmentCode in route parameters.');
   }
 }
+
 showModalPerMonth(): void {
   const modalElement = document.getElementById('viewMonthlyProgressPerMonth');
   if (!modalElement) {
@@ -497,6 +756,7 @@ showModalMPPR(): void {
   this.bacDropMPPRReport.show();
 }
 showModalPE(): void {
+  this.PsychEvaluationReportForm.reset();
   const modalElement = document.getElementById('viewPEModal');
   if (!modalElement) {
     console.error('Modal element not found in DOM');
@@ -505,6 +765,17 @@ showModalPE(): void {
 
  this.bacDropPEReport = new Modal(modalElement);
   this.bacDropPEReport.show();
+}
+showModalPlan(): void {
+  this.TreatPlanReportForm.reset();
+  const modalElement = document.getElementById('viewPlanModal');
+  if (!modalElement) {
+    console.error('Modal element not found in DOM');
+    return;
+  }
+
+ this.bacDropPlanReport = new Modal(modalElement);
+  this.bacDropPlanReport.show();
 }
   hideModal(): void {
     this.backDropModalInstance?.hide();
@@ -521,7 +792,12 @@ showModalPE(): void {
    hideModaviewPMMRModal(): void {
     this.bacDropMPPRReport?.hide();
   }
-  
+  hideModalPe(): void {
+    this.bacDropPEReport?.hide();
+  }
+  hideModalPlan(): void {
+    this.bacDropPlanReport?.hide();
+  }
   backToApp(): void {
   if (!this.router) {
     console.error('Router is undefined!');
@@ -563,7 +839,7 @@ showModalPE(): void {
      const today = new Date().toISOString().split('T')[0];
      this.userInfo = this.authService.getUserInfo();
     console.log('Staff ID No:', this.userInfo.id);
-
+    this.currentUserID = this.userInfo.id;
 
     const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
     const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
@@ -625,27 +901,51 @@ showModalPE(): void {
     
   });
      this.PsychEvaluationReportForm = this.fb.group({
-   
-    dateSubmitted: ['', Validators.required],
-    purposeEval: ['', Validators.required],
-    AssessProced: ['', Validators.required],
-    Complaints: ['', Validators.required],
-    Background: ['', Validators.required],
-    PSYCHOMETRIC: ['', Validators.required],
-    SUMMARY: ['', Validators.required],
-    RECOMMENDATIONS: ['', Validators.required],
-    PreparedBy: ['', Validators.required],
-    ApprovedBy: ['', Validators.required],
-    NotedBy: ['', Validators.required],
-    NotedByBy: ['', Validators.required],
-  });
+  recNo: [0],
+  patientCode: [patientCode],
+  code: [assessmentCode],
+  datelog: ['', Validators.required],
+  purposeForEvaluation: ['', Validators.required],
+  assessmentProcedures: ['', Validators.required],
+  presentingProblems: ['', Validators.required],
+  caseBackground: ['', Validators.required],
+  psychometricEvaluation: ['', Validators.required],
+  summary: ['', Validators.required],
+  recommedation: ['', Validators.required],
+  preparedBy: ['', Validators.required],
+  approvedBy: ['', Validators.required],
+  notedByF: ['', Validators.required],
+  notedByS: ['', Validators.required],
+});
+console.log(this.PsychEvaluationReportForm.value);
+
+  this.TreatPlanReportForm = this.fb.group({
+  recNo: [0],
+  patientCode: [patientCode],
+  code: [assessmentCode],
+  dateIdentified: ['', Validators.required],
+  patientDomainCode: ['', Validators.required],
+  patientProblem: ['', Validators.required],
+  patientGoal: ['', Validators.required],
+  patientObjective: ['', Validators.required],
+  patientIntervention: ['', Validators.required],
+  preparedBy: ['', Validators.required],
+  notedBy: ['', Validators.required],
+  approvedBy: ['', Validators.required],
+  // notedByS: ['', Validators.required],
+});
+console.log(this.TreatPlanReportForm.value);
 
   this.PsychEvaluationReportForm.valueChanges.subscribe(() => {
     this.updateSummaryTable();
   });
+  this.TreatPlanReportForm.valueChanges.subscribe(() => {
+    this.updatePlanSummaryTable();
+  });
 
-  // Optional: initialize immediately if form is already filled
+   this.updatePlanSummaryTable();
   this.updateSummaryTable();
+  
     this.service.getrefAppearance().subscribe({
       next: (response) => {
         this.Appearance = response as any[];
@@ -751,7 +1051,50 @@ showModalPE(): void {
         console.error('Error:', error);
       },
     });
+     this.service.getrefDomain().subscribe({
+      next: (response) => {
+        this.domains = response;
+      },
+      error: (error) => {
+        console.error('Error:', error);
+      },
+    });
+     this.service.getUsers().subscribe({
+      next: (response) => {
+        console.log('API response:', response);
+
+        // Defensive check
+        if (Array.isArray(response)) {
+          this.users = response;
+
+          this.administratives = this.users.filter(user => user.posCode === 'sa001');
+          this.psychologists = this.users.filter(user => user.posCode === 'p002');
+          this.psychometricians = this.users.filter(user => user.posCode === 'pc001');
+          this.medicalOfficers = this.users.filter(user => user.posCode === 'mo001');
+          this.nursing = this.users.filter(user => user.posCode === 'n001');
+           this.socialWelfare = this.users.filter(user => user.posCode === 'sw001');
+          console.log('users:', this.users);
+          console.log('nursing:', this.nursing);
+          console.log('socialWelfare:', this.socialWelfare);
+          console.log('Medical Officers:', this.medicalOfficers);
+        } else {
+          console.error('Expected array, got:', typeof response);
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching users:', error);
+      },
+    });
+    
   }
+  formatDateToMonth(dateString: string): string {
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  return `${year}-${month}`; // e.g., "2025-07"
+}
+
  fetchAdditionalData(): void {
       const patientCode = this.route.snapshot.paramMap.get('patientCode');
       const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
@@ -819,6 +1162,64 @@ if (patientCode && assessmentCode) {
 } else {
   console.error('Missing patientCode or assessmentCode in route.');
 }
+if (patientCode && assessmentCode) {
+  this.service.getExistedPatientPsychologicalEvaluationReport(patientCode, assessmentCode).subscribe({
+    next: (response) => {
+  console.log('API full response:', response);
+
+  if (Array.isArray(response) && response.length > 0) {
+  this.peData = response.map((item) => {
+    const date = new Date(item.datelog);
+    const monthName = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+
+    return {
+      monthName,
+      fullData: item
+    };
+  });
+} else {
+  console.warn('No response data or not an array.');
+  this.peData = [];
+}
+
+
+  console.log('peData:', this.peData);
+},
+    error: (error) => {
+      console.error('Error fetching patient psychological evaluation report:', error);
+    }
+  });
+} else {
+  console.error('Missing patientCode or assessmentCode in route parameters.');
+}
+if (patientCode && assessmentCode) {
+  this.service.getExistedPatientTreatmentPlan(patientCode, assessmentCode).subscribe({
+    next: (response) => {
+      console.log('API full response:', response);
+
+      if (Array.isArray(response) && response.length > 0) {
+        this.planData = response.map((item) => ({
+        recNo: item.recNo,
+        patientDomainDesc: item.patientDomainDesc, 
+        dateIdentified: item.dateIdentified, 
+        fullData: item
+      }));
+
+      } else {
+        console.warn('No response data or not an array.');
+        this.planData = [];
+      }
+
+      console.log('planData by recNo:', this.planData);
+    },
+    error: (error) => {
+      console.error('Error fetching patient treatment plan:', error);
+    }
+  });
+} else {
+  console.error('Missing patientCode or assessmentCode in route parameters.');
+}
+
     }
     refreshNursingNotesData(): void {
       const patientCode = this.route.snapshot.paramMap.get('patientCode');
@@ -876,8 +1277,43 @@ refreshMonthlyProgressData(): void {
         console.error('Error loading monthly progress:', err);
       }
     });
+    
 }
+refreshPEData(): void {
+  const patientCode = this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  if (!patientCode || !assessmentCode) {
+    console.error('Missing patientCode or assessmentCode in route.');
+    return;
+  }
 
+  this.service.getExistedPatientPsychologicalEvaluationReport(patientCode, assessmentCode).subscribe({
+    next: (response) => {
+      console.log('API full response:', response);
+
+      if (Array.isArray(response) && response.length > 0) {
+        this.peData = response.map((item) => {
+          const date = new Date(item.datelog);
+          const monthName = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+
+          return {
+            monthName,
+            fullData: item
+          };
+        });
+      } else {
+        console.warn('No response data or not an array.');
+        this.peData = [];
+      }
+
+      console.log('peData:', this.peData);
+    },
+    error: (error) => {
+      console.error('Error fetching patient psychological evaluation report:', error);
+    }
+  });
+    
+}
 getExisted(): void {
   this.route.paramMap.subscribe((params) => {
     const patientCode = params.get('patientCode');
@@ -913,17 +1349,43 @@ updateSummaryTable() {
 
   this.listPatientPsychEvalReport = [
 
-    { section: 'Date Submitted', values: [{ label: formData.dateSubmitted || '' }] },
-    { section: 'II. Purpose for Evaluation', values: [{ label: formData.purposeEval || '' }] },
-    { section: 'III. Assessment Procedure', values: [{ label: formData.AssessProced || '' }] },
-    { section: 'IV. Presenting Problems/Complaints', values: [{ label: formData.Complaints || '' }] },
-    { section: 'V. Case Background', values: [{ label: formData.Background || '' }] },
-    { section: 'VI. PsychoMetric Evaluation', values: [{ label: formData.PSYCHOMETRIC || '' }] },
-    { section: 'VII. Summary', values: [{ label: formData.SUMMARY || '' }] },
-    { section: 'VIII. Recommendations', values: [{ label: formData.RECOMMENDATIONS || '' }] },
+    { section: 'Date Submitted', values: [{ label: formData.datelog || '' }] },
+    { section: 'II. Purpose for Evaluation', values: [{ label: formData.purposeForEvaluation || '' }] },
+    { section: 'III. Assessment Procedure', values: [{ label: formData.assessmentProcedures || '' }] },
+    { section: 'IV. Presenting Problems/Complaints', values: [{ label: formData.presentingProblems || '' }] },
+    { section: 'V. Case Background', values: [{ label: formData.caseBackground || '' }] },
+    { section: 'VI. PsychoMetric Evaluation', values: [{ label: formData.psychometricEvaluation || '' }] },
+    { section: 'VII. Summary', values: [{ label: formData.summary || '' }] },
+    { section: 'VIII. Recommendations', values: [{ label: formData.recommedation || '' }] },
   ];
 }
+updatePlanSummaryTable() {
+  const formData = this.TreatPlanReportForm.value;
+  const domainDesc = this.domains.find((d: any) => d.domainCode === formData.patientDomainCode)?.domainDesc || '';
+  this.listTreatmentPlanReport = [
 
+     { 
+      section: 'Date Identified', 
+      values: [
+        { 
+          label: formData.dateIdentified 
+            ? formatDate(formData.dateIdentified, 'MMMM d, yyyy', 'en-US') 
+            : '' 
+        }
+      ] 
+    },
+     { section: 'Domain', values: [{ label: domainDesc }] },
+    { section: 'Problem', values: [{ label: formData.patientProblem || '' }] },
+    { section: 'Goal', values: [{ label: formData.patientGoal || '' }] },
+    { section: 'Objective', values: [{ label: formData.patientObjective || '' }] },
+    { section: 'Intervention', values: [{ label: formData.patientIntervention || '' }] },
+    { section: 'prepared By', values: [{ label: formData.preparedBy || '' }] },
+    { section: '', values: [{ label: formData.preparedBy || '' }] },
+    { section: '', values: [{ label: formData.preparedBy || '' }] },
+    { section: 'notedBy', values: [{ label: formData.notedBy || '' }] },
+    { section: 'Approved By', values: [{ label: formData.approvedBy || '' }] },
+  ];
+}
 checkExisted(): void {
     this.route.paramMap.subscribe((params) => {
       const patientCode = params.get('patientCode');
@@ -996,9 +1458,6 @@ tryprint(): void{
 
 }
 
-// MPPRFormSubmit(): void {
-//     this.patientFormService.SocialWorkerNotesFormSubmit(this.SocialWorkerNotesForm);
-//   }
   NursingNotesFormSubmit(): void {
     if (this.NursingNotesForm.invalid) {
       this.NursingNotesForm.markAllAsTouched();
@@ -1046,6 +1505,8 @@ tryprint(): void{
       }
     });
   }
+
+  
 SocialWorkerNotesFormSubmit(): void {
  
   if (this.SocialWorkerNotesForm.invalid) {
@@ -1760,19 +2221,14 @@ onSaveNext(): void {
 
   console.log('Updated Monthly Report:', this.listPatientMonthlyPReport);
 }
-onSavePE(): void {
-  if (this.PsychEvaluationReportForm.invalid) {
-    this.PsychEvaluationReportForm.markAllAsTouched();
-    console.warn('Form is invalid:', this.PsychEvaluationReportForm.errors);
-    return;
-  }
 
-  const formData = this.PsychEvaluationReportForm.value;
-  console.log('Submitted Psychological Evaluation Form:', formData);
+ private formatDateLog = (datelog: string | null): string | null => {
+  if (!datelog || !datelog.includes('-')) return null;
+  const [year, month] = datelog.split('-').map(Number);
+  const fullDate = new Date(Date.UTC(year, month - 1, 1));
+  return fullDate.toISOString();
+};
 
-  // Optional: call save service here
-  // this.apiService.savePsychEval(formData).subscribe(...);
-}
 
  goToSubstanceHisto(): void {
   this.showTab('#RehabProgress'); 
@@ -1780,7 +2236,9 @@ onSavePE(): void {
 goToEvalSum(): void {
   this.showTab('#PsychologicalEvalSummary'); 
 }
-
+goToPlanSummary(): void {
+  this.showTab('#PlanSummary'); 
+}
   goToPsychologicalSummary(): void {
   this.markFieldsAsTouched(this.physicalFields);
 
