@@ -59,25 +59,38 @@
             <!-- <span class="badge rounded-pill bg-danger ms-auto">5</span> -->
           </a>
         </li>
-
+    
         <!-- Layouts -->
         <!-- Components -->
-        <li [hidden]="userRegHidden" class="menu-header small text-uppercase"><span class="menu-header-text">user dashboard</span></li>
+     <!-- User Dashboard Header -->
+<li *ngIf="!userRegHidden" class="menu-header small text-uppercase">
+  <span class="menu-header-text">User Dashboard</span>
+</li>
 
-        <li [hidden]="userRegHidden" class="menu-item" [ngClass]="{'active': isActive('/userReg')}" (click)="toggleMenu($event)">
+    <!-- User Management Menu -->
+    <li *ngIf="!userRegHidden"
+        class="menu-item"
+        [ngClass]="{'active': isActive('/userReg')}"
+        (click)="toggleMenu($event)">
+      
+      <a routerLink="/userReg" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-user"></i>
+        <div class="text-truncate" data-i18n="userReg">User Management</div>
+        <i class="bx"
+          [ngClass]="{'bx-chevron-down': isMenuOpen, 'bx-chevron-right': !isMenuOpen}"
+          style="padding-left:10%;"></i>
+      </a>
+
+      <!-- Submenu -->
+      <ul class="menu-sub" [ngClass]="{'show': isMenuOpen}">
+        <li class="menu-item" [ngClass]="{'active': isActive('/userReg')}">
           <a routerLink="/userReg" class="menu-link">
-            <i class="menu-icon tf-icons bx bx-user"></i>
-            <div class="text-truncate" data-i18n="userReg">User Management</div>
-            <i class="bx" [ngClass]="{'bx-chevron-down': isMenuOpen, 'bx-chevron-right': !isMenuOpen}" style="padding-left:10%;"></i>
+            <div class="text-truncate" data-i18n="Analytics">Analytics</div>
           </a>
-          <ul class="menu-sub" [ngClass]="{'show': isMenuOpen}">
-            <li class="menu-item active">
-              <a routerLink="/dashboard" class="menu-link">
-                <div class="text-truncate" data-i18n="Analytics">Analytics</div>
-              </a>
-            </li>
-          </ul>
         </li>
+      </ul>
+    </li>
+
 
         <!-- <li class="menu-item ">
           <a routerLink="/houseowners" class="menu-link menu-toggle">

@@ -36,6 +36,8 @@ export class PatientDashboardComponent  implements OnInit {
   NursingNotesForm!: FormGroup;
   PsychEvaluationReportForm!: FormGroup;
   TreatPlanReportForm!: FormGroup;
+  DocOrderForm!: FormGroup;
+   MedicationForm!: FormGroup;
   isSubmitting = false;
   fb: FormBuilder;
   viewNotesModalInstance: any;
@@ -45,6 +47,8 @@ export class PatientDashboardComponent  implements OnInit {
   bacDropMPPRReport: any;
   bacDropPEReport: any;
   bacDropPlanReport: any;
+  backDropModalDocOrder: any;
+  backDropModalMedication: any;
   viewNotesModal: any;
   viewPMMRModal: any;
   viewNursingNotesModal: any;
@@ -96,6 +100,8 @@ export class PatientDashboardComponent  implements OnInit {
     listPatientMonthlyPReportToSave: any[] = [];
     listPatientPsychEvalReport: any[] = [];
     listTreatmentPlanReport: any[] = [];
+    listDoctorOrderReport: any[] = [];
+    listMedicationReport: any[] = [];
     listPsychologicalEvaluation: any[] = [];
   physicalFields = [
     'physicaIndicatorsId',
@@ -112,7 +118,12 @@ export class PatientDashboardComponent  implements OnInit {
     'dailyPatternsId',
     'thoughtContentId',
     'otherObservations',
-    'dateSubmitted'
+    'dateSubmitted',
+ 
+  ];
+  asignatoryFields = [
+    'notedBy',
+    'preparedBy'
   ];
 onEditNotes(
   recNo: number,
@@ -227,11 +238,11 @@ viewPlanModalEdit(item: any): void {
     patientProblem: plan.patientProblem,
     patientObjective: plan.patientObjective,
     patientIntervention: plan.patientIntervention,
-    // preparedBy: plan.staffIdNo ?? this.userInfo?.id ?? '',
-    preparedBy1: plan.approvedBy?.staffIdNo ?? '',
-    preparedBy2: plan.approvedBy?.staffIdNo ?? '',
+    preparedBy: plan.preparedBy ?.staffIdNo ?? '',
+    nurseCode: plan.nurseCode?.staffIdNo ?? '',
+    psychometricianCode: plan.psychometricianCode?.staffIdNo ?? '',
     notedBy: plan.notedBy?.staffIdNo ?? '',
-    approvedBy: plan.notedByS?.staffIdNo ?? ''
+    approvedBy: plan.approvedBy?.staffIdNo ?? ''
   });
   setTimeout(() => {
     const modalElement = document.getElementById('viewPlanModal');
@@ -541,6 +552,19 @@ const payload = {
     this.fb = fb;
 
   }
+ 
+    getStaffName(staffData: any, staffType: 'medical' | 'psychologist'): string {
+      if (staffData && typeof staffData === 'object') {
+        return staffData.uFullName || staffData.fullName || staffData.firstName + ' ' + staffData.lastName || staffData.name || 'Unknown Staff';
+      }
+      
+      const staffId = Number(staffData);
+      if (!staffId) return 'Not specified';
+      
+      const staffArray = staffType === 'medical' ? this.medicalOfficers : this.psychologists;
+      const staff = staffArray?.find(s => s.staffIdNo === staffId);
+      return staff ? staff.uFullName : 'Unknown Staff';
+    }
   viewPerMonth(monthName: string): void {
   const patientCode = this.route.snapshot.paramMap.get('patientCode');
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
@@ -615,7 +639,16 @@ const payload = {
               {
                 section: 'Other Observation',
                 values: filtered.otherObservation ? [{ label: filtered.otherObservation }] : []
-              }
+              },
+               {
+              section: 'Noted By',
+              values: filtered.notedBy ? [{ label: this.getStaffName(filtered.notedBy, 'medical') }] : []
+            },
+            {
+              section: 'Prepared By',
+              values: filtered.preparedBy ? [{ label: this.getStaffName(filtered.preparedBy, 'psychologist') }] : []
+            }
+            
             ];
 
             console.log('Monthly Progress Table Data:', this.listPatientMonthlyPReportView);
@@ -777,6 +810,28 @@ showModalPlan(): void {
  this.bacDropPlanReport = new Modal(modalElement);
   this.bacDropPlanReport.show();
 }
+showModalDocOrder(): void {
+  this.DocOrderForm.reset();
+  const modalElement = document.getElementById('viewDocOrderModal');
+  if (!modalElement) {
+    console.error('Modal element not found in DOM');
+    return;
+  }
+
+ this.backDropModalDocOrder = new Modal(modalElement);
+  this.backDropModalDocOrder.show();
+}
+showModalMedication(): void {
+  this.MedicationForm.reset();
+  const modalElement = document.getElementById('viewMedicationModal');
+  if (!modalElement) {
+    console.error('Modal element not found in DOM');
+    return;
+  }
+
+ this.backDropModalMedication = new Modal(modalElement);
+  this.backDropModalMedication.show();
+}
   hideModal(): void {
     this.backDropModalInstance?.hide();
   }
@@ -797,6 +852,9 @@ showModalPlan(): void {
   }
   hideModalPlan(): void {
     this.bacDropPlanReport?.hide();
+  }
+  hideModalDoctorOrder(): void {
+    this.backDropModalDocOrder?.hide();
   }
   backToApp(): void {
   if (!this.router) {
@@ -891,8 +949,10 @@ showModalPlan(): void {
     physicalWsymptomsId: this.fb.array([]),
     suspensionofActivitiesId: this.fb.array([]),
     cravingsId: this.fb.array([]),
-     otherObservations: ['', Validators.required],
-     dateSubmitted: ['', Validators.required],
+    otherObservations: ['', Validators.required],
+    dateSubmitted: ['', Validators.required],
+    notedBy: ['', Validators.required],
+    preparedBy: ['', Validators.required],
   }, {
     validators: [
       this.requireAtLeastOnePerFieldValidator.bind(this),
@@ -932,9 +992,44 @@ console.log(this.PsychEvaluationReportForm.value);
   preparedBy: ['', Validators.required],
   notedBy: ['', Validators.required],
   approvedBy: ['', Validators.required],
-  // notedByS: ['', Validators.required],
+  nurseCode: ['', Validators.required],
+  psychometricianCode: ['', Validators.required],
 });
 console.log(this.TreatPlanReportForm.value);
+ this.DocOrderForm = this.fb.group({
+  recNo: [0],
+  patientCode: [patientCode],
+  code: [assessmentCode],
+  dateIdentified: ['', Validators.required],
+  patientDomainCode: ['', Validators.required],
+  patientProblem: ['', Validators.required],
+  patientGoal: ['', Validators.required],
+  patientObjective: ['', Validators.required],
+  patientIntervention: ['', Validators.required],
+  preparedBy: ['', Validators.required],
+  notedBy: ['', Validators.required],
+  approvedBy: ['', Validators.required],
+  nurseCode: ['', Validators.required],
+  psychometricianCode: ['', Validators.required],
+});
+console.log(this.DocOrderForm.value);
+ this.MedicationForm = this.fb.group({
+  recNo: [0],
+  patientCode: [patientCode],
+  code: [assessmentCode],
+  dateIdentified: ['', Validators.required],
+  patientDomainCode: ['', Validators.required],
+  patientProblem: ['', Validators.required],
+  patientGoal: ['', Validators.required],
+  patientObjective: ['', Validators.required],
+  patientIntervention: ['', Validators.required],
+  preparedBy: ['', Validators.required],
+  notedBy: ['', Validators.required],
+  approvedBy: ['', Validators.required],
+  nurseCode: ['', Validators.required],
+  psychometricianCode: ['', Validators.required],
+});
+console.log(this.MedicationForm.value);
 
   this.PsychEvaluationReportForm.valueChanges.subscribe(() => {
     this.updateSummaryTable();
@@ -942,10 +1037,12 @@ console.log(this.TreatPlanReportForm.value);
   this.TreatPlanReportForm.valueChanges.subscribe(() => {
     this.updatePlanSummaryTable();
   });
-
+this.DocOrderForm.valueChanges.subscribe(() => {
+    this.updateOrderSummaryTable();
+  });
    this.updatePlanSummaryTable();
   this.updateSummaryTable();
-  
+  this.updateOrderSummaryTable();
     this.service.getrefAppearance().subscribe({
       next: (response) => {
         this.Appearance = response as any[];
@@ -1380,10 +1477,62 @@ updatePlanSummaryTable() {
     { section: 'Objective', values: [{ label: formData.patientObjective || '' }] },
     { section: 'Intervention', values: [{ label: formData.patientIntervention || '' }] },
     { section: 'prepared By', values: [{ label: formData.preparedBy || '' }] },
-    { section: '', values: [{ label: formData.preparedBy || '' }] },
-    { section: '', values: [{ label: formData.preparedBy || '' }] },
-    { section: 'notedBy', values: [{ label: formData.notedBy || '' }] },
-    { section: 'Approved By', values: [{ label: formData.approvedBy || '' }] },
+    { section: 'Nurse', values: [{ label: formData.nurseCode || '' }] },
+    { section: 'Psychometrician', values: [{ label: formData.psychometricianCode || '' }] },
+    { section: 'Administrative Officer', values: [{ label: formData.notedBy || '' }] },
+    { section: 'Medical Officer', values: [{ label: formData.approvedBy || '' }] },
+  ];
+}
+updateOrderSummaryTable() {
+  const formData = this.DocOrderForm.value;
+  const domainDesc = this.domains.find((d: any) => d.domainCode === formData.patientDomainCode)?.domainDesc || '';
+  this.listDoctorOrderReport = [
+
+     { 
+      section: 'Date Ordered', 
+      values: [
+        { 
+          label: formData.dateIdentified 
+            ? formatDate(formData.dateIdentified, 'MMMM d, yyyy', 'en-US') 
+            : '' 
+        }
+      ] 
+    },
+     { section: 'Subjective', values: [{ label: domainDesc }] },
+    { section: 'Physical Examination', values: [{ label: formData.patientProblem || '' }] },
+    { section: 'Assessment', values: [{ label: formData.patientGoal || '' }] },
+    { section: 'Intervention', values: [{ label: formData.patientIntervention || '' }] },
+    { section: 'Ordered By', values: [{ label: formData.preparedBy || '' }] },
+    { section: 'Carry Out by', values: [{ label: formData.nurseCode || '' }] },
+    // { section: 'Psychometrician', values: [{ label: formData.psychometricianCode || '' }] },
+    // { section: 'Administrative Officer', values: [{ label: formData.notedBy || '' }] },
+    // { section: 'Medical Officer', values: [{ label: formData.approvedBy || '' }] },
+  ];
+}
+updateMedicationSummaryTable() {
+  const formData = this.MedicationForm.value;
+  const domainDesc = this.domains.find((d: any) => d.domainCode === formData.patientDomainCode)?.domainDesc || '';
+  this.listMedicationReport = [
+
+     { 
+      section: 'Date Ordered', 
+      values: [
+        { 
+          label: formData.dateIdentified 
+            ? formatDate(formData.dateIdentified, 'MMMM d, yyyy', 'en-US') 
+            : '' 
+        }
+      ] 
+    },
+     { section: 'Subjective', values: [{ label: domainDesc }] },
+    { section: 'Physical Examination', values: [{ label: formData.patientProblem || '' }] },
+    { section: 'Assessment', values: [{ label: formData.patientGoal || '' }] },
+    { section: 'Intervention', values: [{ label: formData.patientIntervention || '' }] },
+    { section: 'Physician', values: [{ label: formData.preparedBy || '' }] },
+    { section: 'Carry Out by', values: [{ label: formData.nurseCode || '' }] },
+    // { section: 'Psychometrician', values: [{ label: formData.psychometricianCode || '' }] },
+    // { section: 'Administrative Officer', values: [{ label: formData.notedBy || '' }] },
+    // { section: 'Medical Officer', values: [{ label: formData.approvedBy || '' }] },
   ];
 }
 checkExisted(): void {
@@ -1631,6 +1780,12 @@ refreshSwpnData(): void {
 }
    dateSubmitted() {
   return this.MentalStatusForm.get('dateSubmitted') as FormControl;
+}
+  get notedBy() {
+  return this.MentalStatusForm.get('notedBy') as FormControl;
+}
+  get preparedBy() {
+  return this.MentalStatusForm.get('preparedBy') as FormControl;
 }
 
 
@@ -1892,6 +2047,15 @@ onSuspensionofActCheckboxChange(event: any, item: any): void {
   this.updateMonthlyReport();
 }
 onSaveNext(): void {
+ this.markFieldsAsTouched(this.asignatoryFields);
+ const hasInvalid = this.asignatoryFields.some(field => {
+    const control = this.MentalStatusForm.get(field);
+    return !control?.touched || (control?.value?.length || 0) === 0;
+  });
+
+  if (hasInvalid) {
+    return; 
+  }
   this.isSubmitting = true;
 
   const appearanceIds = this.appearanceId.value;
@@ -1912,6 +2076,10 @@ onSaveNext(): void {
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode') || '';
   const dateSubmitted = this.dateSubmitted().value;
   this.listPatientMonthlyPReportToSave = [];
+  
+  // Convert to integers with proper fallback
+  const notedBy = parseInt(this.notedBy.value) || 0;
+  const preparedBy = parseInt(this.preparedBy.value) || 0;
 
   // Compute dateSubmittedValue in the same way as updateMonthlyReport
   let dateSubmittedValue: string | null = null;
@@ -1934,7 +2102,7 @@ onSaveNext(): void {
     denialIds.length,
     physicalWsymptomsIds.length,
     suspensionofActivitiesIds.length,
-    
+    cravingsIds.length,
   );
 
   for (let i = 0; i < maxLength; i++) {
@@ -1956,7 +2124,9 @@ onSaveNext(): void {
       suspensionofActivitiesId: suspensionofActivitiesIds[i] || 0,
       cravingsId: cravingsIds[i] || 0,
       otherObservations: otherObservations?.trim() || '',
-      dateSubmitted: dateSubmittedValue
+      dateSubmitted: dateSubmittedValue,
+      notedBy: notedBy,
+      preparedBy: preparedBy
     });
   }
 
@@ -1968,7 +2138,6 @@ onSaveNext(): void {
 
   this.service.postPatientMonthlyProgressReport(formData).subscribe({
     next: () => {
-
       Swal.fire({
         icon: 'success',
         title: 'Success',
@@ -1981,7 +2150,7 @@ onSaveNext(): void {
       this.MentalStatusForm.reset();
       this.isSubmitting = false;
       this.refreshMonthlyProgressData();
-       this.listPatientMonthlyPReport = [];
+      this.listPatientMonthlyPReport = [];
     },
     error: (err) => {
       console.error('Submission failed:', err);
@@ -1998,9 +2167,7 @@ onSaveNext(): void {
   });
 }
 
-
-
-    updateMonthlyReport(): void {
+  updateMonthlyReport(): void {
   const appearanceIds = this.appearanceId.value;
   const sensoriumIds = this.sensoriumId.value;
   const functioningIds = this.functioningId.value;
@@ -2018,6 +2185,8 @@ onSaveNext(): void {
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
   const otherObservations = this.MentalStatusForm.get('otherObservations')?.value;
   const monthValue = this.MentalStatusForm.get('dateSubmitted')?.value;
+  const notedBy = this.notedBy.value;
+  const preparedBy = this.preparedBy.value;
   let dateSubmittedValue: string | null = null;
 
     if (monthValue) {
@@ -2074,7 +2243,16 @@ onSaveNext(): void {
   const selectedTCraving = this.Cravings
     .filter((s: any) => cravingsIds.includes(s.cravingsId))
     .map((s: any) => ({ id: s.cravingsId}));
+  // Replace the incorrect selectednotedBy and selectedpreparedBy with these:
 
+  const selectednotedBy = this.medicalOfficers
+    .filter((s: any) => s.staffIdNo === notedBy)
+    .map((s: any) => ({ id: s.staffIdNo }));
+    
+  const selectedpreparedBy = this.psychologists
+    .filter((s: any) => s.staffIdNo === preparedBy)
+    .map((s: any) => ({ id: s.staffIdNo }));
+    
   // Format the dateSubmittedValue as "Month Day, Year" (e.g., "June 1, 2025")
   let formattedMonth = '';
   if (dateSubmittedValue) {
@@ -2086,98 +2264,99 @@ onSaveNext(): void {
     });
   }
 
-  this.listPatientMonthlyPReport = [
-    {
-      section: 'Appearance',
-      values: this.Appearance
-        .filter(a => appearanceIds.includes(a.appearanceId))
-        .map(a => ({ id: a.appearanceId, label: a.appearanceDesc }))
-    },
-    {
-      section: 'Sensorium',
-      values: this.Sensorium
-        .filter((s: any) => sensoriumIds.includes(s.sensoriumId))
-        .map((s: any) => ({ id: s.sensoriumId, label: s.sensoriumDesc }))
-    },
-    {
-      section: 'Functioning',
-      values: this.Functioning
-        .filter((s: any) => functioningIds.includes(s.functioningId))
-        .map((s: any) => ({ id: s.functioningId, label: s.functioningDesc }))
-    },
-    {
-      section: 'Speech',
-      values: this.Speech
-        .filter((s: any) => speechIds.includes(s.speechId))
-        .map((s: any) => ({ id: s.speechId, label: s.speechDesc }))
-    },
-    {
-      section: 'Behavior',
-      values: this.Behavior
-        .filter((s: any) => behaviorIds.includes(s.behaviorId))
-        .map((s: any) => ({ id: s.behaviorId, label: s.behaviorDesc }))
-    },
-    {
-      section: 'Mood/Affect',
-      values: this.MoodAffect
-        .filter((s: any) => moodAffectIds.includes(s.moodAffectId))
-        .map((s: any) => ({ id: s.moodAffectId, label: s.moodAffectDesc }))
-    },
-    {
-      section: 'Daily Patterns',
-      values: this.DailyPattern
-        .filter((s: any) => dailyPatternsIds.includes(s.dailyPatternsId))
-        .map((s: any) => ({ id: s.dailyPatternsId, label: s.dailyPatternsDesc }))
-    },
-    {
-      section: 'Thought Content',
-      values: this.ThoughtContent
-        .filter((s: any) => thoughtContentIds.includes(s.thoughtContentId))
-        .map((s: any) => ({ id: s.thoughtContentId, label: s.thoughtContentDesc }))
-    },
-    {
-      section: 'Physical Indicators',
-      values: this.PhysicIndicators
-        .filter((s: any) => physicaIndicatorsIds.includes(s.physicaIndicatorsId))
-        .map((s: any) => ({ id: s.physicaIndicatorsId, label: s.physicaIndicatorsDesc }))
-    },
-    {
-      section: 'Denial',
-      values: this.Denial
-        .filter((s: any) => denialIds.includes(s.denialId))
-        .map((s: any) => ({ id: s.denialId, label: s.denialDesc }))
-    },
-    {
-      section: 'Withdrawal Symptoms',
-      values: this.WithdSymptoms
-        .filter((s: any) => physicalWsymptomsIds.includes(s.physicalWsymptomsId))
-        .map((s: any) => ({ id: s.physicalWsymptomsId, label: s.physicalWsymptomsDesc }))
-    },
-    {
-      section: 'Suspension of Activities',
-      values: this.SuspenActivities
-        .filter((s: any) => suspensionofActivitiesIds.includes(s.suspensionofActivitiesId))
-        .map((s: any) => ({ id: s.suspensionofActivitiesId, label: s.suspensionofActivitiesDesc }))
-    },
-    {
-      section: 'Cravings',
-      values: this.Cravings
-        .filter((s: any) => cravingsIds.includes(s.cravingsId))
-        .map((s: any) => ({ id: s.cravingsId, label: s.cravingsDesc }))
-    },
-    {
-      section: 'Other Observations',
-      values: (otherObservations?.trim())
-        ? [{ label: otherObservations.trim() }]
-        : []
-    },
-    {
-      section: 'Month Selected',
-      values: (formattedMonth)
-        ? [{ label: formattedMonth }]
-        : []
-    }
-  ];
+ this.listPatientMonthlyPReport = [
+  {
+    section: 'Appearance',
+    values: this.Appearance
+      .filter(a => appearanceIds.includes(a.appearanceId))
+      .map(a => ({ id: a.appearanceId, label: a.appearanceDesc }))
+  },
+  {
+    section: 'Sensorium',
+    values: this.Sensorium
+      .filter((s: any) => sensoriumIds.includes(s.sensoriumId))
+      .map((s: any) => ({ id: s.sensoriumId, label: s.sensoriumDesc }))
+  },
+  {
+    section: 'Functioning',
+    values: this.Functioning
+      .filter((s: any) => functioningIds.includes(s.functioningId))
+      .map((s: any) => ({ id: s.functioningId, label: s.functioningDesc }))
+  },
+  {
+    section: 'Speech',
+    values: this.Speech
+      .filter((s: any) => speechIds.includes(s.speechId))
+      .map((s: any) => ({ id: s.speechId, label: s.speechDesc }))
+  },
+  {
+    section: 'Behavior',
+    values: this.Behavior
+      .filter((s: any) => behaviorIds.includes(s.behaviorId))
+      .map((s: any) => ({ id: s.behaviorId, label: s.behaviorDesc }))
+  },
+  {
+    section: 'Mood/Affect',
+    values: this.MoodAffect
+      .filter((s: any) => moodAffectIds.includes(s.moodAffectId))
+      .map((s: any) => ({ id: s.moodAffectId, label: s.moodAffectDesc }))
+  },
+  {
+    section: 'Daily Patterns',
+    values: this.DailyPattern
+      .filter((s: any) => dailyPatternsIds.includes(s.dailyPatternsId))
+      .map((s: any) => ({ id: s.dailyPatternsId, label: s.dailyPatternsDesc }))
+  },
+  {
+    section: 'Thought Content',
+    values: this.ThoughtContent
+      .filter((s: any) => thoughtContentIds.includes(s.thoughtContentId))
+      .map((s: any) => ({ id: s.thoughtContentId, label: s.thoughtContentDesc }))
+  },
+  {
+    section: 'Physical Indicators',
+    values: this.PhysicIndicators
+      .filter((s: any) => physicaIndicatorsIds.includes(s.physicaIndicatorsId))
+      .map((s: any) => ({ id: s.physicaIndicatorsId, label: s.physicaIndicatorsDesc }))
+  },
+  {
+    section: 'Denial',
+    values: this.Denial
+      .filter((s: any) => denialIds.includes(s.denialId))
+      .map((s: any) => ({ id: s.denialId, label: s.denialDesc }))
+  },
+  {
+    section: 'Withdrawal Symptoms',
+    values: this.WithdSymptoms
+      .filter((s: any) => physicalWsymptomsIds.includes(s.physicalWsymptomsId))
+      .map((s: any) => ({ id: s.physicalWsymptomsId, label: s.physicalWsymptomsDesc }))
+  },
+  {
+    section: 'Suspension of Activities',
+    values: this.SuspenActivities
+      .filter((s: any) => suspensionofActivitiesIds.includes(s.suspensionofActivitiesId))
+      .map((s: any) => ({ id: s.suspensionofActivitiesId, label: s.suspensionofActivitiesDesc }))
+  },
+  {
+    section: 'Cravings',
+    values: this.Cravings
+      .filter((s: any) => cravingsIds.includes(s.cravingsId))
+      .map((s: any) => ({ id: s.cravingsId, label: s.cravingsDesc }))
+  },
+  {
+    section: 'Other Observations',
+    values: (otherObservations?.trim())
+      ? [{ label: otherObservations.trim() }]
+      : []
+  },
+  {
+    section: 'Month Selected',
+    values: (formattedMonth)
+      ? [{ label: formattedMonth }]
+      : []
+  },
+  
+];
 
  const maxLength = Math.max(
     appearanceIds.length, sensoriumIds.length, functioningIds.length,
@@ -2211,7 +2390,10 @@ onSaveNext(): void {
       suspensionofActivitiesId: suspensionofActivitiesIds[i] || 0,
       cravingsId: cravingsIds[i] || 0,
       otherObservations: otherObservations?.trim() || '',
-      dateSubmitted: dateSubmitted
+      dateSubmitted: dateSubmitted,
+      notedBy: notedBy,     
+       preparedBy: preparedBy
+
     });
   }
 
@@ -2275,7 +2457,9 @@ requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | nul
     'dailyPatternsId',
     'thoughtContentId',
     'otherObservations',
-    'dateSubmitted'
+    'dateSubmitted',
+    'notedBy',
+    'preparedBy'
   ];
 
   const invalidFields: string[] = [];
@@ -2305,7 +2489,9 @@ requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | nul
       'denialId',
       'physicalWsymptomsId',
       'suspensionofActivitiesId',
-      'cravingsId'
+      'cravingsId',
+      'notedBy',
+     'preparedBy'
     ];
 
     const errors: any = {};
