@@ -175,8 +175,15 @@
                       <td>{{ s.patientActivies?.length > 10 ? (s.patientActivies | slice:0:20) + '...' : s.patientActivies }}</td>
                       <td>{{ s.patientIntervention?.length > 10 ? (s.patientIntervention | slice:0:20) + '...' : s.patientIntervention }}</td>
                       <td class="text-center">
-                        <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewNotes(s.recNo)" title="View Details"  >
+                       <button type="button" class="btn btn-sm btn-primary text-white"     (click)="viewNotes(s.recNo)" title="View Details"  >
                           <i class="bx bx-show"></i> 
+                        </button>
+                         <button 
+                          type="button" 
+                          class="btn btn-sm btn-secondary text-white" 
+                          title="Print" 
+                          (click)="printSWPN(s.recNo)">
+                          <i class="bx bx-printer"></i>
                         </button>
                       </td>
                     </tr>
@@ -221,6 +228,13 @@
                         <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewNursingNotes(s.recNo)" title="View Details"  >
                           <i class="bx bx-show"></i> 
                         </button>
+                          <button 
+                          type="button" 
+                          class="btn btn-sm btn-secondary text-white " 
+                          title="Print" 
+                          (click)="printNurses(s.recNo)">
+                          <i class="bx bx-printer"></i>
+                        </button>
                       </td>
                     </tr>
                     
@@ -258,6 +272,13 @@
                         <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewPerMonth(item.monthName)" title="View Details"  >
                           <i class="bx bx-show"></i> 
                         </button>
+                         <button 
+                          type="button" 
+                          class="btn btn-sm btn-secondary text-white" 
+                          title="Print" 
+                          (click)="printMPPR(item.monthName)">
+                          <i class="bx bx-printer"></i>
+                        </button>
                       </td>
                     </tr>
                     
@@ -294,6 +315,13 @@
                         <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewPEModalEdit(item)" title="View Details">
                           <i class="bx bx-show"></i> 
                         </button>
+                         <button 
+                          type="button" 
+                          class="btn btn-sm btn-secondary text-white" 
+                          title="Print" 
+                          (click)="printPsychEVal(item)">
+                          <i class="bx bx-printer"></i>
+                        </button>
                       </td>
                     </tr>
 
@@ -322,7 +350,7 @@
                       <th style="width: 5%;">#</th>
                        <th style="width: 30%;">Domain</th>
                       <th style="width: 30%;">Date Identified</th>
-                      <th style="width: 5%;">Action</th>
+                      <th style="width: 10%;">Action</th>
                     </tr>
                   </thead>
                    <tbody class="table-border-bottom-0">
@@ -333,6 +361,13 @@
                       <td class="text-center">
                         <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewPlanModalEdit(item)" title="View Details">
                           <i class="bx bx-show"></i> 
+                        </button>
+                         <button 
+                          type="button" 
+                          class="btn btn-sm btn-secondary text-white" 
+                          title="Print" 
+                          (click)="printTreatPlan(item)">
+                          <i class="bx bx-printer"></i>
                         </button>
                       </td>
                     </tr>
@@ -386,6 +421,13 @@
                         <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewPlanModalEdit(item)" title="View Details">
                           <i class="bx bx-show"></i> 
                         </button>
+                        <button 
+                          type="button" 
+                          class="btn btn-sm btn-secondary text-white" 
+                          title="Print" 
+                          (click)="printDocOrder(item)">
+                          <i class="bx bx-printer"></i>
+                        </button>
                       </td>
                     </tr>
 
@@ -425,14 +467,18 @@
                         <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewPlanModalEdit(item)" title="View Details">
                           <i class="bx bx-show"></i> 
                         </button>
+                        <button 
+                          type="button" 
+                          class="btn btn-sm btn-secondary text-white" 
+                          title="Print" 
+                          (click)="printMedication(item)">
+                          <i class="bx bx-printer"></i>
+                        </button>
                       </td>
                     </tr>
-
-                    
                   </tbody>
                 </table>
               </div>
-             
             </div>
           </div>
         </div>
@@ -441,13 +487,9 @@
             <h5 class="card-header">Laboratory</h5>
             <div class="card-body">
               <div class="mb-4">
-                        <label for="formFileMultiple" class="form-label">Multiple files input example</label>
-                        <input class="form-control" type="file" id="formFileMultiple" multiple="">
+                  <label for="formFileMultiple" class="form-label">Multiple files input example</label>
+                  <input class="form-control" type="file" id="formFileMultiple" multiple="">
               </div>
-              <div class="mb-4">
-                        <label for="formFileMultiple" class="form-label">Multiple files input example</label>
-                        <input class="form-control" type="file" id="formFileMultiple" multiple="">
-                      </div>
             </div>
           </div>
         </div>
@@ -1654,7 +1696,13 @@
                 Date Identified is required.
               </div>
             </div>
-              
+               <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Ordered By</label>
+              <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Enter Full name" formControlName="notedBy">
+              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admin) is required.
+              </div>
+            </div>
           </div>
           <hr>
 
@@ -1693,11 +1741,6 @@
             </div>
           </div>
           <hr>
-
-          <!-- Objective -->
-        
-          <hr>
-
           <!-- Intervention -->
           <div class="d-flex align-items-start flex-wrap mb-3">
             <div class="col-md-12">
@@ -1708,7 +1751,6 @@
               </div>
             </div>
           </div>
-          <hr>
         </div>
       </div>
 
@@ -1744,26 +1786,7 @@
           <hr>
 
           <!-- Prepared By -->
-          <div class="d-flex align-items-start flex-wrap mb-3">
-           <div class="col-md-6 mb-3">
-              <label class="form-label fw-bold">Ordered By</label>
-              <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Enter Full name" formControlName="notedBy">
-              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
-                Noted By (Admin) is required.
-              </div>
-            </div>
-            <!-- Noted By (Medical Officer) -->
-            <div class="col-md-6 mb-3">
-              <label class="form-label fw-bold">Carry-out By: <span class="text-muted">(Nurse)</span></label>
-              <select class="form-select" id="approvedBy" formControlName="approvedBy">
-                <option value="" disabled>Select Personnel</option>
-                <option *ngFor="let staff of medicalOfficers" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
-              </select>
-              <div *ngIf="DocOrderForm.get('approvedBy')?.touched && DocOrderForm.get('approvedBy')?.invalid" class="text-danger">
-                Approved By (Medical Officer) is required.
-              </div>
-            </div>
-          </div>
+         
 
           <div class="mt-3 text-end">
            <button 
@@ -1796,7 +1819,7 @@
     <div class="modal-content">
       
       <div class="modal-header">
-        <h5 class="modal-title" id="backDropModalTitle">Medication Summary</h5>
+        <h5 class="modal-title" id="backDropModalTitle">Medication</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -1823,8 +1846,15 @@
             <div class="col-md-3">
               <label for="dateIdentified" class="form-label me-2">Medication Start</label>
               <input type="datetime-local" class="form-control" id="dateIdentified" formControlName="dateIdentified" />
-              <div *ngIf="DocOrderForm.get('dateIdentified')?.touched && DocOrderForm.get('dateIdentified')?.invalid" class="text-danger">
+              <div *ngIf="MedicationForm.get('dateIdentified')?.touched && MedicationForm.get('dateIdentified')?.invalid" class="text-danger">
                 Date Identified is required.
+              </div>
+            </div>
+              <div class="col-md-4">
+              <label class="form-label fw-bold">Prescribed by</label>
+               <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Enter Full name" formControlName="notedBy">
+              <div *ngIf="MedicationForm.get('notedBy')?.touched && MedicationForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admin) is required.
               </div>
             </div>
            <div class="col-md-4">
@@ -1833,7 +1863,7 @@
                 <option value="" disabled>Select Medication</option>
                 <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
               </select>
-              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+              <div *ngIf="MedicationForm.get('notedBy')?.touched && MedicationForm.get('notedBy')?.invalid" class="text-danger">
                 Noted By (Admin) is required.
               </div>
             </div>
@@ -1847,7 +1877,7 @@
                 <option value="" disabled>Select Personnel</option>
                 <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
               </select>
-              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+              <div *ngIf="MedicationForm.get('notedBy')?.touched && MedicationForm.get('notedBy')?.invalid" class="text-danger">
                 Noted By (Admiwn) is required.
               </div>
             </div>
@@ -1857,7 +1887,7 @@
                 <option value="" disabled>Select Dose</option>
                 <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
               </select>
-              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+              <div *ngIf="MedicationForm.get('notedBy')?.touched && MedicationForm.get('notedBy')?.invalid" class="text-danger">
                 Noted By (Admin) is required.
               </div>
             </div>
@@ -1867,7 +1897,7 @@
                 <option value="" disabled>Select Personnel</option>
                 <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
               </select>
-              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+              <div *ngIf="MedicationForm.get('notedBy')?.touched && MedicationForm.get('notedBy')?.invalid" class="text-danger">
                 Noted By (Admin) is required.
               </div>
             </div>
@@ -1880,7 +1910,7 @@
                 <option value="" disabled>Select Dosage</option>
                 <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
               </select>
-              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+              <div *ngIf="MedicationForm.get('notedBy')?.touched && MedicationForm.get('notedBy')?.invalid" class="text-danger">
                 Noted By (Admin) is required.
               </div>
             </div>
@@ -1890,41 +1920,30 @@
                 <option value="" disabled>Select Duration</option>
                 <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
               </select>
-              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+              <div *ngIf="MedicationForm.get('notedBy')?.touched && MedicationForm.get('notedBy')?.invalid" class="text-danger">
                 Noted By (Admin) is required.
               </div>
             </div>
             <div class="col-md-4">
-               <label for="defaultFormControlInput" class="form-label">Quantity to Dispense</label>
-                <input type="number" class="form-control" id="defaultFormControlInput" placeholder="Enter Quantity" formControlName="notedBy">
+              <label for="defaultFormControlInput" class="form-label">Quantity to Dispense</label>
+              <input type="number" class="form-control" id="defaultFormControlInput" placeholder="Enter Quantity" formControlName="notedBy">
             </div>
             </div>
             <hr>
-        
         <div class="row">
-          <div class="col-md-4">
+          <div class="col-md-6">
               <div class="col-md-12">
               <label for="patientObjective" class="form-label">Indication</label>
               <textarea class="form-control" id="patientObjective" formControlName="patientObjective" rows="2" placeholder="Enter Purpose"></textarea>
-              <div *ngIf="DocOrderForm.get('patientObjective')?.touched && DocOrderForm.get('patientObjective')?.invalid" class="text-danger">
+              <div *ngIf="MedicationForm.get('patientObjective')?.touched && DocOrderForm.get('patientObjective')?.invalid" class="text-danger">
                 Objective is required.
               </div>
             </div>
             </div>
           
-             <div class="col-md-4">
-              <label class="form-label fw-bold">Prescriber </label>
-               <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Enter Full name" formControlName="notedBy">
-              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
-                Noted By (Admin) is required.
-              </div>
+           
             </div>
-            </div>
-
-          <hr>
-        
-        
-          <hr>
+            <hr>
         </div>
       </div>
 
@@ -1959,32 +1978,7 @@
           </table>
           <hr>
 
-          <!-- Prepared By -->
-          <div class="d-flex align-items-start flex-wrap mb-3">
-            <!-- Noted By (Admin Officer) -->
-            <div class="col-md-6 mb-3">
-              <label class="form-label fw-bold">Prepared By: <span class="text-muted">(Physician)</span></label>
-              <select class="form-select" id="NotedByF" formControlName="notedBy">
-                <option value="" disabled>Select Personnel</option>
-                <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
-              </select>
-              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
-                Noted By (Admin) is required.
-              </div>
-            </div>
-
-            <!-- Noted By (Medical Officer) -->
-            <div class="col-md-6 mb-3">
-              <label class="form-label fw-bold">Carry-out By: <span class="text-muted">(Nurse)</span></label>
-              <select class="form-select" id="approvedBy" formControlName="approvedBy">
-                <option value="" disabled>Select Personnel</option>
-                <option *ngFor="let staff of medicalOfficers" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
-              </select>
-              <div *ngIf="DocOrderForm.get('approvedBy')?.touched && DocOrderForm.get('approvedBy')?.invalid" class="text-danger">
-                Approved By (Medical Officer) is required.
-              </div>
-            </div>
-          </div>
+        
 
           <div class="mt-3 text-end">
            <button 

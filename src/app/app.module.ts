@@ -22,7 +22,9 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'application/:patientCode', component: ApplicationDashboardComponent },
   { path: 'patientDashboard/:patientCode/:assessmentCode', component: PatientDashboardComponent }, // Dynamic route for patientCode
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' } // Optional: redirect to dashboard
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: '/user-Registration', pathMatch: 'full' },
+  { path: 'user-Registration', component: UserRegComponent }
 ];
 
 @NgModule({
