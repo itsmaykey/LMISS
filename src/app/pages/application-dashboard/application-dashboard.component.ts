@@ -638,52 +638,65 @@ AssessmentFormSubmit(): void {
       isActive: true,
     };
 
-    this.PatientStaffAssessmentService.postPatientAssessmentData(formData).subscribe({
-      next: () => {
-        console.log('Assessment submitted:', formData);
+    if (this.AssessmentForm.valid) {
+  Swal.fire({
+    title: 'Confirm Submission',
+    text: 'Are you sure all the assessment details are complete and accurate?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, submit',
+    cancelButtonText: 'No, review again',
+    allowOutsideClick: false
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const formData = this.AssessmentForm.value;
+      const listAdmissionData = formData.admissionCode.map((code: string) => ({ admissionCode: code }));
 
-        this.PatientStaffAssessmentService.postAdmissionData({ listAdmissionData }).subscribe({
-          next: () => {
-            console.log('Admission list submitted:', listAdmissionData);
+      this.PatientStaffAssessmentService.postPatientAssessmentData(formData).subscribe({
+        next: () => {
+          console.log('Assessment submitted:', formData);
 
-            Swal.fire({
-              icon: 'success',
-              title: 'Success',
-              text: 'Patient Assessment data submitted successfully!',
-              timer: 1000,
-              timerProgressBar: true,
-              showConfirmButton: false,
-              allowOutsideClick: false,
-              allowEscapeKey: false,
-            didClose: () => {
-            this.AssessmentForm.reset();
-            (this.AssessmentForm.get('admissionCode') as FormArray).clear(); 
-                this.refreshHistoryList();
+          this.PatientStaffAssessmentService.postAdmissionData({ listAdmissionData }).subscribe({
+            next: () => {
+              console.log('Admission list submitted:', listAdmissionData);
 
-              this.selectedAdmissionType = [];
-
-              this.admissionType.forEach((type: any) => type.selected = false);
-
-              this.AssessmentForm.markAsPristine();
-              this.AssessmentForm.markAsUntouched();
+              Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Patient Assessment data submitted successfully!',
+                timer: 1000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didClose: () => {
+                  this.AssessmentForm.reset();
+                  (this.AssessmentForm.get('admissionCode') as FormArray).clear(); 
+                  this.refreshHistoryList();
+                  this.selectedAdmissionType = [];
+                  this.admissionType.forEach((type: any) => type.selected = false);
+                  this.AssessmentForm.markAsPristine();
+                  this.AssessmentForm.markAsUntouched();
+                  this.isSubmitting = false;
+                }
+              });
+            },
+            error: (err) => {
               this.isSubmitting = false;
+              this.handleError(err, 'admission data');
             }
-            });
-          },
-          error: (err) => {
-            this.isSubmitting = false;
-            this.handleError(err, 'admission data');
-          }
-        });
-      },
-      error: (err) => {
-        this.isSubmitting = false;
-        this.handleError(err, 'assessment form');
-      }
-    });
-
-  } else {
-    alert('Please fill in all required fields correctly.');
+          });
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.handleError(err, 'assessment form');
+        }
+      });
+    }
+  });
+} else {
+  alert('Please fill in all required fields correctly.');
+}
   }
 }
 

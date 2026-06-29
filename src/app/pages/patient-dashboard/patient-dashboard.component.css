@@ -203,4 +203,21 @@
     color: #007bff;
     transition: background-color 0.3s, color 0.3s;
   }
-  
+  .loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1055; /* Slightly above Bootstrap modals (1050) */
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.25em;
+  border-color: rgba(0, 123, 255, 0.25) transparent transparent transparent;
+}

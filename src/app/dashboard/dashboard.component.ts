@@ -4,6 +4,7 @@ import { AuthService } from '../Admin/Auth/AuthService';
 import { DashboardServiceService } from './dashboard-service/dashboard-service.service';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 import {Modal} from 'bootstrap';
 
 @Component({
@@ -53,23 +54,31 @@ previewPdf(patientCode: string): void {
   }
   
   FilteredSearchNames(): void {
-    this.hasSearched = true; // <-- Mark that a search attempt has happened
-  
-    const search = this.searchText?.trim().toLowerCase();
-  
-    if (!search) {
-      this.filteredSearchNames = [];
-      return;
-    }
-  
-    this.filteredSearchNames = this.patients.filter(patient =>
-      Object.values(patient).some(value =>
-        value?.toString().toLowerCase().includes(search)
-      )
-    );
+  const search = this.searchText?.trim().toLowerCase() || '';
+
+  if (search.length < 3) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Input too short',
+        text: 'Please enter at least 3 letters to search.',
+        timer: 1000, 
+        timerProgressBar: true,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        showConfirmButton: false
+      });
+
+    this.filteredSearchNames = [];
+    return;
   }
-  
-  
+
+  this.filteredSearchNames = this.patients.filter(patient =>
+    Object.values(patient).some(value =>
+      value?.toString().toLowerCase().includes(search)
+    )
+  );
+}
 
 
   goToAppDashboard() {

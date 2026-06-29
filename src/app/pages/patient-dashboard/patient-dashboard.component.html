@@ -24,7 +24,7 @@
                   </h6>
 
                 <label class="badge bg-label-secondary">
-                    Byname: {{ ExistedPatient.pNickName | uppercase }} |
+                    Byname: {{ ExistedPatient.pNickName | uppercase }} | 
                    {{ ExistedPatient.sex == 1 ? 'Male' : ExistedPatient.sex == 2 ? 'Female' : 'Unknown' }} |
                     Age: {{ ExistedPatient.age }} | {{ ExistedPatient.birthdate | date:'yyyy-MM-dd' }}
                   </label>
@@ -76,7 +76,7 @@
     <div class="col-xl-8 col-lg-7 order-0 order-md-1">
       <!-- User Pills -->
       <div class="nav-align-top bg-label-primary">
-        <span class="badge badge-custom">Selected Application:</span>
+        <span class="badge badge-custom">Selected Date Application: <b>{{ ExistedPatient.patientAssessmentDate | date:'MMMM d, yyyy' }}</b></span>
         <ul class="nav nav-pills flex-column flex-md-row">
           <li class="nav-item">
             <button class="nav-link " data-bs-toggle="tab" data-bs-target="#FinanceTab" type="button">
@@ -100,7 +100,7 @@
           </li>
           <li class="nav-item">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#PETab" type="button">
-              <i class="icon-base bx bx-book icon-sm me-1_5"></i>PE
+                <i class="icon-base bx bx-brain icon-sm me-1_5"></i>Psych Eval
             </button>
           </li>
           <li class="nav-item">
@@ -126,11 +126,6 @@
           <li class="nav-item">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#LaboratoryTab" type="button">
               <i class="icon-base bx bx-test-tube icon-sm me-1_5"></i>Laboratory
-            </button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#PsychEvalTab" type="button">
-              <i class="icon-base bx bx-brain icon-sm me-1_5"></i>Psych Eval
             </button>
           </li>
         </ul>
@@ -193,15 +188,44 @@
           </div>
 
         </div>
+        
         <div class="tab-pane fade" id="NurseTab">
-
           <div class="card">
-            <h5 class="card-header">Nurses Notes</h5>
-            <div class="card-body">
-              <div>
-                <label for="defaultFormControlInput" class="form-label">Name</label>
-                <input type="text" class="form-control" id="defaultFormControlInput" placeholder="John Doe" aria-describedby="defaultFormControlHelp">
+             <div class="card-header d-flex align-items-center ">
+              <div class="d-flex align-items-center">
+                <h5 class="mb-0">Nurses Notes</h5>
+                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white"  (click)="showNursingModal()"><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Notes</label></button>
 
+              </div>
+            </div>
+            <div class="card-body">
+             <br>
+              <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                <table class="table table-bordered table-striped table-hover">
+                  <thead class="table-dark text-center">
+                    <tr >
+                      <th style="width: 5%;">#</th>
+                      <th style="width: 30%;">Date</th>
+                      <th style="width: 30%;">Narrative</th>
+                      <th style="width: 30%;">Added by</th>
+                      <th style="width: 5%;">Action</th>
+                    </tr>
+                  </thead>
+                   <tbody class="table-border-bottom-0">
+                    <tr *ngFor="let s of nursingNotesData?.entity; let i = index">
+                      <td class="text-center">{{ i + 1}}</td>
+                      <td>{{ s.dateSubmitted | date:'MMMM d, yyyy' }}</td>
+                      <td>{{ s.remarks?.length > 10 ? (s.remarks | slice:0:20) + '...' : s.remarks }}</td>
+                      <td>{{ s.staffFullName }}</td>
+                      <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewNursingNotes(s.recNo)" title="View Details"  >
+                          <i class="bx bx-show"></i> 
+                        </button>
+                      </td>
+                    </tr>
+                    
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -222,17 +246,17 @@
                   <thead class="table-dark text-center">
                     <tr >
                       <th style="width: 5%;">#</th>
-                      <th style="width: 30%;">Month</th>
+                      <th style="width: 30%;">Month Encoded</th>
                       <th style="width: 5%;">Action</th>
                     </tr>
                   </thead>
                    <tbody class="table-border-bottom-0">
-                    <tr *ngFor="let s of swpnData?.entity; let i = index">
+                    <tr *ngFor="let item of monthlyProgressData; let i = index">
                       <td class="text-center">{{ i + 1}}</td>
-                      <td class="text-center">{{ s.interventionDate | date:'MMMM d, yyyy' }}</td>
+                      <td class="text-center">{{ item.monthName}}</td>
                       <td class="text-center">
                         <!-- <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewAddReportBtn(s.recNo)" title="View Details"  >
-                          <i class="bx bx-show"></i>
+                          <i class="bx bx-show"></i> 
                         </button> -->
                       </td>
                     </tr>
@@ -245,24 +269,77 @@
         </div>
         <div class="tab-pane fade" id="PETab">
           <div class="card">
-            <h5 class="card-header">Psychological Evaluation (PE)</h5>
+             <div class="card-header d-flex align-items-center ">
+              <div class="d-flex align-items-center">
+                <h5 class="mb-0">Psychological Evaluation (PE)</h5>
+                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white"  (click)="showModalPE()"><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Evaluation</label></button>
+              </div>
+            </div>
             <div class="card-body">
-              <div>
-                <label for="defaultFormControlInput" class="form-label">Name</label>
-                <input type="text" class="form-control" id="defaultFormControlInput" placeholder="John Doe" aria-describedby="defaultFormControlHelp">
+              <br>
+              <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                <table class="table table-bordered table-striped table-hover">
+                  <thead class="table-dark text-center">
+                    <tr >
+                      <th style="width: 5%;">#</th>
+                      <th style="width: 30%;">Month Evaluated</th>
+                      <th style="width: 5%;">Action</th>
+                    </tr>
+                  </thead>
+                   <tbody class="table-border-bottom-0">
+                    <tr *ngFor="let item of peData; let i = index">
+                      <td class="text-center">{{ i + 1 }}</td>
+                      <td class="text-center">{{ item.monthName }}</td>
+                      <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewPEModalEdit(item)" title="View Details">
+                          <i class="bx bx-show"></i> 
+                        </button>
+                      </td>
+                    </tr>
 
+                    
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
         </div>
         <div class="tab-pane fade" id="TreatmentTab">
           <div class="card">
-            <h5 class="card-header">Treatment Plan</h5>
-            <div class="card-body">
-              <div>
-                <label for="defaultFormControlInput" class="form-label">Name</label>
-                <input type="text" class="form-control" id="defaultFormControlInput" placeholder="John Doe" aria-describedby="defaultFormControlHelp">
+           
+             <div class="card-header d-flex align-items-center ">
+              <div class="d-flex align-items-center">
+                <h5 class="mb-0">Treatment Plan</h5>
+                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white"  (click)="showModalPlan()"><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Plan</label></button>
+              </div>
+            </div>
+           <div class="card-body">
+              <br>
+              <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                <table class="table table-bordered table-striped table-hover">
+                  <thead class="table-dark text-center">
+                    <tr >
+                      <th style="width: 5%;">#</th>
+                       <th style="width: 30%;">Domain</th>
+                      <th style="width: 30%;">Date Identified</th>
+                      <th style="width: 5%;">Action</th>
+                    </tr>
+                  </thead>
+                   <tbody class="table-border-bottom-0">
+                    <tr *ngFor="let item of planData; let i = index">
+                      <td class="text-center">{{ i + 1 }}</td>
+                         <td class="text-center">{{ item.patientDomainDesc}}</td>
+                        <td class="text-center">{{ item.dateIdentified | date:'MMMM d, yyyy' }}</td>
+                      <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewPlanModalEdit(item)" title="View Details">
+                          <i class="bx bx-show"></i> 
+                        </button>
+                      </td>
+                    </tr>
 
+                    
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -282,25 +359,80 @@
         </div>
         <div class="tab-pane fade" id="DoctorsTab">
           <div class="card">
-            <h5 class="card-header">Doctors Order</h5>
-            <div class="card-body">
-              <div>
-                <label for="defaultFormControlInput" class="form-label">Name</label>
-                <input type="text" class="form-control" id="defaultFormControlInput" placeholder="John Doe" aria-describedby="defaultFormControlHelp">
+           <div class="card-header d-flex align-items-center ">
+              <div class="d-flex align-items-center">
+                <h5 class="mb-0">Doctors Order</h5>
+                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white"  (click)="showModalDocOrder()"><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Order</label></button>
+              </div>
+            </div>
+             <div class="card-body">
+              <br>
+              <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                <table class="table table-bordered table-striped table-hover">
+                  <thead class="table-dark text-center">
+                    <tr >
+                      <th style="width: 5%;">#</th>
+                       <th style="width: 30%;">Date Ordered</th>
+                      <th style="width: 30%;">Subjective</th>
+                      <th style="width: 5%;">Action</th>
+                    </tr>
+                  </thead>
+                   <tbody class="table-border-bottom-0">
+                    <tr *ngFor="let item of planData; let i = index">
+                      <td class="text-center">{{ i + 1 }}</td>
+                      <td class="text-center">{{ item.dateIdentified | date:'MMMM d, yyyy' }}</td>
+                      <td class="text-center">{{ item.patientDomainDesc}}</td>
+                      <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewPlanModalEdit(item)" title="View Details">
+                          <i class="bx bx-show"></i> 
+                        </button>
+                      </td>
+                    </tr>
 
+                    
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
         </div>
         <div class="tab-pane fade" id="MedicationTab">
            <div class="card">
-            <h5 class="card-header">Medication</h5>
-            <div class="card-body">
-              <div>
-                <label for="defaultFormControlInput" class="form-label">Name</label>
-                <input type="text" class="form-control" id="defaultFormControlInput" placeholder="John Doe" aria-describedby="defaultFormControlHelp">
-
+         <div class="card-header d-flex align-items-center ">
+              <div class="d-flex align-items-center">
+                <h5 class="mb-0">Medication</h5>
+                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white"  (click)="showModalMedication()"><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Entry</label></button>
               </div>
+            </div>
+            <div class="card-body">
+               <br>
+              <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                <table class="table table-bordered table-striped table-hover">
+                  <thead class="table-dark text-center">
+                    <tr >
+                      <th style="width: 5%;">#</th>
+                       <th style="width: 30%;">Medication Date</th>
+                      <th style="width: 30%;">Medication</th>
+                      <th style="width: 5%;">Action</th>
+                    </tr>
+                  </thead>
+                   <tbody class="table-border-bottom-0">
+                    <tr *ngFor="let item of planData; let i = index">
+                      <td class="text-center">{{ i + 1 }}</td>
+                      <td class="text-center">{{ item.dateIdentified | date:'MMMM d, yyyy' }}</td>
+                      <td class="text-center">{{ item.patientDomainDesc}}</td>
+                      <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewPlanModalEdit(item)" title="View Details">
+                          <i class="bx bx-show"></i> 
+                        </button>
+                      </td>
+                    </tr>
+
+                    
+                  </tbody>
+                </table>
+              </div>
+             
             </div>
           </div>
         </div>
@@ -308,25 +440,18 @@
           <div class="card">
             <h5 class="card-header">Laboratory</h5>
             <div class="card-body">
-              <div>
-                <label for="defaultFormControlInput" class="form-label">Name</label>
-                <input type="text" class="form-control" id="defaultFormControlInput" placeholder="John Doe" aria-describedby="defaultFormControlHelp">
+              <div class="mb-4">
+                        <label for="formFileMultiple" class="form-label">Multiple files input example</label>
+                        <input class="form-control" type="file" id="formFileMultiple" multiple="">
+              </div>
+              <div class="mb-4">
+                        <label for="formFileMultiple" class="form-label">Multiple files input example</label>
+                        <input class="form-control" type="file" id="formFileMultiple" multiple="">
+                      </div>
+            </div>
+          </div>
+        </div>
 
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="tab-pane fade" id="PsychEvalTab">
-          <div class="card">
-            <h5 class="card-header">Psychiatric Evaluation </h5>
-            <div class="card-body">
-              <div>
-                <label for="defaultFormControlInput" class="form-label">Name</label>
-                <input type="text" class="form-control" id="defaultFormControlInput" placeholder="John Doe" aria-describedby="defaultFormControlHelp">
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <!--/ Tab Content -->
     </div>
@@ -373,83 +498,115 @@
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="SocialWorkerNotesForm.invalid || isSubmitting">Save</button>
         </div>
+         <label class="form-label fw-bold text-muted "> Note: Please ensure all fields are filled out before saving.</label>
       </div>
     </div>
   </div>
 </form>
-  <div class="modal fade" id="viewNotesModal" tabindex="-1" aria-hidden="true">
+<!-- Loading Spinner Overlay -->
+<div *ngIf="isLoadingNotes" class="loading-overlay">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
 
+  <div class="modal fade" id="viewNotesModal" tabindex="-1" aria-hidden="true">
+    
   <div class="modal-dialog">
     <div class="modal-content">
-
+      
       <div class="modal-header">
         <h5 class="modal-title" id="backDropModalTitle">SWP Notes</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-
       <div class="modal-body">
-        <!-- Table view -->
-        <table class="table table-border-bottom-0" *ngIf="isEditingTbleView">
-          <tbody>
-            <ng-container *ngFor="let s of swpnDataEdit?.entity; let i = index">
-              <tr>
-                <td class="align-middle"><small class="text-light fw-medium">Date Noted</small></td>
-                <td class="py-4">
-                  <p class="mb-0">{{ s.interventionDate | date:'MM-dd-yyyy' }}</p>
-                </td>
-              </tr>
-              <tr>
-                <td class="align-middle"><small class="text-light fw-medium">Activity</small></td>
-                <td class="py-6">
-                  <p class="lead mb-0">{{ s.patientActivies }}</p>
-                </td>
-              </tr>
-              <tr>
-                <td class="align-middle"><small class="text-light fw-medium">Intervention</small></td>
-                <td class="py-4">
-                  <p class="lead mb-0">{{ s.patientIntervention }}</p>
-                </td>
-              </tr>
-                <tr>
-                <td class="align-middle"><small class="text-light fw-medium">Added By</small></td>
-                <td class="py-4">
-                  <p class="lead mb-0">{{s.staffFullName}}</p>
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
+<table class="table table-border-bottom-0" *ngIf="isEditingTbleView">
+  <tbody>
+    <ng-container *ngFor="let s of swpnDataEdit?.entity; let i = index">
+      <tr>
+        <td class="align-middle"><small class="text-light fw-medium">Date Noted</small></td>
+        <td class="py-4">
+          <p class="mb-0">{{ s.interventionDate | date:'MMMM-d-yyyy' }}</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="align-middle"><small class="text-light fw-medium">Activity</small></td>
+        <td class="py-6">
+          <p class="lead mb-0">{{ s.patientActivies }}</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="align-middle"><small class="text-light fw-medium">Intervention</small></td>
+        <td class="py-4">
+          <p class="lead mb-0">{{ s.patientIntervention }}</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="align-middle"><small class="text-light fw-medium">Added By</small></td>
+        <td class="py-4 d-flex justify-content-between align-items-center">
+          <p class="lead mb-0">{{ s.staffFullName }}</p>
 
-        <!-- Edit form view -->
-        <div class="pt-3" *ngIf="isEditing">
-          <div class="col-md-12">
-            <label for="intervention" class="form-label">Intervention</label>
-            <textarea class="form-control" id="intervention" formControlName="patientIntervention" rows="2"
-              placeholder="Enter Intervention"></textarea>
-            <div *ngIf="SocialWorkerNotesForm.get('patientIntervention')?.touched && SocialWorkerNotesForm.get('patientIntervention')?.invalid"
-              class="text-danger">
-              Intervention is required.
-            </div>
-          </div>
-          <div class="col-md-12 mt-3">
-            <label for="personalHealth" class="form-label">Activities</label>
-            <textarea class="form-control" id="personalHealth" formControlName="patientActivies" rows="2"
-              placeholder="Enter Personal Health History"></textarea>
-            <div *ngIf="SocialWorkerNotesForm.get('patientActivies')?.touched && SocialWorkerNotesForm.get('patientActivies')?.invalid"
-              class="text-danger">
-              Activities is required.
-            </div>
-          </div>
-        </div>
+          <!-- Edit Button (Only in view mode) -->
+          <button
+            type="button"
+            class="btn btn-sm btn-primary text-white"
+            (click)="onEditNotes(s.recNo,s.interventionDate,s.code, s.patientCode,s.staffIdNo)"
+            *ngIf="isEditingTbleView"
+            title="Edit Note">
+            <i class="bx bx-edit"></i>
+          </button>
+        </td>
+      </tr>
+    </ng-container>
+  </tbody>
+</table>
+
+<!-- Edit form view -->
+<div class="pt-3" *ngIf="isEditing">
+  <form [formGroup]="SocialWorkerNotesForm">
+    <div class="mb-3">
+  <label class="form-label fw-bold text-muted" style="display: none;">Editing Record #{{ currentRecNo }}</label>
+</div>
+<div class="col-md-12 mt-3">
+      <label for="personalHealth" class="form-label">Activities</label>
+      <textarea
+        class="form-control"
+        id="personalHealth"
+        formControlName="patientActivies"
+        rows="2"
+        placeholder="Enter Personal Health History"
+      ></textarea>
+    </div>
+    <div class="col-md-12">
+      <label for="intervention" class="form-label">Intervention</label>
+      <textarea
+        class="form-control"
+        id="intervention"
+        formControlName="patientIntervention"
+        rows="2"
+        placeholder="Enter Intervention"
+      ></textarea>
+    </div>
+
+    
+  </form>
+   
+  <div class="d-flex justify-content-between mt-3">
+     <button
+      type="button"
+      class="btn btn-sm btn-secondary text-white"
+      (click)="BackonEditNotes()"
+      title="Cancel Edit">
+      <i class="bx bx-arrow-back"></i>
+    </button>
+
+    <button type="button" class="btn btn-primary text-white" (click)="onSaveNotes()">
+      <i class="bx bx-save"></i> Save
+    </button>
+  </div>
+</div>
       </div>
-
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary me-3 text-white" (click)="onEditNotes()" *ngIf="isEditingTbleView">
-          <i class="bx bx-edit"></i>
-        </button>
-         <button type="button" class="btn btn-primary me-3 text-white" (click)="onSaveNotes()" *ngIf="isEditing">
-          <i class="bx bx-save"></i>
-        </button>
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
       </div>
 
@@ -489,45 +646,78 @@
       </li>
 
     </ul>
-
-
+      
 <div class="tab-content">
   <div class="tab-pane fade " id="PsychologicalSummary" role="tabpanel">
-    <table class="table table-border-bottom-0">
-      <tbody>
-        <tr>
-        </tr>
-        <tr><td><small class="text-light fw-medium">Appearance</small></td><td class="py-4"></td></tr>
-        <tr><td><small class="text-light fw-medium">Sensorium</small></td><td class="py-6"></td></tr>
-        <tr><td><small class="text-light fw-medium">Functioning</small></td><td class="py-4"></td></tr>
-        <tr><td><small class="text-light fw-medium">Speech</small></td><td class="py-4"></td></tr>
-        <tr><td><small class="text-light fw-medium">Behavior</small></td><td class="py-4"></td></tr>
-        <tr><td><small class="text-light fw-medium">Mood/Affect</small></td><td class="py-4"></td></tr>
-        <tr><td><small class="text-light fw-medium">Daily Pattern</small></td><td class="py-4"></td></tr>
-        <tr><td><small class="text-light fw-medium">Thought Content</small></td><td class="py-4"></td></tr>
-        <tr>
-        </tr>
-        <tr><td><small class="text-light fw-medium">Physical Indicators</small></td><td class="py-4"></td></tr>
-        <tr><td><small class="text-light fw-medium">Denial</small></td><td class="py-6"></td></tr>
-        <tr><td><small class="text-light fw-medium">Physical Withdrawal Symptoms</small></td><td class="py-4"></td></tr>
-        <tr><td><small class="text-light fw-medium">Suspension of Activities</small></td><td class="py-4"></td></tr>
-        <tr><td><small class="text-light fw-medium">Cravings</small></td><td class="py-4"></td></tr>
-      </tbody>
-    </table>
-    <div class="mt-3 text-end">
-       <button type="button" class="btn btn-primary text-white" (click)="onSaveNext()">
-      <i class="bx bx-save"></i>
+    <div class="table-scroll">
+          <div class="card-body pt-4 custom-font" style="max-height: 400px; overflow-y: auto;">
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Section</th>
+      <th>Selected Progress</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let section of listPatientMonthlyPReport">
+      <td>{{ section.section }}</td>
+      <td>
+        <ul class="mb-0" *ngIf="section.values && section.values.length > 0; else noData">
+          <li *ngFor="let item of section.values">{{ item.label }}</li>
+        </ul>
+        <ng-template #noData><i>No data</i></ng-template>
+      </td>
+    
+    </tr>
+  </tbody>
+</table>
+<hr>
+  <form [formGroup]="MentalStatusForm" >
+ <div class="d-flex align-items-start flex-wrap mb-3">
+     <div class="col-md-6 mb-3">
+      <label for="preparedBy" class="form-label fw-bold">Prepared By: <span class="text-muted">(LPRRC Consulting Psychologist)</span></label>
+      <select class="form-select" id="PreparedBy" formControlName="preparedBy">
+        <option value="" disabled>Select Personnel</option>
+        <option *ngFor="let staff of psychologists" [value]="staff.staffIdNo">
+          {{ staff.uFullName }}
+        </option>
+      </select>
+    </div>
+      <div class="col-md-6 mb-3">
+       <label for="notedBy" class="form-label fw-bold">Noted By: <span class="text-muted">(Medical Officer)</span></label>
+      <select class="form-select" id="notedBy" formControlName="notedBy">
+        <option value="" disabled>Select Personnel</option>
+        <option 
+          *ngFor="let staff of medicalOfficers" 
+          [value]="staff.staffIdNo">
+          {{ staff.uFullName }}
+        </option>
+      </select>
+      </div>
+    </div>
+      <div *ngIf="MentalStatusForm.get('preparedBy')?.touched && MentalStatusForm.get('preparedBy')?.errors?.['required']" class="text-danger">
+          preparedBy field is required.
+        </div>
+         <div *ngIf="MentalStatusForm.get('notedBy')?.touched && MentalStatusForm.get('notedBy')?.errors?.['required']" class="text-danger">
+          notedBy field is required.
+        </div>
+    </form>
+    
+ <div class="mt-3 text-end">
+       <button type="button" class="btn btn-primary text-white"  [disabled]="isSubmitting" (click)="onSaveNext()">
+      Save <i class="bx bx-save"></i>
     </button>
     </div>
-
+   
   </div>
-
+</div>
+  </div>
  <div class="tab-pane fade active show" id="AppearanceTab" role="tabpanel">
   <div class="card my-3 shadow-sm rounded-3">
       <div class="card-body pt-4 custom-font" style="max-height: 300px; overflow-y: auto;">
-
+         
       <form [formGroup]="MentalStatusForm">
-
+      
         <div class="d-flex align-items-start flex-wrap mb-3">
           <h4 class="mb-2 me-3">Appearance:</h4>
           <div formArrayName="appearanceId" class="row flex-grow-1">
@@ -666,7 +856,7 @@
       </form>
       </div>
     </div>
-
+    
       <div *ngIf="MentalStatusForm.errors?.['appearanceId'] && MentalStatusForm.touched" class="text-danger">
         Please select at least one appearance option.
       </div>
@@ -692,16 +882,15 @@
        Please select at least one Thought Content option.
       </div>
         <div class="mt-3 text-end">
-          <button type="button" (click)="goToSubstanceHisto()" class="btn btn-primary text-white">
-            <i class="bx bx-save"></i> Next
+          <button type="button" (click)="goToSubstanceHisto()" class="btn btn-secondary text-white">
+             Next
           </button>
         </div>
   </div>
   <div class="tab-pane fade" id="RehabProgress" role="tabpanel">
-
+    
      <div class="card my-3 shadow-sm rounded-3">
-      <div class="card-body pt-4 custom-font" style="max-height: 300px; overflow-y: auto;">
-
+      <div class="card-body pt-4 custom-font" style="max-height: 500px; overflow-y: auto;">
       <form [formGroup]="MentalStatusForm">
         <div class="mb-3">
           <h4 class="mb-2">Physical Indicators:</h4>
@@ -719,6 +908,7 @@
             </div>
           </div>
         </div>
+        <hr>
         <div class="mb-3">
           <h4 class="mb-2">Denial:</h4>
           <div formArrayName="denialId">
@@ -735,6 +925,7 @@
             </div>
           </div>
         </div>
+        <hr>
         <div class="mb-3">
           <h4 class="mb-2">Physical Withdrawal Symptoms:</h4>
           <div formArrayName="physicalWsymptomsId">
@@ -751,6 +942,7 @@
             </div>
           </div>
         </div>
+        <hr>
         <div class="mb-3">
           <h4 class="mb-2">Suspension of Activities:</h4>
           <div formArrayName="suspensionofActivitiesId">
@@ -767,6 +959,7 @@
             </div>
           </div>
         </div>
+        <hr>
         <div class="mb-3">
           <h4 class="mb-2">Cravings:</h4>
           <div formArrayName="cravingsId">
@@ -783,10 +976,41 @@
             </div>
           </div>
         </div>
+        <hr>
+         <div class="col-md-12">
+          <label for="otherObservations" class="form-label">Other Observations</label>
+          <textarea class="form-control" id="otherObservations" (input)="updateMonthlyReport()" formControlName="otherObservations" rows="2"
+          placeholder="Enter Observation"></textarea>
+          </div>
+          <hr>
       </form>
       </div>
-</div>
+      </div>
 
+      <div *ngIf="MentalStatusForm.errors?.['appearanceId'] && MentalStatusForm.touched" class="text-danger">
+        Please select at least one appearance option.
+      </div>
+       <div *ngIf="MentalStatusForm.errors?.['sensoriumId'] && MentalStatusForm.touched" class="text-danger">
+        Please select at least one Sensorium option.
+      </div>
+        <div *ngIf="MentalStatusForm.errors?.['functioningId'] && MentalStatusForm.touched" class="text-danger">
+        Please select at least one Functioning option.
+      </div>
+      <div *ngIf="MentalStatusForm.errors?.['speechId'] && MentalStatusForm.touched" class="text-danger">
+          Please select at least one Speech option.
+      </div>
+      <div *ngIf="MentalStatusForm.errors?.['behaviorId'] && MentalStatusForm.touched" class="text-danger">
+       Please select at least one Behavior option.
+      </div>
+      <div *ngIf="MentalStatusForm.errors?.['moodAffectId'] && MentalStatusForm.touched" class="text-danger">
+      Please select at least one Mood/Affect option.
+      </div>
+      <div *ngIf="MentalStatusForm.errors?.['dailyPatternsId'] && MentalStatusForm.touched" class="text-danger">
+       Please select at least one Daily Pattern option.
+       </div>
+      <div *ngIf="MentalStatusForm.errors?.['thoughtContentId'] && MentalStatusForm.touched" class="text-danger">
+       Please select at least one Thought Content option.
+      </div>
       <div *ngIf="MentalStatusForm.errors?.['physicaIndicatorsId'] && MentalStatusForm.touched" class="text-danger">
         Please select at least one Physical Indicators option.
       </div>
@@ -802,9 +1026,16 @@
       <div *ngIf="MentalStatusForm.errors?.['physicalWsymptomsId'] && MentalStatusForm.touched" class="text-danger">
        Please select at least one Physical Withdrawal Symptoms option.
       </div>
+        <div *ngIf="MentalStatusForm.get('otherObservations')?.touched && MentalStatusForm.get('otherObservations')?.errors?.['required']" class="text-danger">
+          Observations field is required.
+        </div>
+      
+        <div *ngIf="MentalStatusForm.get('dateSubmitted')?.touched && MentalStatusForm.get('dateSubmitted')?.errors?.['required']" class="text-danger">
+          Month field is required.
+        </div>
          <div class="mt-3 text-end">
-      <button type="button" (click)="goToPsychologicalSummary()" class="btn btn-primary text-white">
-        <i class="bx bx-save"></i> Next
+      <button type="button" (click)="goToPsychologicalSummary()"  class="btn btn-secondary text-white">
+         Next
       </button>
     </div>
   </div>
@@ -821,11 +1052,978 @@
 
   </div>
 </div>
+ <div class="modal fade" id="viewMonthlyProgressPerMonth" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+      <div class="modal-content"> 
+        <div class="modal-header">
+          <h5 class="modal-title" id="backDropModalTitle">Psychological Progress Report</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <div class="card-body pt-4 custom-font" style="max-height: 500px; overflow-y: auto;">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Section</th>
+                <th>Selected Progress</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let section of listPatientMonthlyPReportView">
+                <td>{{ section.section }}</td>
+                <td>
+                  <ul class="mb-0" *ngIf="section.values && section.values.length > 0; else noData">
+                    <li *ngFor="let item of section.values">{{ item.label }}</li>
+                  </ul>
+                  <ng-template #noData><i>No data</i></ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+         
+      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+ <form [formGroup]="NursingNotesForm" (ngSubmit)="NursingNotesFormSubmit()">
+<div class="modal fade" id="viewNusingNotesModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="backDropModalTitle">Nusing Note</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12">
+              <label for="remarks" class="form-label">Narrative</label>
+              <textarea class="form-control" id="remarks" formControlName="remarks" rows="2"
+                placeholder="Enter Personal Health History"></textarea>
+              <div *ngIf="NursingNotesForm.get('remarks')?.touched && NursingNotesForm.get('remarks')?.invalid" class="text-danger">
+                Narrative is required.
+              </div>
+            </div>
+            <div class="col-md-12 mt-3">
+              <label for="appDate" class="form-label">Activity Date</label>
+              <input type="date" id="appDate" formControlName="dateSubmitted" class="form-control" placeholder="Enter Date">
+              <div *ngIf="NursingNotesForm.get('dateSubmitted')?.touched && NursingNotesForm.get('dateSubmitted')?.invalid" class="text-danger">
+                Date is required.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="NursingNotesForm.invalid || isSubmitting">Save</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+      <label class="form-label  text-muted ">Note: Please ensure all fields are filled out before saving.</label>
+    </div>
+  </div>
+</div>
+</form>
+
+<div class="modal fade" id="viewEditNursingNotesModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="backDropModalTitle">Nusing Note</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+<div class="modal-body">
+<table class="table table-border-bottom-0" *ngIf="isEditingNursingTbleView">
+  <tbody>
+    <ng-container *ngFor="let s of nursingNotesDataEdit?.entity; let i = index">
+      <tr>
+        <td class="align-middle"><small class="text-light fw-medium">Date Noted</small></td>
+        <td class="py-4">
+          <p class="mb-0">{{ s.dateSubmitted | date:'MMMM-d-yyyy' }}</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="align-middle"><small class="text-light fw-medium">Narrative</small></td>
+        <td class="py-6">
+          <p class="lead mb-0">{{ s.remarks }}</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="align-middle"><small class="text-light fw-medium">Added By</small></td>
+        <td class="py-4 d-flex justify-content-between align-items-center">
+          <p class="lead mb-0">{{ s.staffFullName }}</p>
+
+          <!-- Edit Button (Only in view mode) -->
+          <button
+            type="button"
+            class="btn btn-sm btn-primary text-white"
+            (click)="onEditNursingNotes(s.recNo,s.dateSubmitted,s.code,s.patientCode,s.staffIdNo)"
+            *ngIf="isEditingNursingTbleView"
+            title="Edit Note">
+            <i class="bx bx-edit"></i>
+          </button>
+        </td>
+      </tr>
+    </ng-container>
+  </tbody>
+</table>
+
+<!-- Edit form view -->
+<div class="pt-3" *ngIf="isEditingNurseNotes">
+  <form [formGroup]="NursingNotesForm">
+    <div class="mb-3">
+  <label class="form-label fw-bold text-muted" style="display: none;">Editing Record #{{ currentNursingRecNo }}</label>
+</div>
+
+    <div class="col-md-12">
+      <label for="remarks" class="form-label">Narrative</label>
+      <textarea
+        class="form-control"
+        id="remarks"
+        formControlName="remarks"
+        rows="2"
+        placeholder="Enter Narrative"
+      ></textarea>
+    </div>
+  </form>
+   
+  <div class="d-flex justify-content-between mt-3">
+     <button
+      type="button"
+      class="btn btn-sm btn-secondary text-white"
+      (click)="BackonEditNursingNotes()"
+      title="Cancel Edit">
+      <i class="bx bx-arrow-back"></i>
+    </button>
+
+    <button type="button" class="btn btn-primary text-white" (click)="onSaveNursingNotes()">
+      <i class="bx bx-save"></i> Save
+    </button>
+  </div>
+</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="viewPEModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewPMMRModal" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="backDropModalTitle">Psychological Evaluation (PE)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Nav Tabs -->
+    <ul class="nav nav-pills flex-column flex-md-row custom-nav">
+      <li class="nav-item">
+        <a class="nav-link active py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#PEReportTab" role="tab" aria-selected="false">
+          <i class="bx bx-user bx-sm me-1"></i> PE Details
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#PsychologicalEvalSummary" role="tab" aria-selected="true">
+          <i class="bx bx-book-open bx-sm me-1"></i> Psychological Evaluation Summary
+        </a>
+      </li>
+    </ul>
+    <form [formGroup]="PsychEvaluationReportForm" >
+  <div class="tab-content">
+  <div class="tab-pane fade active show" id="PEReportTab" role="tabpanel">
+    <div class="card my-3 shadow-sm rounded-3">
+        <div class="card-body pt-4 custom-font" style="max-height: 500px; overflow-y: auto;">
+        <div class="d-flex align-items-start flex-wrap mb-3">
+          <div class="col-md-6">
+              <label for="dateSubmitted" class="form-label me-2">Date Submitted</label>
+              <input
+                type="month"
+                class="form-control"
+                id="dateSubmitted"
+                formControlName="datelog"
+              />
+            </div>
+          </div>
+            <hr>
+             <div class="d-flex align-items-start flex-wrap mb-3">
+              <div class="col-md-12">
+                    <label for="purposeEval" class="form-label">II. Purpose for Evaluation</label>
+                    <textarea class="form-control" id="purposeEval" formControlName="purposeForEvaluation" rows="2"
+                      placeholder="Enter Purpose"></textarea>
+                  </div>
+          </div>
+            <hr>
+            <div class="d-flex align-items-start flex-wrap mb-3">
+              <div class="col-md-12">
+                    <label for="AssessProced" class="form-label">III. Assessment Procedure</label>
+                    <textarea class="form-control" id="AssessProced" formControlName="assessmentProcedures" rows="2"
+                      placeholder="Enter Purpose"></textarea>
+                  </div>
+          </div>
+            <hr>
+               <div class="d-flex align-items-start flex-wrap mb-3">
+              <div class="col-md-12">
+                    <label for="Complaints" class="form-label">IV. Presenting Problems/Complaints</label>
+                    <textarea class="form-control" id="Complaints" formControlName="presentingProblems" rows="2"
+                      placeholder="Enter Purpose"></textarea>
+                  </div>
+          </div>
+            <hr>
+            <div class="d-flex align-items-start flex-wrap mb-3">
+              <div class="col-md-12">
+                    <label for="Background" class="form-label">V. Case Background</label>
+                    <textarea class="form-control" id="Background" formControlName="caseBackground" rows="2"
+                      placeholder="Enter Purpose"></textarea>
+                  </div>
+          </div>
+            <hr>
+            <div class="d-flex align-items-start flex-wrap mb-3">
+              <div class="col-md-12">
+                    <label for="PSYCHOMETRIC" class="form-label">VI. PsychoMetric Evaluation</label>
+                    <textarea class="form-control" id="PSYCHOMETRIC" formControlName="psychometricEvaluation" rows="2"
+                      placeholder="Enter Purpose"></textarea>
+                  </div>
+          </div>
+            <hr>
+               <div class="d-flex align-items-start flex-wrap mb-3">
+              <div class="col-md-12">
+                    <label for="SUMMARY" class="form-label">VII. Summary</label>
+                    <textarea class="form-control" id="SUMMARY" formControlName="summary" rows="2"
+                      placeholder="Enter Purpose"></textarea>
+                  </div>
+          </div>
+            <hr>
+            <div class="d-flex align-items-start flex-wrap mb-3">
+              <div class="col-md-12">
+                    <label for="RECOMMENDATIONS" class="form-label">VIII. Recommendations</label>
+                    <textarea class="form-control" id="RECOMMENDATIONS" formControlName="recommedation" rows="2"
+                      placeholder="Enter Purpose"></textarea>
+                  </div>
+          </div>
+            <hr>
+        </div>
+      </div>
+          <div class="mt-3 text-end">
+            <button type="button" (click)="goToEvalSum()" class="btn btn-secondary text-white">
+              Next
+            </button>
+          </div>
+    </div>
+    <div class="tab-pane fade " id="PsychologicalEvalSummary" role="tabpanel">
+      <div class="table-scroll">
+            <div class="card-body pt-4 custom-font" style="max-height: 500px; overflow-y: auto;">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th style="width: 30%;">Section</th>
+          <th style="width: 70%;">Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let section of listPatientPsychEvalReport">
+          <td>{{ section.section }}</td>
+          <td>
+            <ul class="mb-0" *ngIf="section.values && section.values.length > 0; else noData">
+              <li *ngFor="let item of section.values">{{ item.label }}</li>
+            </ul>
+            <ng-template #noData><i>No data</i></ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+    <div class="d-flex align-items-start flex-wrap mb-3">
+     <div class="col-md-6 mb-3">
+      <label for="ApprovedBy" class="form-label fw-bold">Prepared By: <span class="text-muted">(Psychometrician)</span></label>
+      <select class="form-select" id="PreparedBy" formControlName="preparedBy">
+        <option value="" disabled>Select Personnel</option>
+        <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">
+          {{ staff.uFullName }}
+        </option>
+      </select>
+
+    </div>
+    
+    <div class="col-md-6 mb-3">
+       <label for="ApprovedBy" class="form-label fw-bold">Approved By: <span class="text-muted">(Psychologist)</span></label>
+      <select class="form-select" id="ApprovedBy" formControlName="approvedBy">
+        <option value="" disabled>Select Personnel</option>
+        <option 
+          *ngFor="let staff of psychologists" 
+          [value]="staff.staffIdNo">
+          {{ staff.uFullName }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label for="ApprovedBy" class="form-label fw-bold">Noted By: <span class="text-muted">(Administrative Officer)</span></label>
+      <select class="form-select" id="NotedByF" formControlName="notedByF">
+        <option value="" disabled>Select Personnel</option>
+        <option 
+          *ngFor="let staff of psychometricians" 
+          [value]="staff.staffIdNo">
+          {{ staff.uFullName }}
+        </option>
+      </select>
+      
+    </div>
+      <div class="col-md-6 mb-3">
+       <label for="ApprovedBy" class="form-label fw-bold">Noted By: <span class="text-muted">(Medical Officer)</span></label>
+      <select class="form-select" id="NotedByS" formControlName="notedByS">
+        <option value="" disabled>Select Personnel</option>
+        <option 
+          *ngFor="let staff of medicalOfficers" 
+          [value]="staff.staffIdNo">
+          {{ staff.uFullName }}
+        </option>
+      </select>
+      </div>
+    </div>
+    <div class="mt-3 text-end">
+        <button type="button" class="btn btn-primary text-white"  [disabled]="isSubmitting" (click)="onSavePE()">
+        Save <i class="bx bx-save"></i>
+      </button>
+      </div>
+      
+   <label class="form-label fw-bold text-muted ">Note: Please ensure all fields are filled out before saving.</label>
+    </div>
+  </div>
+    </div>
+  </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+</div>
+
+    </div>
+    
+  </div>
+</div>
 
 
+<div class="modal fade" id="viewPlanModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewPMMRModal" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="backDropModalTitle">Treatment Plan Form</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Nav Tabs -->
+    <ul class="nav nav-pills flex-column flex-md-row custom-nav">
+      <li class="nav-item">
+        <a class="nav-link active py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#PlanReportTab" role="tab" aria-selected="false">
+          <i class="bx bx-user bx-sm me-1"></i> Treatment Plan
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#PlanSummary" role="tab" aria-selected="true">
+          <i class="bx bx-book-open bx-sm me-1"></i> Treatment Plan Summary
+        </a>
+      </li>
+    </ul>
+   <form [formGroup]="TreatPlanReportForm">
+  <div class="tab-content">
+    <div class="tab-pane fade active show" id="PlanReportTab" role="tabpanel">
+      <div class="card my-3 shadow-sm rounded-3">
+        <div class="card-body pt-4 custom-font" style="max-height: 500px; overflow-y: auto;">
+          
+          <!-- Date Identified -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+            <div class="col-md-6">
+              <label for="dateIdentified" class="form-label me-2">Date Identified</label>
+              <input type="datetime-local" class="form-control" id="dateIdentified" formControlName="dateIdentified" />
+              <div *ngIf="TreatPlanReportForm.get('dateIdentified')?.touched && TreatPlanReportForm.get('dateIdentified')?.invalid" class="text-danger">
+                Date Identified is required.
+              </div>
+            </div>
+          </div>
+          <hr>
 
+          <!-- Domain -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+            <div class="col-md-12">
+              <label for="patientDomain" class="form-label me-2">Domain</label>
+              <select class="form-select" id="patientDomain" formControlName="patientDomainCode">
+                <option value="" disabled>Select Personnel</option>
+                <option *ngFor="let staff of domains" [value]="staff.domainCode">{{ staff.domainDesc  }}</option>
+              </select>
+              <div *ngIf="TreatPlanReportForm.get('patientDomainCode')?.touched && TreatPlanReportForm.get('patientDomainCode')?.invalid" class="text-danger">
+                Domain is required.
+              </div>
+            </div>
+          </div>
+          <hr>
 
+          <!-- Problem -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+            <div class="col-md-12">
+              <label for="patientProblem" class="form-label">Problem</label>
+              <textarea class="form-control" id="patientProblem" formControlName="patientProblem" rows="2" placeholder="Enter Purpose"></textarea>
+              <div *ngIf="TreatPlanReportForm.get('patientProblem')?.touched && TreatPlanReportForm.get('patientProblem')?.invalid" class="text-danger">
+                Problem is required.
+              </div>
+            </div>
+          </div>
+          <hr>
 
+          <!-- Goal -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+            <div class="col-md-12">
+              <label for="patientGoal" class="form-label">Goal</label>
+              <textarea class="form-control" id="patientGoal" formControlName="patientGoal" rows="2" placeholder="Enter Purpose"></textarea>
+              <div *ngIf="TreatPlanReportForm.get('patientGoal')?.touched && TreatPlanReportForm.get('patientGoal')?.invalid" class="text-danger">
+                Goal is required.
+              </div>
+            </div>
+          </div>
+          <hr>
 
+          <!-- Objective -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+            <div class="col-md-12">
+              <label for="patientObjective" class="form-label">Objective</label>
+              <textarea class="form-control" id="patientObjective" formControlName="patientObjective" rows="2" placeholder="Enter Purpose"></textarea>
+              <div *ngIf="TreatPlanReportForm.get('patientObjective')?.touched && TreatPlanReportForm.get('patientObjective')?.invalid" class="text-danger">
+                Objective is required.
+              </div>
+            </div>
+          </div>
+          <hr>
 
+          <!-- Intervention -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+            <div class="col-md-12">
+              <label for="patientIntervention" class="form-label">Intervention</label>
+              <textarea class="form-control" id="patientIntervention" formControlName="patientIntervention" rows="2" placeholder="Enter Purpose"></textarea>
+              <div *ngIf="TreatPlanReportForm.get('patientIntervention')?.touched && TreatPlanReportForm.get('patientIntervention')?.invalid" class="text-danger">
+                Intervention is required.
+              </div>
+            </div>
+          </div>
+          <hr>
+        </div>
+      </div>
 
+      <div class="mt-3 text-end">
+        <button type="button" (click)="goToPlanSummary()" class="btn btn-secondary text-white">Next</button>
+      </div>
+    </div>
+
+    <!-- Summary Tab -->
+    <div class="tab-pane fade" id="PlanSummary" role="tabpanel">
+      <div class="table-scroll">
+        <div class="card-body pt-4 custom-font" style="max-height: 500px; overflow-y: auto;">
+          
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th style="width: 30%;">Section</th>
+                <th style="width: 70%;">Summary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let section of listTreatmentPlanReport">
+                <td>{{ section.section }}</td>
+                <td>
+                  <ul class="mb-0" *ngIf="section.values && section.values.length > 0; else noData">
+                    <li *ngFor="let item of section.values">{{ item.label }}</li>
+                  </ul>
+                  <ng-template #noData><i>No data</i></ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <hr>
+
+          <!-- Prepared By -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+             <div class="col-md-4 mb-3">
+              <label for="PreparedBy" class="form-label fw-bold">Prepared By <span class="text-muted">(Social Welfare)</span></label>
+              <select class="form-select" id="PreparedBy" formControlName="preparedBy">
+                <option value="" disabled>Select Personnel</option>
+                <option *ngFor="let staff of socialWelfare" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="TreatPlanReportForm.get('preparedBy')?.touched && TreatPlanReportForm.get('preparedBy')?.invalid" class="text-danger">
+                Prepared By is required.
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="nurseCode" class="form-label fw-bold">Prepared By <span class="text-muted">(Nurse)</span></label>
+              <select class="form-select" id="nurseCode" formControlName="nurseCode">
+                <option value="" disabled>Select Personnel</option>
+                <option *ngFor="let staff of nursing" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="TreatPlanReportForm.get('nurseCode')?.touched && TreatPlanReportForm.get('nurseCode')?.invalid" class="text-danger">
+                Prepared By is required.
+              </div>
+            </div>
+
+            <!-- Approved By -->
+            <div class="col-md-4 mb-3">
+              <label for="psychometricianCode" class="form-label fw-bold">Prepared By <span class="text-muted">(Psychometrician)</span></label>
+              <select class="form-select" id="psychometricianCode" formControlName="psychometricianCode">
+                <option value="" disabled>Select Personnel</option>
+                <option *ngFor="let staff of psychometricians" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="TreatPlanReportForm.get('psychometricianCode')?.touched && TreatPlanReportForm.get('psychometricianCode')?.invalid" class="text-danger">
+                Approved By is required.
+              </div>
+            </div>
+
+            <!-- Noted By (Admin Officer) -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Noted By: <span class="text-muted">(Administrative Officer)</span></label>
+              <select class="form-select" id="NotedByF" formControlName="notedBy">
+                <option value="" disabled>Select Personnel</option>
+                <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="TreatPlanReportForm.get('notedBy')?.touched && TreatPlanReportForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admin) is required.
+              </div>
+            </div>
+
+            <!-- Noted By (Medical Officer) -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Approved By: <span class="text-muted">(Medical Officer)</span></label>
+              <select class="form-select" id="approvedBy" formControlName="approvedBy">
+                <option value="" disabled>Select Personnel</option>
+                <option *ngFor="let staff of medicalOfficers" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="TreatPlanReportForm.get('approvedBy')?.touched && TreatPlanReportForm.get('approvedBy')?.invalid" class="text-danger">
+                Approved By (Medical Officer) is required.
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 text-end">
+           <button 
+            type="button" 
+            class="btn btn-primary text-white"
+            [disabled]="isSubmitting || TreatPlanReportForm.invalid"
+            (click)="onSaveTreatment()">
+            Save <i class="bx bx-save"></i>
+          </button>
+          </div>
+          <label class="form-label fw-bold text-muted ">Note: Please ensure all fields are filled out before saving.</label>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+</div>
+
+    </div>
+    
+  </div>
+</div>
+<div class="modal fade" id="viewDocOrderModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewPMMRModal" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="backDropModalTitle">Doctors Order</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Nav Tabs -->
+    <ul class="nav nav-pills flex-column flex-md-row custom-nav">
+      <li class="nav-item">
+        <a class="nav-link active py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#OrderDetailsTab" role="tab" aria-selected="false">
+          <i class="bx bx-user bx-sm me-1"></i> Order Details
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#OrderSummary" role="tab" aria-selected="true">
+          <i class="bx bx-book-open bx-sm me-1"></i> Order Summary
+        </a>
+      </li>
+    </ul>
+   <form [formGroup]="DocOrderForm">
+  <div class="tab-content">
+    <div class="tab-pane fade active show" id="OrderDetailsTab" role="tabpanel">
+      <div class="card my-3 shadow-sm rounded-3">
+        <div class="card-body pt-4 custom-font" style="max-height: 500px; overflow-y: auto;">
+          
+          <!-- Date Identified -->
+          <div class="row">
+            <div class="col-md-6">
+              <label for="dateIdentified" class="form-label me-2">Date Order</label>
+              <input type="datetime-local" class="form-control" id="dateIdentified" formControlName="dateIdentified" />
+              <div *ngIf="DocOrderForm.get('dateIdentified')?.touched && DocOrderForm.get('dateIdentified')?.invalid" class="text-danger">
+                Date Identified is required.
+              </div>
+            </div>
+              
+          </div>
+          <hr>
+
+          <!-- Domain -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+            <div class="col-md-12">
+              <label for="patientObjective" class="form-label">Subjective</label>
+              <textarea class="form-control" id="patientObjective" formControlName="patientObjective" rows="2" placeholder="Enter Purpose"></textarea>
+              <div *ngIf="DocOrderForm.get('patientObjective')?.touched && DocOrderForm.get('patientObjective')?.invalid" class="text-danger">
+                Objective is required.
+              </div>
+            </div>
+          </div>
+          <hr>
+
+          <!-- Problem -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+            <div class="col-md-12">
+              <label for="patientProblem" class="form-label">Physical Examination</label>
+              <textarea class="form-control" id="patientProblem" formControlName="patientProblem" rows="2" placeholder="Enter Purpose"></textarea>
+              <div *ngIf="DocOrderForm.get('patientProblem')?.touched && DocOrderForm.get('patientProblem')?.invalid" class="text-danger">
+                Problem is required.
+              </div>
+            </div>
+          </div>
+          <hr>
+
+          <!-- Goal -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+            <div class="col-md-12">
+              <label for="patientGoal" class="form-label">Assessment</label>
+              <textarea class="form-control" id="patientGoal" formControlName="patientGoal" rows="2" placeholder="Enter Purpose"></textarea>
+              <div *ngIf="DocOrderForm.get('patientGoal')?.touched && DocOrderForm.get('patientGoal')?.invalid" class="text-danger">
+                Goal is required.
+              </div>
+            </div>
+          </div>
+          <hr>
+
+          <!-- Objective -->
+        
+          <hr>
+
+          <!-- Intervention -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+            <div class="col-md-12">
+              <label for="patientIntervention" class="form-label">Intervention</label>
+              <textarea class="form-control" id="patientIntervention" formControlName="patientIntervention" rows="2" placeholder="Enter Purpose"></textarea>
+              <div *ngIf="DocOrderForm.get('patientIntervention')?.touched && DocOrderForm.get('patientIntervention')?.invalid" class="text-danger">
+                Intervention is required.
+              </div>
+            </div>
+          </div>
+          <hr>
+        </div>
+      </div>
+
+      <div class="mt-3 text-end">
+        <button type="button" (click)="goToPlanSummary()" class="btn btn-secondary text-white">Next</button>
+      </div>
+    </div>
+
+    <!-- Summary Tab -->
+    <div class="tab-pane fade" id="OrderSummary" role="tabpanel">
+      <div class="table-scroll">
+        <div class="card-body pt-4 custom-font" style="max-height: 500px; overflow-y: auto;">
+          
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th style="width: 30%;">Section</th>
+                <th style="width: 70%;">Summary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let section of listDoctorOrderReport">
+                <td>{{ section.section }}</td>
+                <td>
+                  <ul class="mb-0" *ngIf="section.values && section.values.length > 0; else noData">
+                    <li *ngFor="let item of section.values">{{ item.label }}</li>
+                  </ul>
+                  <ng-template #noData><i>No data</i></ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <hr>
+
+          <!-- Prepared By -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+           <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Ordered By</label>
+              <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Enter Full name" formControlName="notedBy">
+              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admin) is required.
+              </div>
+            </div>
+            <!-- Noted By (Medical Officer) -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Carry-out By: <span class="text-muted">(Nurse)</span></label>
+              <select class="form-select" id="approvedBy" formControlName="approvedBy">
+                <option value="" disabled>Select Personnel</option>
+                <option *ngFor="let staff of medicalOfficers" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="DocOrderForm.get('approvedBy')?.touched && DocOrderForm.get('approvedBy')?.invalid" class="text-danger">
+                Approved By (Medical Officer) is required.
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 text-end">
+           <button 
+            type="button" 
+            class="btn btn-primary text-white"
+            [disabled]="isSubmitting || TreatPlanReportForm.invalid"
+            (click)="onSaveTreatment()">
+            Save <i class="bx bx-save"></i>
+          </button>
+          </div>
+          <label class="form-label fw-bold text-muted ">Note: Please ensure all fields are filled out before saving.</label>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+</div>
+
+    </div>
+    
+  </div>
+</div>
+<div class="modal fade" id="viewMedicationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewPMMRModal" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="backDropModalTitle">Medication Summary</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Nav Tabs -->
+    <ul class="nav nav-pills flex-column flex-md-row custom-nav">
+      <li class="nav-item">
+        <a class="nav-link active py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#MedicationDetailsTab" role="tab" aria-selected="false">
+          <i class="bx bx-user bx-sm me-1"></i> Medication Details
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link py-1 px-2 small d-flex align-items-center" data-bs-toggle="tab" data-bs-target="#MedicationSummary" role="tab" aria-selected="true">
+          <i class="bx bx-book-open bx-sm me-1"></i> Medication Summary
+        </a>
+      </li>
+    </ul>
+   <form [formGroup]="MedicationForm">
+  <div class="tab-content">
+    <div class="tab-pane fade active show" id="MedicationDetailsTab" role="tabpanel">
+      <div class="card my-3 shadow-sm rounded-3">
+        <div class="card-body pt-4 custom-font" style="max-height: 500px; overflow-y: auto;">
+          
+        <div class="row">
+            <div class="col-md-3">
+              <label for="dateIdentified" class="form-label me-2">Medication Start</label>
+              <input type="datetime-local" class="form-control" id="dateIdentified" formControlName="dateIdentified" />
+              <div *ngIf="DocOrderForm.get('dateIdentified')?.touched && DocOrderForm.get('dateIdentified')?.invalid" class="text-danger">
+                Date Identified is required.
+              </div>
+            </div>
+           <div class="col-md-4">
+              <label class="form-label fw-bold">Medication </label>
+              <select class="form-select" id="NotedByF" formControlName="notedBy">
+                <option value="" disabled>Select Medication</option>
+                <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admin) is required.
+              </div>
+            </div>
+            </div>
+          <hr>
+         <div class="row">
+           
+          <div class="col-md-4">
+              <label class="form-label fw-bold">Preparation</label>
+              <select class="form-select" id="NotedByF" formControlName="notedBy">
+                <option value="" disabled>Select Personnel</option>
+                <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admiwn) is required.
+              </div>
+            </div>
+             <div class="col-md-4">
+              <label class="form-label fw-bold">Dose Form </label>
+              <select class="form-select" id="NotedByF" formControlName="notedBy">
+                <option value="" disabled>Select Dose</option>
+                <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admin) is required.
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Route</label>
+              <select class="form-select" id="NotedByF" formControlName="notedBy">
+                <option value="" disabled>Select Personnel</option>
+                <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admin) is required.
+              </div>
+            </div>
+            </div>
+            <hr>
+            <div class="row">
+          <div class="col-md-4">
+              <label class="form-label fw-bold">Dosage</label>
+              <select class="form-select" id="NotedByF" formControlName="notedBy">
+                <option value="" disabled>Select Dosage</option>
+                <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admin) is required.
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Duration</label>
+              <select class="form-select" id="NotedByF" formControlName="notedBy">
+                <option value="" disabled>Select Duration</option>
+                <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admin) is required.
+              </div>
+            </div>
+            <div class="col-md-4">
+               <label for="defaultFormControlInput" class="form-label">Quantity to Dispense</label>
+                <input type="number" class="form-control" id="defaultFormControlInput" placeholder="Enter Quantity" formControlName="notedBy">
+            </div>
+            </div>
+            <hr>
+        
+        <div class="row">
+          <div class="col-md-4">
+              <div class="col-md-12">
+              <label for="patientObjective" class="form-label">Indication</label>
+              <textarea class="form-control" id="patientObjective" formControlName="patientObjective" rows="2" placeholder="Enter Purpose"></textarea>
+              <div *ngIf="DocOrderForm.get('patientObjective')?.touched && DocOrderForm.get('patientObjective')?.invalid" class="text-danger">
+                Objective is required.
+              </div>
+            </div>
+            </div>
+          
+             <div class="col-md-4">
+              <label class="form-label fw-bold">Prescriber </label>
+               <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Enter Full name" formControlName="notedBy">
+              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admin) is required.
+              </div>
+            </div>
+            </div>
+
+          <hr>
+        
+        
+          <hr>
+        </div>
+      </div>
+
+      <div class="mt-3 text-end">
+        <button type="button" (click)="goToPlanSummary()" class="btn btn-secondary text-white">Next</button>
+      </div>
+    </div>
+
+    <!-- Summary Tab -->
+    <div class="tab-pane fade" id="MedicationSummary" role="tabpanel">
+      <div class="table-scroll">
+        <div class="card-body pt-4 custom-font" style="max-height: 500px; overflow-y: auto;">
+          
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th style="width: 30%;">Section</th>
+                <th style="width: 70%;">Summary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let section of listMedicationReport">
+                <td>{{ section.section }}</td>
+                <td>
+                  <ul class="mb-0" *ngIf="section.values && section.values.length > 0; else noData">
+                    <li *ngFor="let item of section.values">{{ item.label }}</li>
+                  </ul>
+                  <ng-template #noData><i>No data</i></ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <hr>
+
+          <!-- Prepared By -->
+          <div class="d-flex align-items-start flex-wrap mb-3">
+            <!-- Noted By (Admin Officer) -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Prepared By: <span class="text-muted">(Physician)</span></label>
+              <select class="form-select" id="NotedByF" formControlName="notedBy">
+                <option value="" disabled>Select Personnel</option>
+                <option *ngFor="let staff of administratives" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
+                Noted By (Admin) is required.
+              </div>
+            </div>
+
+            <!-- Noted By (Medical Officer) -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Carry-out By: <span class="text-muted">(Nurse)</span></label>
+              <select class="form-select" id="approvedBy" formControlName="approvedBy">
+                <option value="" disabled>Select Personnel</option>
+                <option *ngFor="let staff of medicalOfficers" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="DocOrderForm.get('approvedBy')?.touched && DocOrderForm.get('approvedBy')?.invalid" class="text-danger">
+                Approved By (Medical Officer) is required.
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 text-end">
+           <button 
+            type="button" 
+            class="btn btn-primary text-white"
+            [disabled]="isSubmitting || TreatPlanReportForm.invalid"
+            (click)="onSaveTreatment()">
+            Save <i class="bx bx-save"></i>
+          </button>
+          </div>
+          <label class="form-label fw-bold text-muted ">Note: Please ensure all fields are filled out before saving.</label>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+</div>
+
+    </div>
+    
+  </div>
+</div>

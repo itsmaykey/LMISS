@@ -12,14 +12,23 @@ export class PatientDashboardService {
  getExistedPatientData(patientCode: string, assessmentCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatient?patientCode=${patientCode}&assessmentCode=${assessmentCode}`);
   }
-  postPatientProgressReport(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatasB/PostPatientProgressReport`, data);
-  }
   getPatientProgressReport(patientCode: string, assessmentCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientDatasB/GetExistedPatientProgressReports?patientCode=${patientCode}&code=${assessmentCode}`);
   }
+  getExistedPatientMonthlyProgressReports(patientCode: string, assessmentCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientDatasD/GetExistedPatientMonthlyProgressReports?patientCode=${patientCode}&code=${assessmentCode}`);
+  }
+ getExistedPatientNursingNotes(patientCode: string, assessmentCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientDatasC/GetExistedPatientNursingNotes?patientCode=${patientCode}&code=${assessmentCode}`);
+  }
+  getExistedPatientPsychologicalEvaluationReport(patientCode: string, assessmentCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientDatasE/GetExistedPatientPsychologicalEvaluationReport?patientCode=${patientCode}&code=${assessmentCode}`);
+  }
+  getExistedPatientTreatmentPlan(patientCode: string, assessmentCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientDatasF/GetExistedPatientTreatmentPlan?patientCode=${patientCode}&code=${assessmentCode}`);
+  }
   gettrefMPPRQuestionaire() {
-    return this.http.get(`${environment.apiUrl}getrefAppearance/GettrefMPPRQuestionaire`);
+    return this.http.get(`${environment.apiUrl}GetPatientDatasD/GettrefMPPRQuestionaire`);
   }
  getrefAppearance() {
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/getrefAppearance`);
@@ -51,6 +60,9 @@ export class PatientDashboardService {
   getrefDenial() {
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/getrefDenial`);
   }
+  getUsers() {
+    return this.http.get(`${environment.apiUrl}GetPatientDatasE/GetUsers`);
+  }
   getrefPhysicalWithdrawalSymptoms() {
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/getrefPhysicalWithdrawalSymptoms`);
   }
@@ -59,5 +71,24 @@ export class PatientDashboardService {
   }
   getrefCravings() {
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/getrefCravings`);
+  }
+  getrefDomain() {
+    return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/getrefDomain`);
+  }
+/////post
+  postPatientMonthlyProgressReport(data: any) {
+    return this.http.post(`${environment.apiUrl}PostPatientDatasD/PostPatientMonthlyProgressReport`, data);
+  }
+  postPatientNursingNotes(data: any) {
+    return this.http.post(`${environment.apiUrl}PostPatientDatasC/PostPatientNursingNotes`, data);
+  }
+   postPatientProgressReport(data: any) {
+    return this.http.post(`${environment.apiUrl}PostPatientDatasB/PostPatientProgressReport`, data);
+  }
+  postPatientPsychologicalEvaluationReport(data: any) {
+    return this.http.post(`${environment.apiUrl}PostPatientDatasE/PostPatientPsychologicalEvaluationReport`, data);
+  }
+  postPatientTreatmentPlan(data: any) {
+    return this.http.post(`${environment.apiUrl}PostPatientDatasF/PostPatientTreatmentPlan`, data);
   }
 }
