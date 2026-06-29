@@ -1040,9 +1040,13 @@ console.log(this.MedicationForm.value);
 this.DocOrderForm.valueChanges.subscribe(() => {
     this.updateOrderSummaryTable();
   });
+  this.MedicationForm.valueChanges.subscribe(() => {
+    this.updateMedicationSummaryTable();
+  });
    this.updatePlanSummaryTable();
   this.updateSummaryTable();
   this.updateOrderSummaryTable();
+  this.updateMedicationSummaryTable();
     this.service.getrefAppearance().subscribe({
       next: (response) => {
         this.Appearance = response as any[];
@@ -1503,7 +1507,6 @@ updateOrderSummaryTable() {
     { section: 'Assessment', values: [{ label: formData.patientGoal || '' }] },
     { section: 'Intervention', values: [{ label: formData.patientIntervention || '' }] },
     { section: 'Ordered By', values: [{ label: formData.preparedBy || '' }] },
-    { section: 'Carry Out by', values: [{ label: formData.nurseCode || '' }] },
     // { section: 'Psychometrician', values: [{ label: formData.psychometricianCode || '' }] },
     // { section: 'Administrative Officer', values: [{ label: formData.notedBy || '' }] },
     // { section: 'Medical Officer', values: [{ label: formData.approvedBy || '' }] },
@@ -1515,7 +1518,7 @@ updateMedicationSummaryTable() {
   this.listMedicationReport = [
 
      { 
-      section: 'Date Ordered', 
+      section: 'Medication Start', 
       values: [
         { 
           label: formData.dateIdentified 
@@ -1524,17 +1527,36 @@ updateMedicationSummaryTable() {
         }
       ] 
     },
-     { section: 'Subjective', values: [{ label: domainDesc }] },
-    { section: 'Physical Examination', values: [{ label: formData.patientProblem || '' }] },
-    { section: 'Assessment', values: [{ label: formData.patientGoal || '' }] },
-    { section: 'Intervention', values: [{ label: formData.patientIntervention || '' }] },
-    { section: 'Physician', values: [{ label: formData.preparedBy || '' }] },
-    { section: 'Carry Out by', values: [{ label: formData.nurseCode || '' }] },
+     { section: 'Medication', values: [{ label: domainDesc }] },
+    { section: 'Preparation', values: [{ label: formData.patientProblem || '' }] },
+    { section: 'Dose Form', values: [{ label: formData.patientGoal || '' }] },
+    { section: 'Route', values: [{ label: formData.patientIntervention || '' }] },
+    { section: 'Dosage', values: [{ label: formData.patientIntervention || '' }] },
+    { section: 'Duration', values: [{ label: formData.patientIntervention || '' }] },
+    { section: 'Quantity to Dispense', values: [{ label: formData.patientIntervention || '' }] },
+    { section: 'Indication', values: [{ label: formData.preparedBy || '' }] },
+    { section: 'Prescribed by', values: [{ label: formData.preparedBy || '' }] },
     // { section: 'Psychometrician', values: [{ label: formData.psychometricianCode || '' }] },
     // { section: 'Administrative Officer', values: [{ label: formData.notedBy || '' }] },
     // { section: 'Medical Officer', values: [{ label: formData.approvedBy || '' }] },
   ];
 }
+async downloadReport(reportName: string) {
+  const response = await fetch(`/Reports/ExportReport?reportName=${reportName}`);
+  const blob = await response.blob();
+
+  // Create a temporary download link
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${reportName}.pdf`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+// Call it from your app, e.g.:
+// this.downloadReport("MyReport");
+
 checkExisted(): void {
     this.route.paramMap.subscribe((params) => {
       const patientCode = params.get('patientCode');
@@ -1655,8 +1677,7 @@ tryprint(): void{
     });
   }
 
-  
-SocialWorkerNotesFormSubmit(): void {
+  SocialWorkerNotesFormSubmit(): void {
  
   if (this.SocialWorkerNotesForm.invalid) {
     this.SocialWorkerNotesForm.markAllAsTouched();
@@ -1692,6 +1713,61 @@ SocialWorkerNotesFormSubmit(): void {
       });
       this.hideModal();
       this.SocialWorkerNotesForm.reset();
+      this.isSubmitting = false;
+      this.refreshSwpnData();
+    },
+    error: (error) => {
+      console.error('Error saving form:', error);
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to submit patient progress report. Please try again.',
+        showConfirmButton: true,
+        allowOutsideClick: true,
+        allowEscapeKey: true
+      });
+
+      this.isSubmitting = false;
+    }
+  });
+}
+onSubmitMedicationForm(): void {
+ 
+  if (this.MedicationForm.invalid) {
+    this.MedicationForm.markAllAsTouched();
+    return;
+  }
+
+  this.isSubmitting = true;
+
+  // Ensure patientCode, code, and staffIdNo are set before submit
+  this.MedicationForm.patchValue({
+    recNo: 0, // Reset recNo to 0 for new submission
+    patientCode: this.route.snapshot.paramMap.get('patientCode') || this.ExistedPatientCode,
+    code: this.route.snapshot.paramMap.get('assessmentCode') || this.ExistedAssessmentCode,
+    staffIdNo: this.userInfo?.id || ''
+  });
+  const formData = this.MedicationForm.value;
+  console.log(formData);
+
+  this.service.postPatientProgressReport( formData ).subscribe({
+
+    next: (response) => {
+      console.log('Form saved successfully:', response);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Patient progress report submitted successfully!',
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      });
+      this.hideModal();
+      this.MedicationForm.reset();
       this.isSubmitting = false;
       this.refreshSwpnData();
     },
@@ -2580,6 +2656,37 @@ requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | nul
 //     alert('Please fill in all required fields correctly.');
 //   }
 // }
+
+////Printing Functions
+printSWPN(recNo: string): void {
+  console.log('Printing for:', recNo);
+  // TODO: implement print logic here
+}
+printNurses(recNo: string): void {
+  console.log('Printing for:', recNo);
+  // TODO: implement print logic here
+}
+printMPPR(recNo: string): void {
+  console.log('Printing for:', recNo);
+  // TODO: implement print logic here
+}
+printPsychEVal(recNo: string): void {
+  console.log('Printing for:', recNo);
+  // TODO: implement print logic here
+}
+printTreatPlan(recNo: string): void {
+  console.log('Printing for:', recNo);
+  // TODO: implement print logic here
+}
+printDocOrder(recNo: string): void {
+  console.log('Printing for:', recNo);
+  // TODO: implement print logic here
+}
+printMedication(recNo: string): void {
+  console.log('Printing for:', recNo);
+  // TODO: implement print logic here
+}
+
 private handleError(error: any, context: string): void {
   console.error(`Error submitting ${context} data:`, error);
 

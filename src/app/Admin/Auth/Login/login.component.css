@@ -1,0 +1,19 @@
+
+.login-background {
+  background-image: url('/assets/img/backgrounds/bgLog.png');
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+.card {
+  max-width: 400px;
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.451);
+  font-family: 'Roboto', sans-serif;
+  background-color: rgba(255, 255, 255, 0.925);
+  border: 1px solid rgba(255, 255, 255, 0.5); /* visible border */
+}
+

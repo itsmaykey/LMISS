@@ -9,7 +9,7 @@ import { AuthService } from '../AuthService';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent  {
+export class LoginComponent implements OnInit {
 
  constructor(private service: LoginService, private router: Router, private authService: AuthService) { }
 username: string = '';
@@ -57,6 +57,15 @@ onLogin() {
     },
   });
 }
+ngOnInit(): void {
+  const element = document.getElementById("myDiv");
+  if (element) {
+    element.style.backgroundImage = "url('src/bg.jpg')";
+    element.style.backgroundSize = "cover";   // makes it fit
+    element.style.backgroundPosition = "center";
+  }
+}
+
 // }) }
 
 // onLogin() {

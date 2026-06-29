@@ -26,6 +26,7 @@ import { forkJoin } from 'rxjs';
   selector: 'app-application-dashboard',
   templateUrl: './application-dashboard.component.html',
   styleUrls: ['./application-dashboard.component.css'],
+  
 })
 export class ApplicationDashboardComponent implements OnInit {
   isSubmitting: boolean = false;
@@ -591,6 +592,10 @@ export class ApplicationDashboardComponent implements OnInit {
     this.PatientDrugEffectService.submitPatientDrugEffectForm(this.patientDrugEffectForm);
   }
 
+printAssessment(patientCode: string, assessmentCode: string): void {
+  console.log('Printing for:', patientCode, assessmentCode);
+  // TODO: implement print logic here
+}
 
 AssessmentFormSubmit(): void {
   if (this.isSubmitting) {

@@ -1121,9 +1121,23 @@
                       <td>{{ s.assessmentDate | date:'MMMM d, yyyy' }}</td>
                       <td>{{s.type}}</td>
                       <td>OnDev</td>
-                      <td class="text-center">
-                        <button type="button" class="btn btn-sm btn-primary text-white" title="View Details" (click)="goToPatientDashboard(s.patientCode,s.assessmentCode)">
-                          <i class="bx bx-show"></i> <!-- Eye Icon -->
+                     <td class="text-center">
+                        <!-- View Details -->
+                        <button 
+                          type="button" 
+                          class="btn btn-sm btn-primary text-white me-1" 
+                          title="View Details" 
+                          (click)="goToPatientDashboard(s.patientCode, s.assessmentCode)">
+                          <i class="bx bx-show"></i>
+                        </button>
+
+                        <!-- Print -->
+                        <button 
+                          type="button" 
+                          class="btn btn-sm btn-secondary text-white me-1" 
+                          title="Print" 
+                          (click)="printAssessment(s.patientCode, s.assessmentCode)">
+                          <i class="bx bx-printer"></i>
                         </button>
                       </td>
                     </tr>
