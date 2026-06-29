@@ -86,13 +86,19 @@
               <th>{{ x.fullName }}</th>
               <th style="text-align: center;">{{ x.sex }}</th>
               <th style="text-align: center;">{{ x.age }}</th>
-              <th style="text-align: center;"><button type="button" class="btn btn-success btn-sm text-white" (click)="goToApplicationDashboard(x.patientCode)">Edit</button> &nbsp;
+              <th style="text-align: center;">
+                <button type="button" class="btn btn-success btn-sm text-white" (click)="goToApplicationDashboard(x.patientCode)">Edit</button> &nbsp;
+          <button type="button" class="btn btn-success btn-sm text-white"(click)="previewPdf(x.patientCode)"> Preview PDF</button>
+              <!-- Modal -->
+
                 <!-- <button  type="button" class="btn btn-primary btn-sm text-white" (click)="goTopatientDashboard(x.patientCode)">Profile</button> -->
               </th>
               </tr>
             </tbody>
             <tfoot></tfoot>
               </table>
+
+   
               <p *ngIf="searchText && filteredSearchNames.length === 0">No patient found. Try to press [Enter].</p>
             </div>
 
@@ -161,6 +167,9 @@
 
   </div>
 
+
+
+  
   <div class="modal modal-top fade show" id="modalTop" tabindex="-1" [ngStyle]="{ 'display': isModalVisible ? 'block' : 'none' }" aria-modal="true" role="dialog">
     <div class="modal-dialog">
       <form class="modal-content">

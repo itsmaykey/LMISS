@@ -7,7 +7,7 @@ import { catchError, Observable, throwError } from 'rxjs';
 })
 export class LoginService {
 
-  private apiUrl = 'http://172.16.0.20/LMISSWebApi/api/Auth/PostLogin';
+  private apiUrl = 'http://localhost/LMISSWebApi/api/Auth/PostLogin';
 
   constructor(private http: HttpClient) { }
 

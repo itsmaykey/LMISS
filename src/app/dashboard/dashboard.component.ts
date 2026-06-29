@@ -2,8 +2,9 @@ import { Component, inject, OnDestroy, OnInit, ViewChild, } from '@angular/core'
 import { NgxScannerQrcodeComponent, ScannerQRCodeResult } from 'ngx-scanner-qrcode';
 import { AuthService } from '../Admin/Auth/AuthService';
 import { DashboardServiceService } from './dashboard-service/dashboard-service.service';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import {Modal} from 'bootstrap';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,7 +13,7 @@ import { Router } from '@angular/router';
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   service = inject(DashboardServiceService);
-
+  private pdfModal?: Modal;
   isLoading = false;
   isModalVisible = false;
   scannedData: string = '';
@@ -21,19 +22,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
   patients: any[] = [];
   filteredSearchNames: any[] = [];
   searchText: string = '';
+
+  showIframe = false;
+  pdfUrl!:SafeResourceUrl;
   @ViewChild(NgxScannerQrcodeComponent) scanner: NgxScannerQrcodeComponent | undefined;
 
   userInfo: any;
 
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private authService: AuthService, private router: Router, private sanitizer:DomSanitizer) {
 
   }
+previewPdf(patientCode: string): void {
+  const url = `http://172.16.0.20/LMISSWebApi/api/QuestPDFPatientDetails/PatientDataReport?patientCode=${patientCode}`;
 
+  window.open(url, '_blank');
+}
 
   ngOnInit(): void {
     this.userInfo = this.authService.getUserInfo();
+    console.log(this.userInfo)
     this.patientNames();
+    
   }
   patientNames(): void {
     this.service.getPatients().subscribe((response: any) => {
@@ -66,6 +76,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.router.navigate(['/application']);
 
   }
+  
   goToApplicationDashboard(patientCode: string): void {
     if (!this.router) {
       console.error('Router is undefined!'); // Debugging check

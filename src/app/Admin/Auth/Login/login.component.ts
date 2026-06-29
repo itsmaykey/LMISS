@@ -27,9 +27,7 @@ onLogin() {
   }, 3000);
   //console.log(this.username, this.password);
   this.service.PostLogin(this.username, this.password).subscribe({
-
     next: (response) => {
-
      // console.log('Response:', response);
       if (response.status === 200 && response.body?.token) {
         const expiresIn = response.body.expiresIn || 3600; // Assuming the response contains expiresIn in seconds
@@ -42,7 +40,7 @@ onLogin() {
 
 
         });
-        console.log('User info stored:', this.authService.getUserInfo());
+      //  console.log('User info stored:', this.authService.getUserInfo());
 
         this.router.navigate(['/dashboard']);
       } else {

@@ -24,7 +24,7 @@
                   </h6>
 
                 <label class="badge bg-label-secondary">
-                    Byname: {{ ExistedPatient.pNickName | uppercase }} | 
+                    Byname: {{ ExistedPatient.pNickName | uppercase }} |
                    {{ ExistedPatient.sex == 1 ? 'Male' : ExistedPatient.sex == 2 ? 'Female' : 'Unknown' }} |
                     Age: {{ ExistedPatient.age }} | {{ ExistedPatient.birthdate | date:'yyyy-MM-dd' }}
                   </label>
@@ -156,7 +156,7 @@
             <div class="card-header d-flex align-items-center ">
               <div class="d-flex align-items-center">
                 <h5 class="mb-0">Social Work Progress Notes (SWPN)</h5>
-                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white"  (click)="showModal()"><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Notes</label></button>
+                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white"  ><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Notes</label></button>
 
               </div>
             </div>
@@ -181,11 +181,11 @@
                       <td>{{ s.patientIntervention?.length > 10 ? (s.patientIntervention | slice:0:20) + '...' : s.patientIntervention }}</td>
                       <td class="text-center">
                         <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewNotes(s.recNo)" title="View Details"  >
-                          <i class="bx bx-show"></i> 
+                          <i class="bx bx-show"></i>
                         </button>
                       </td>
                     </tr>
-                    
+
                   </tbody>
                 </table>
               </div>
@@ -232,11 +232,11 @@
                       <td class="text-center">{{ s.interventionDate | date:'MMMM d, yyyy' }}</td>
                       <td class="text-center">
                         <!-- <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewAddReportBtn(s.recNo)" title="View Details"  >
-                          <i class="bx bx-show"></i> 
+                          <i class="bx bx-show"></i>
                         </button> -->
                       </td>
                     </tr>
-                    
+
                   </tbody>
                 </table>
               </div>
@@ -334,7 +334,7 @@
   <form [formGroup]="SocialWorkerNotesForm" (ngSubmit)="SocialWorkerNotesFormSubmit()">
   <div class="modal fade" id="backDropModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content"> 
+      <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="backDropModalTitle">SWP Notes</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -378,10 +378,10 @@
   </div>
 </form>
   <div class="modal fade" id="viewNotesModal" tabindex="-1" aria-hidden="true">
-    
+
   <div class="modal-dialog">
     <div class="modal-content">
-      
+
       <div class="modal-header">
         <h5 class="modal-title" id="backDropModalTitle">SWP Notes</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -460,7 +460,7 @@
 
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
-      
+
       <div class="modal-header">
         <h5 class="modal-title" id="backDropModalTitle">Psychological Progress Report</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -519,15 +519,15 @@
       <i class="bx bx-save"></i>
     </button>
     </div>
-   
+
   </div>
 
  <div class="tab-pane fade active show" id="AppearanceTab" role="tabpanel">
   <div class="card my-3 shadow-sm rounded-3">
       <div class="card-body pt-4 custom-font" style="max-height: 300px; overflow-y: auto;">
-         
+
       <form [formGroup]="MentalStatusForm">
-      
+
         <div class="d-flex align-items-start flex-wrap mb-3">
           <h4 class="mb-2 me-3">Appearance:</h4>
           <div formArrayName="appearanceId" class="row flex-grow-1">
@@ -540,7 +540,7 @@
                 (change)="onAppearanceCheckboxChange($event, x)">
               {{ x.appearanceDesc }}
             </div>
-            
+
           </div>
         </div>
           <hr>
@@ -557,7 +557,7 @@
                 (change)="onSensoriumCheckboxChange($event, x)">
               {{ x.sensoriumDesc }}
             </div>
-            
+
           </div>
       </div>
 
@@ -575,7 +575,7 @@
                 (change)="onFunctioningCheckboxChange($event, x)">
               {{ x.functioningDesc }}
             </div>
-             
+
           </div>
       </div>
          <hr>
@@ -593,7 +593,7 @@
               {{ x.speechDesc }}
             </div>
           </div>
-           
+
       </div>
        <hr>
       <div class="d-flex align-items-start flex-wrap mb-3">
@@ -610,7 +610,7 @@
               {{ x.behaviorDesc }}
             </div>
           </div>
-          
+
       </div>
        <hr>
       <div class="d-flex align-items-start flex-wrap mb-3">
@@ -627,7 +627,7 @@
               {{ x.moodAffectDesc }}
             </div>
           </div>
-          
+
       </div>
       <hr>
       <div class="d-flex align-items-start flex-wrap mb-3">
@@ -644,7 +644,7 @@
               {{ x.dailyPatternsDesc }}
             </div>
           </div>
-            
+
       </div>
       <hr>
       <div class="d-flex align-items-start flex-wrap mb-3">
@@ -661,12 +661,12 @@
               {{ x.thoughtContentDesc }}
             </div>
           </div>
-          
+
       </div>
       </form>
       </div>
     </div>
-    
+
       <div *ngIf="MentalStatusForm.errors?.['appearanceId'] && MentalStatusForm.touched" class="text-danger">
         Please select at least one appearance option.
       </div>
@@ -698,7 +698,7 @@
         </div>
   </div>
   <div class="tab-pane fade" id="RehabProgress" role="tabpanel">
-    
+
      <div class="card my-3 shadow-sm rounded-3">
       <div class="card-body pt-4 custom-font" style="max-height: 300px; overflow-y: auto;">
 
@@ -808,17 +808,17 @@
       </button>
     </div>
   </div>
-  
+
 </div>
 
-  
+
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
 </div>
 
     </div>
-    
+
   </div>
 </div>
 

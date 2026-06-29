@@ -44,11 +44,12 @@
               "src/assets/css/demo.css",
               "src/assets/vendor/css/core.css",
               "src/styles.css"
+            
 
 
             ],
             "scripts": [
-
+            "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ]
           },
           "configurations": {
@@ -109,8 +110,11 @@
             "styles": [
               "src/assets/css/demo.css",
               "src/assets/vendor/css/core.css"
+             
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            ]
           }
         }
       }
