@@ -125,6 +125,52 @@ export class PatientDashboardComponent  implements OnInit {
     'notedBy',
     'preparedBy'
   ];
+  private patchSocialWorkerNotesDefaults(recNo = 0): void {
+    this.SocialWorkerNotesForm.patchValue({
+      recNo,
+      patientCode: this.route.snapshot.paramMap.get('patientCode') || this.ExistedPatientCode,
+      code: this.route.snapshot.paramMap.get('assessmentCode') || this.ExistedAssessmentCode,
+      staffIdNo: Number(this.userInfo?.id) || 0
+    });
+  }
+  private formatSocialWorkerInterventionDate(value: string | Date | null | undefined): string {
+    if (!value) {
+      return '';
+    }
+
+    if (typeof value === 'string' && value.includes('T')) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      return `${value}T00:00:00.000Z`;
+    }
+
+    return new Date(value).toISOString();
+  }
+
+  private buildSocialWorkerNotesPayload(recNo: number): any {
+    this.patchSocialWorkerNotesDefaults(recNo);
+
+    return {
+      ...this.SocialWorkerNotesForm.value,
+      recNo,
+      patientCode: this.route.snapshot.paramMap.get('patientCode') || this.ExistedPatientCode,
+      code: this.route.snapshot.paramMap.get('assessmentCode') || this.ExistedAssessmentCode,
+      staffIdNo: Number(this.SocialWorkerNotesForm.value.staffIdNo) || 0,
+      interventionDate: this.formatSocialWorkerInterventionDate(this.SocialWorkerNotesForm.value.interventionDate)
+    };
+  }
+
+  private isSavedSocialWorkerNote(response: any, submittedRecNo: number): boolean {
+    const savedRecNo = Number(response?.recNo ?? response?.entity?.recNo ?? 0);
+
+    if (savedRecNo > 0) {
+      return true;
+    }
+
+    return submittedRecNo > 0 && savedRecNo === submittedRecNo;
+  }
 onEditNotes(
   recNo: number,
   interventionDate: Date,
@@ -146,10 +192,10 @@ onEditNotes(
       recNo: note.recNo,
       patientCode: note.patientCode ?? this.route.snapshot.paramMap.get('patientCode') ?? this.ExistedPatientCode,
       code: note.code ?? this.route.snapshot.paramMap.get('assessmentCode') ?? this.ExistedAssessmentCode,
-      staffIdNo: note.staffIdNo ?? this.userInfo?.id ?? '',
+      staffIdNo: Number(note.staffIdNo ?? this.userInfo?.id ?? 0),
       patientActivies: note.patientActivies,
       patientIntervention: note.patientIntervention,
-      interventionDate: note.interventionDate
+      interventionDate: note.interventionDate ? formatDate(note.interventionDate, 'yyyy-MM-dd', 'en-US') : ''
     });
   }
 }
@@ -276,15 +322,14 @@ BackonEditNotes(): void {
   this.isEditingTbleView = true;
 }
 onSaveNotes(): void {
-     this.isEditing = false;
-     this.isEditingTbleView = true;
-     this.isSubmitting = true;
+  if (this.SocialWorkerNotesForm.invalid) {
+    this.SocialWorkerNotesForm.markAllAsTouched();
+    return;
+  }
 
-  const formData = {
-  ...this.SocialWorkerNotesForm.value,
-  recNo: this.currentRecNo,
-  interventionDate: this['currentInterventionDate'] ? formatDate(this['currentInterventionDate'], 'yyyy-MM-dd', 'en-US') : ''
-};
+  this.isSubmitting = true;
+  const submittedRecNo = this.currentRecNo ?? 0;
+  const formData = this.buildSocialWorkerNotesPayload(submittedRecNo);
 
   console.log(formData);
 
@@ -292,6 +337,22 @@ onSaveNotes(): void {
 
     next: (response) => {
       console.log('Form saved successfully:', response);
+
+      if (!this.isSavedSocialWorkerNote(response, submittedRecNo)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Save Failed',
+          text: 'The server did not return a saved SWP note record.',
+          showConfirmButton: true
+        });
+        this.isEditing = true;
+        this.isEditingTbleView = false;
+        this.isSubmitting = false;
+        return;
+      }
+
+      this.isEditing = false;
+      this.isEditingTbleView = true;
 
       Swal.fire({
         icon: 'success',
@@ -305,6 +366,7 @@ onSaveNotes(): void {
       });
       this.hideModalSWPNotes();
       this.SocialWorkerNotesForm.reset();
+      this.patchSocialWorkerNotesDefaults();
       this.isSubmitting = false;
       this.refreshSwpnData();
     },
@@ -320,6 +382,8 @@ onSaveNotes(): void {
         allowEscapeKey: true
       });
 
+      this.isEditing = true;
+      this.isEditingTbleView = false;
       this.isSubmitting = false;
     }
   });
@@ -908,22 +972,18 @@ showModalMedication(): void {
      this.userInfo = this.authService.getUserInfo();
 
        
-        this.SocialWorkerNotesForm = this.fb.group({
+          this.SocialWorkerNotesForm = this.fb.group({
             recNo: [0],
             patientCode: [''],
             code: [''],
-            staffIdNo: [''],
+            staffIdNo: [0],
             patientActivies: ['', Validators.required],
             patientIntervention: ['', Validators.required],
             interventionDate: ['', Validators.required]
           });
 
           // ✅ PATCH after form creation
-          this.SocialWorkerNotesForm.patchValue({
-            patientCode: patientCode || this.ExistedPatientCode,
-            code: assessmentCode || this.ExistedAssessmentCode,
-            staffIdNo: this.userInfo?.id || ''
-          });
+          this.patchSocialWorkerNotesDefaults();
 
 
 
@@ -1686,20 +1746,24 @@ tryprint(): void{
 
   this.isSubmitting = true;
 
-  // Ensure patientCode, code, and staffIdNo are set before submit
-  this.SocialWorkerNotesForm.patchValue({
-    recNo: 0, // Reset recNo to 0 for new submission
-    patientCode: this.route.snapshot.paramMap.get('patientCode') || this.ExistedPatientCode,
-    code: this.route.snapshot.paramMap.get('assessmentCode') || this.ExistedAssessmentCode,
-    staffIdNo: this.userInfo?.id || ''
-  });
-  const formData = this.SocialWorkerNotesForm.value;
+  const formData = this.buildSocialWorkerNotesPayload(0);
   console.log(formData);
 
   this.service.postPatientProgressReport( formData ).subscribe({
 
     next: (response) => {
       console.log('Form saved successfully:', response);
+
+      if (!this.isSavedSocialWorkerNote(response, 0)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Save Failed',
+          text: 'The server did not return a saved SWP note record.',
+          showConfirmButton: true
+        });
+        this.isSubmitting = false;
+        return;
+      }
 
       Swal.fire({
         icon: 'success',
@@ -1713,6 +1777,7 @@ tryprint(): void{
       });
       this.hideModal();
       this.SocialWorkerNotesForm.reset();
+      this.patchSocialWorkerNotesDefaults();
       this.isSubmitting = false;
       this.refreshSwpnData();
     },

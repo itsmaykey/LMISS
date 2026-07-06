@@ -151,7 +151,7 @@
             <div class="card-header d-flex align-items-center ">
               <div class="d-flex align-items-center">
                 <h5 class="mb-0">Social Work Progress Notes (SWPN)</h5>
-                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white"  ><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Notes</label></button>
+                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2" (click)="showModal()"><label style="color:white"  ><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Notes</label></button>
 
               </div>
             </div>
@@ -475,6 +475,161 @@
             </div>
           </div>
         </div>
+          <form [formGroup]="SocialWorkerNotesForm" (ngSubmit)="SocialWorkerNotesFormSubmit()">
+  <div class="modal fade" id="backDropModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content"> 
+        <div class="modal-header">
+          <h5 class="modal-title" id="backDropModalTitle">SWP Notes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12">
+              <label for="personalHealth" class="form-label">Activities</label>
+              <textarea class="form-control" id="personalHealth" formControlName="patientActivies" rows="2"
+                placeholder="Enter Personal Health History"></textarea>
+              <div *ngIf="SocialWorkerNotesForm.get('patientActivies')?.touched && SocialWorkerNotesForm.get('patientActivies')?.invalid" class="text-danger">
+                Activities is required.
+              </div>
+            </div>
+
+            <div class="col-md-12 mt-3">
+              <label for="intervention" class="form-label">Intervention</label>
+              <textarea class="form-control" id="intervention" formControlName="patientIntervention" rows="2"
+                placeholder="Enter Intervention"></textarea>
+              <div *ngIf="SocialWorkerNotesForm.get('patientIntervention')?.touched && SocialWorkerNotesForm.get('patientIntervention')?.invalid" class="text-danger">
+                Intervention is required.
+              </div>
+            </div>
+
+            <div class="col-md-12 mt-3">
+              <label for="appDate" class="form-label">Activity Date</label>
+              <input type="date" id="appDate" formControlName="interventionDate" class="form-control" placeholder="Enter Date">
+              <div *ngIf="SocialWorkerNotesForm.get('interventionDate')?.touched && SocialWorkerNotesForm.get('interventionDate')?.invalid" class="text-danger">
+                Date is required.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary me-3 text-white" [disabled]="SocialWorkerNotesForm.invalid || isSubmitting">Save</button>
+        </div>
+         <label class="form-label fw-bold text-muted "> Note: Please ensure all fields are filled out before saving.</label>
+      </div>
+    </div>
+  </div>
+</form>
+<!-- Loading Spinner Overlay -->
+<div *ngIf="isLoadingNotes" class="loading-overlay">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+  <div class="modal fade" id="viewNotesModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="backDropModalTitle">SWP Notes</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+<table class="table table-border-bottom-0" *ngIf="isEditingTbleView">
+  <tbody>
+    <ng-container *ngFor="let s of swpnDataEdit?.entity; let i = index">
+      <tr>
+        <td class="align-middle"><small class="text-light fw-medium">Date Noted</small></td>
+        <td class="py-4">
+          <p class="mb-0">{{ s.interventionDate | date:'MMMM-d-yyyy' }}</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="align-middle"><small class="text-light fw-medium">Activity</small></td>
+        <td class="py-6">
+          <p class="lead mb-0">{{ s.patientActivies }}</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="align-middle"><small class="text-light fw-medium">Intervention</small></td>
+        <td class="py-4">
+          <p class="lead mb-0">{{ s.patientIntervention }}</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="align-middle"><small class="text-light fw-medium">Added By</small></td>
+        <td class="py-4 d-flex justify-content-between align-items-center">
+          <p class="lead mb-0">{{ s.staffFullName }}</p>
+
+          <!-- Edit Button (Only in view mode) -->
+          <button
+            type="button"
+            class="btn btn-sm btn-primary text-white"
+            (click)="onEditNotes(s.recNo,s.interventionDate,s.code, s.patientCode,s.staffIdNo)"
+            *ngIf="isEditingTbleView"
+            title="Edit Note">
+            <i class="bx bx-edit"></i>
+          </button>
+        </td>
+      </tr>
+    </ng-container>
+  </tbody>
+</table>
+
+<!-- Edit form view -->
+<div class="pt-3" *ngIf="isEditing">
+  <form [formGroup]="SocialWorkerNotesForm">
+    <div class="mb-3">
+  <label class="form-label fw-bold text-muted" style="display: none;">Editing Record #{{ currentRecNo }}</label>
+</div>
+<div class="col-md-12 mt-3">
+      <label for="personalHealth" class="form-label">Activities</label>
+      <textarea
+        class="form-control"
+        id="personalHealth"
+        formControlName="patientActivies"
+        rows="2"
+        placeholder="Enter Personal Health History"
+      ></textarea>
+    </div>
+    <div class="col-md-12">
+      <label for="intervention" class="form-label">Intervention</label>
+      <textarea
+        class="form-control"
+        id="intervention"
+        formControlName="patientIntervention"
+        rows="2"
+        placeholder="Enter Intervention"
+      ></textarea>
+    </div>
+
+    
+  </form>
+   
+  <div class="d-flex justify-content-between mt-3">
+     <button
+      type="button"
+      class="btn btn-sm btn-secondary text-white"
+      (click)="BackonEditNotes()"
+      title="Cancel Edit">
+      <i class="bx bx-arrow-back"></i>
+    </button>
+
+    <button type="button" class="btn btn-primary text-white" (click)="onSaveNotes()">
+      <i class="bx bx-save"></i> Save
+    </button>
+  </div>
+</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
         <div class="tab-pane fade" id="LaboratoryTab">
           <div class="card">
             <h5 class="card-header">Laboratory</h5>
