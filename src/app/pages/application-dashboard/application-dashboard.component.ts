@@ -569,7 +569,9 @@ export class ApplicationDashboardComponent implements OnInit {
   patientFormSubmit(): void {
     this.patientFormService.submitPatientForm(this.patientForm);
   }
-
+goToDashboard(): void {
+    this.router.navigate(['/dashboard']);
+  }
   patientParentFormSubmit(): void {
     this.patientParentFormService.submitPatientParentForm(this.patientParentForm);
   }
@@ -674,6 +676,7 @@ AssessmentFormSubmit(): void {
                 showConfirmButton: false,
                 allowOutsideClick: false,
                 allowEscapeKey: false,
+                
                 didClose: () => {
                   this.AssessmentForm.reset();
                   (this.AssessmentForm.get('admissionCode') as FormArray).clear(); 
@@ -683,6 +686,7 @@ AssessmentFormSubmit(): void {
                   this.AssessmentForm.markAsPristine();
                   this.AssessmentForm.markAsUntouched();
                   this.isSubmitting = false;
+                  this.router.navigate(['/dashboard']);
                 }
               });
             },

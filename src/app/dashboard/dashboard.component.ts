@@ -50,11 +50,14 @@ previewPdf(patientCode: string): void {
     this.service.getPatients().subscribe((response: any) => {
       this.patients = response.map((owner: any) => ({ ...owner }));
       this.filteredSearchNames = [];
+      this.hasSearched = false;
     });
   }
   
   FilteredSearchNames(): void {
   const search = this.searchText?.trim().toLowerCase() || '';
+
+  this.hasSearched = false;
 
   if (search.length < 3) {
     Swal.fire({
@@ -73,6 +76,7 @@ previewPdf(patientCode: string): void {
     return;
   }
 
+  this.hasSearched = true;
   this.filteredSearchNames = this.patients.filter(patient =>
     Object.values(patient).some(value =>
       value?.toString().toLowerCase().includes(search)
