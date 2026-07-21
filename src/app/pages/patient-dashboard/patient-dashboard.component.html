@@ -631,16 +631,60 @@
   </div>
 </div>
         <div class="tab-pane fade" id="LaboratoryTab">
-          <div class="card">
-            <h5 class="card-header">Laboratory</h5>
-            <div class="card-body">
-              <div class="mb-4">
-                  <label for="formFileMultiple" class="form-label">Multiple files input example</label>
-                  <input class="form-control" type="file" id="formFileMultiple" multiple="">
-              </div>
+    <div class="card">
+        <h5 class="card-header">Laboratory</h5>
+
+        <div class="card-body">
+
+            <!-- File Upload Row -->
+            <div class="row align-items-end mb-4">
+
+                <div class="col-md-10">
+                    <label for="formFileMultiple" class="form-label">
+                        Upload Laboratory Documents
+                    </label>
+
+                    <input 
+                        class="form-control" 
+                        type="file" 
+                        id="formFileMultiple" 
+                        multiple>
+                </div>
+
+
+                <div class="col-md-2">
+                    <button 
+                        type="button" 
+                        class="btn btn-primary text-white"
+                        id="submitDocuments">
+                        Submit
+                    </button>
+                </div>
+
             </div>
-          </div>
+
+
+            <!-- Document List Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th width="5%">#</th>
+                            <th>Document Name</th>
+                            <th>Date Uploaded</th>
+                            <th width="15%">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="documentTableBody">
+                    </tbody>
+
+                </table>
+            </div>
+
         </div>
+    </div>
+</div>
 
       </div>
       <!--/ Tab Content -->
