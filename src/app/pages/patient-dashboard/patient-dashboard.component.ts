@@ -171,6 +171,44 @@ export class PatientDashboardComponent  implements OnInit {
 
     return submittedRecNo > 0 && savedRecNo === submittedRecNo;
   }
+  private patchNursingNotesDefaults(recNo = 0): void {
+    this.NursingNotesForm.patchValue({
+      recNo,
+      patientCode: this.route.snapshot.paramMap.get('patientCode') || this.ExistedPatientCode,
+      code: this.route.snapshot.paramMap.get('assessmentCode') || this.ExistedAssessmentCode,
+      staffIdNo: Number(this.userInfo?.id) || 0
+    });
+  }
+
+  private buildNursingNotesPayload(recNo: number): any {
+    this.patchNursingNotesDefaults(recNo);
+
+    return {
+      ...this.NursingNotesForm.value,
+      recNo,
+      patientCode: this.route.snapshot.paramMap.get('patientCode') || this.ExistedPatientCode,
+      code: this.route.snapshot.paramMap.get('assessmentCode') || this.ExistedAssessmentCode,
+      staffIdNo: Number(this.NursingNotesForm.value.staffIdNo) || Number(this.userInfo?.id) || 0,
+      dateSubmitted: this.NursingNotesForm.value.dateSubmitted
+        ? formatDate(this.NursingNotesForm.value.dateSubmitted, 'yyyy-MM-dd', 'en-US')
+        : ''
+    };
+  }
+
+  private normalizeNursingNotesResponse(response: any): any {
+    const normalized = Array.isArray(response) && response.length > 0
+      ? response[0]
+      : (response as any)?.entity
+        ? response
+        : null;
+
+    if (normalized?.entity && !Array.isArray(normalized.entity)) {
+      normalized.entity = Object.values(normalized.entity);
+    }
+
+    return normalized;
+  }
+
 onEditNotes(
   recNo: number,
   interventionDate: Date,
@@ -415,6 +453,10 @@ onEditNursingNotes(
   const note = this.nursingNotesData?.entity?.find((n: any) => n.recNo === recNo);
   if (note) {
     this.NursingNotesForm.patchValue({
+      recNo: note.recNo,
+      patientCode: note.patientCode ?? this.route.snapshot.paramMap.get('patientCode') ?? this.ExistedPatientCode,
+      code: note.code ?? this.route.snapshot.paramMap.get('assessmentCode') ?? this.ExistedAssessmentCode,
+      staffIdNo: Number(note.staffIdNo ?? this.userInfo?.id ?? 0),
       remarks: note.remarks
     });
   }
@@ -429,11 +471,10 @@ onSaveNursingNotes(): void {
      this.isEditingNursingTbleView = true;
      this.isSubmitting = true;
 
-  const formData = {
-  ...this.NursingNotesForm.value,
-  recNo: this.currentNursingRecNo,
-  dateSubmitted: this['currentDateSubmitted'] ? formatDate(this['currentDateSubmitted'], 'yyyy-MM-dd', 'en-US') : ''
-};
+  const formData = this.buildNursingNotesPayload(this.currentNursingRecNo ?? 0);
+  if (this['currentDateSubmitted']) {
+    formData.dateSubmitted = formatDate(this['currentDateSubmitted'], 'yyyy-MM-dd', 'en-US');
+  }
 
   console.log(formData);
 
@@ -454,6 +495,7 @@ onSaveNursingNotes(): void {
       });
        this.hideModalNursingNotes();
         this.NursingNotesForm.reset();
+        this.patchNursingNotesDefaults();
         this.isSubmitting = false;
         this.refreshNursingNotesData();
     },
@@ -738,13 +780,7 @@ viewNursingNotes(recNo: string): void {
   if (patientCode && assessmentCode) {
     this.service.getExistedPatientNursingNotes(patientCode, assessmentCode).subscribe({
       next: (response) => {
-        if (Array.isArray(response) && response.length > 0) {
-          this.nursingNotesDataEdit = response[0];
-        }
-
-        if (this.nursingNotesDataEdit && this.nursingNotesDataEdit.entity && !Array.isArray(this.nursingNotesDataEdit.entity)) {
-          this.nursingNotesDataEdit.entity = Object.values(this.nursingNotesDataEdit.entity);
-        }
+        this.nursingNotesDataEdit = this.normalizeNursingNotesResponse(response);
 
         if (recNo && this.nursingNotesDataEdit?.entity) {
           this.nursingNotesDataEdit.entity = this.nursingNotesDataEdit.entity.filter((item: any) => item.recNo == recNo);
@@ -839,6 +875,7 @@ showNursingModal(): void {
     return;
   }
   this.NursingNotesForm.reset();
+  this.patchNursingNotesDefaults();
   this.backDropModalNursing = new Modal(modalElement);
   this.backDropModalNursing.show();
 }
@@ -1307,11 +1344,9 @@ if (patientCode && assessmentCode) {
   this.service.getExistedPatientNursingNotes(patientCode, assessmentCode)
     .subscribe({
       next: (response) => {
-        if (Array.isArray(response) && response.length > 0) {
-          this.nursingNotesData = response[0];
+        this.nursingNotesData = this.normalizeNursingNotesResponse(response);
+        if (this.nursingNotesData) {
           console.log('Monthly nursingNotes Data:', this.nursingNotesData);
-        } else if ((response as any)?.entity && typeof (response as any).entity === 'object') {
-          this.nursingNotesData = Object.values((response as any).entity);
         } else {
           console.warn('Unexpected response format', response);
         }
@@ -1389,11 +1424,9 @@ if (patientCode && assessmentCode) {
   this.service.getExistedPatientNursingNotes(patientCode, assessmentCode)
     .subscribe({
       next: (response) => {
-        if (Array.isArray(response) && response.length > 0) {
-          this.nursingNotesData = response[0];
+        this.nursingNotesData = this.normalizeNursingNotesResponse(response);
+        if (this.nursingNotesData) {
           console.log('Monthly nursingNotes Data:', this.nursingNotesData);
-        } else if ((response as any)?.entity && typeof (response as any).entity === 'object') {
-          this.nursingNotesData = Object.values((response as any).entity);
         } else {
           console.warn('Unexpected response format', response);
         }
@@ -1697,7 +1730,7 @@ tryprint(): void{
 
     this.isSubmitting = true;
 
-    const formData = this.NursingNotesForm.value;
+    const formData = this.buildNursingNotesPayload(0);
     console.log(formData);
 
     this.service.postPatientNursingNotes( formData ).subscribe({
@@ -1717,6 +1750,7 @@ tryprint(): void{
         });
         this.hideModalNursing();
         this.NursingNotesForm.reset();
+        this.patchNursingNotesDefaults();
         this.isSubmitting = false;
         this.refreshNursingNotesData();
       },
@@ -2646,6 +2680,10 @@ requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | nul
 
     return Object.keys(errors).length > 0 ? errors : null;
   }
+  printAssessment(patientCode: string, assessmentCode: string): void {
+  console.log('Printing for:', patientCode, assessmentCode);
+  // TODO: implement print logic here
+}
 // AssessmentFormSubmit(): void {
 //   if (this.isSubmitting) {
 //     return; // Prevent rapid re-submission

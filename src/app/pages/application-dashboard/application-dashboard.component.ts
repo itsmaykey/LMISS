@@ -19,9 +19,11 @@ import { PatientRehabRecordService } from './ScriptForms/PatientRehabRecord/pati
 import { PatientFamHealthService } from './ScriptForms/patientFamHealth/patient-fam-health.service';
 import { PatientStaffAssessmentService } from './ScriptForms/patientStaffAssessment/patient-staff-assessment.service';
 import Swal from 'sweetalert2';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Base64 } from 'js-base64';
 
 import { forkJoin } from 'rxjs';
+import Modal from 'bootstrap/js/dist/modal';
 @Component({
   selector: 'app-application-dashboard',
   templateUrl: './application-dashboard.component.html',
@@ -31,6 +33,8 @@ import { forkJoin } from 'rxjs';
 export class ApplicationDashboardComponent implements OnInit {
   isSubmitting: boolean = false;
   isLoading: boolean = false;
+  private pdfModal?: Modal;
+  pdfUrl!: SafeResourceUrl;
   patientParentForm!: FormGroup;
   patientForm!: FormGroup;
   patientSchoolForm!: FormGroup;
@@ -594,11 +598,13 @@ goToDashboard(): void {
     this.PatientDrugEffectService.submitPatientDrugEffectForm(this.patientDrugEffectForm);
   }
 
-printAssessment(patientCode: string, assessmentCode: string): void {
-  console.log('Printing for:', patientCode, assessmentCode);
-  // TODO: implement print logic here
-}
+previewPdf(patientCode: string, assessmentCode: string): void {
+  const url = `http://172.16.0.20/LMISSWebApi/api/QuestPDFPatientDetails/PatientDataReport?patientCode=${encodeURIComponent(patientCode)}&code=${encodeURIComponent(assessmentCode)}`;
 
+  console.log('Printing for:', patientCode, assessmentCode);
+
+  window.open(url, '_blank');
+}
 AssessmentFormSubmit(): void {
   if (this.isSubmitting) {
     return; // Prevent rapid re-submission
@@ -1097,3 +1103,4 @@ goToPatientDashboard(patientCode: string, assessmentCode?: string): void {
   }
 
 }
+
