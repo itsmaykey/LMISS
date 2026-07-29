@@ -563,7 +563,7 @@ const payload = {
        this.hideModalPe();
         this.PsychEvaluationReportForm.reset();
         this.isSubmitting = false;
-        this.refreshPEData();
+        this.refreshTreatmentPlanData();
     },
     error: (error) => {
       console.error('Error saving form:', error);
@@ -626,7 +626,7 @@ const payload = {
        this.hideModalPlan();
         this.TreatPlanReportForm.reset();
         this.isSubmitting = false;
-        this.refreshPEData();
+        this.refreshTreatmentPlanData();
     },
     error: (error) => {
       console.error('Error saving form:', error);
@@ -1538,6 +1538,38 @@ getExisted(): void {
     }
   });
 }
+
+refreshTreatmentPlanData(): void {
+  const patientCode = this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  if (!patientCode || !assessmentCode) {
+    console.error('Missing patientCode or assessmentCode in route.');
+    return;
+  }
+
+  this.service.getExistedPatientTreatmentPlan(patientCode, assessmentCode).subscribe({
+    next: (response) => {
+      console.log('API full response:', response);
+
+      if (Array.isArray(response) && response.length > 0) {
+        this.planData = response.map((item) => ({
+          recNo: item.recNo,
+          patientDomainDesc: item.patientDomainDesc,
+          dateIdentified: item.dateIdentified,
+          fullData: item
+        }));
+      } else {
+        console.warn('No response data or not an array.');
+        this.planData = [];
+      }
+
+      console.log('planData by recNo:', this.planData);
+    },
+    error: (error) => {
+      console.error('Error fetching patient treatment plan:', error);
+    }
+  });
+}
 updateSummaryTable() {
   const formData = this.PsychEvaluationReportForm.value;
 
@@ -1600,9 +1632,7 @@ updateOrderSummaryTable() {
     { section: 'Assessment', values: [{ label: formData.patientGoal || '' }] },
     { section: 'Intervention', values: [{ label: formData.patientIntervention || '' }] },
     { section: 'Ordered By', values: [{ label: formData.preparedBy || '' }] },
-    // { section: 'Psychometrician', values: [{ label: formData.psychometricianCode || '' }] },
-    // { section: 'Administrative Officer', values: [{ label: formData.notedBy || '' }] },
-    // { section: 'Medical Officer', values: [{ label: formData.approvedBy || '' }] },
+
   ];
 }
 updateMedicationSummaryTable() {

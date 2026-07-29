@@ -432,7 +432,7 @@
                   <label for="spouseEduID" class="form-label">Educational Attainment</label>
                   <select class="select2 form-select" formControlName="spouseEduID">
                     <option value="" disabled selected>Select</option>
-                    <option *ngFor="let x of educationalAttainment" [value]="x.edu_ID">{{x.edu_Name}}</option>
+                    <option *ngFor="let x of educationalAttainment" [value]="x.eduId ?? x.edu_ID">{{ x.eduName ?? x.edu_Name }}</option>
                   </select>
                 </div>
                 <div class="col-md-2">

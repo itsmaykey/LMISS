@@ -16,10 +16,10 @@ export class PatientStaffAssessmentService{
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/GetrefAdmissionType`);
   }
   postPatientAssessmentData(data: any) {
-          return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostPatientAssessmentData`, data);
+          return this.http.post(`${environment.apiUrl}PostPatientData/PostPatientAssessmentData`, data);
         }
   postAdmissionData(data: any) {
-          return this.http.post(`${environment.apiUrl}PostPatientDatasA/PostAdmissionData`, data);
+          return this.http.post(`${environment.apiUrl}PostPatientData/PostAdmissionData`, data);
         }
 
   

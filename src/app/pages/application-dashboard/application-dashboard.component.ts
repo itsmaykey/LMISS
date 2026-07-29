@@ -621,6 +621,18 @@ AssessmentFormSubmit(): void {
   };
 
   if (this.AssessmentForm.valid) {
+    const patientAssessmentDateValue = this.AssessmentForm.get('patientAssessmentDate')?.value;
+    if (!patientAssessmentDateValue) {
+      alert('Please provide the application date.');
+      return;
+    }
+
+    const patientAssessmentDate = new Date(patientAssessmentDateValue);
+    if (isNaN(patientAssessmentDate.getTime())) {
+      alert('Application date is invalid.');
+      return;
+    }
+
     this.isSubmitting = true; // Lock submission
 
     const patientCode = this.AssessmentForm.get('patientCode')?.value;
@@ -643,7 +655,7 @@ AssessmentFormSubmit(): void {
       patientCode: patientCode,
       admittingStaffAssessment: this.AssessmentForm.get('admittingStaffAssessment')?.value,
       admittingStaffPlan: this.AssessmentForm.get('admittingStaffPlan')?.value,
-      patientAssessmentDate: new Date(this.AssessmentForm.get('patientAssessmentDate')?.value).toISOString(),
+      patientAssessmentDate: patientAssessmentDate.toISOString(),
       admissionStatus: 1,
       patientAssessmentStatus: 1,
       staffIdNo: this.userInfo?.id || 0,
@@ -662,9 +674,6 @@ AssessmentFormSubmit(): void {
     allowOutsideClick: false
   }).then((result) => {
     if (result.isConfirmed) {
-      const formData = this.AssessmentForm.value;
-      const listAdmissionData = formData.admissionCode.map((code: string) => ({ admissionCode: code }));
-
       this.PatientStaffAssessmentService.postPatientAssessmentData(formData).subscribe({
         next: () => {
           console.log('Assessment submitted:', formData);

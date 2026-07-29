@@ -10,25 +10,25 @@ export class PatientDashboardService {
   constructor(private http: HttpClient) { }
   
  getExistedPatientData(patientCode: string, assessmentCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientDatasA/GetExistedPatient?patientCode=${patientCode}&assessmentCode=${assessmentCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientData/GetExistedPatient?patientCode=${patientCode}&assessmentCode=${assessmentCode}`);
   }
   getPatientProgressReport(patientCode: string, assessmentCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientDatasB/GetExistedPatientProgressReports?patientCode=${patientCode}&code=${assessmentCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientProgressReport/GetExistedPatientProgressReports?patientCode=${patientCode}&code=${assessmentCode}`);
   }
   getExistedPatientMonthlyProgressReports(patientCode: string, assessmentCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientDatasD/GetExistedPatientMonthlyProgressReports?patientCode=${patientCode}&code=${assessmentCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientMonthlyPsychologicalProgressReport/GetExistedPatientMonthlyProgressReports?patientCode=${patientCode}&code=${assessmentCode}`);
   }
  getExistedPatientNursingNotes(patientCode: string, assessmentCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientDatasC/GetExistedPatientNursingNotes?patientCode=${patientCode}&code=${assessmentCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientNursingNotes/GetExistedPatientNursingNotes?patientCode=${patientCode}&code=${assessmentCode}`);
   }
   getExistedPatientPsychologicalEvaluationReport(patientCode: string, assessmentCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientDatasE/GetExistedPatientPsychologicalEvaluationReport?patientCode=${patientCode}&code=${assessmentCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDataPsychologicalEvaluationReport/GetExistedPatientPsychologicalEvaluationReport?patientCode=${patientCode}&code=${assessmentCode}`);
   }
   getExistedPatientTreatmentPlan(patientCode: string, assessmentCode: string) {
-    return this.http.get(`${environment.apiUrl}GetPatientDatasF/GetExistedPatientTreatmentPlan?patientCode=${patientCode}&code=${assessmentCode}`);
+    return this.http.get(`${environment.apiUrl}GetPatientDataTreatmentPlan/GetExistedPatientTreatmentPlan?patientCode=${patientCode}&code=${assessmentCode}`);
   }
   gettrefMPPRQuestionaire() {
-    return this.http.get(`${environment.apiUrl}GetPatientDatasD/GettrefMPPRQuestionaire`);
+    return this.http.get(`${environment.apiUrl}GetPatientMonthlyPsychologicalProgressReport/GettrefMPPRQuestionaire`);
   }
  getrefAppearance() {
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/getrefAppearance`);
@@ -61,7 +61,7 @@ export class PatientDashboardService {
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/getrefDenial`);
   }
   getUsers() {
-    return this.http.get(`${environment.apiUrl}GetPatientDatasE/GetUsers`);
+    return this.http.get(`${environment.apiUrl}GetPatientDataPsychologicalEvaluationReport/GetUsers`);
   }
   getrefPhysicalWithdrawalSymptoms() {
     return this.http.get(`${environment.apiUrl}GetPatientAdmissionReference/getrefPhysicalWithdrawalSymptoms`);
@@ -77,18 +77,18 @@ export class PatientDashboardService {
   }
 /////post
   postPatientMonthlyProgressReport(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatasD/PostPatientMonthlyProgressReport`, data);
+    return this.http.post(`${environment.apiUrl}PostPatientDataMonthlyPsychologicalProgressReport/PostPatientMonthlyProgressReport`, data);
   }
   postPatientNursingNotes(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatasC/PostPatientNursingNotes`, data);
+    return this.http.post(`${environment.apiUrl}PostPatientDataNursingNotes/PostPatientNursingNotes`, data);
   }
    postPatientProgressReport(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatasB/PostPatientProgressReport`, data);
+    return this.http.post(`${environment.apiUrl}PostPatientDataProgressReport/PostPatientProgressReport`, data);
   }
   postPatientPsychologicalEvaluationReport(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatasE/PostPatientPsychologicalEvaluationReport`, data);
+    return this.http.post(`${environment.apiUrl}PostPatientDataPsychologicalEvaluationReport/PostPatientPsychologicalEvaluationReport`, data);
   }
   postPatientTreatmentPlan(data: any) {
-    return this.http.post(`${environment.apiUrl}PostPatientDatasF/PostPatientTreatmentPlan`, data);
+    return this.http.post(`${environment.apiUrl}PostPatientDataTreatmentPlan/PostPatientTreatmentPlan`, data);
   }
 }
