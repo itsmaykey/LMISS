@@ -27,6 +27,9 @@ export class PatientDashboardService {
   getExistedPatientTreatmentPlan(patientCode: string, assessmentCode: string) {
     return this.http.get(`${environment.apiUrl}GetPatientDataTreatmentPlan/GetExistedPatientTreatmentPlan?patientCode=${patientCode}&code=${assessmentCode}`);
   }
+  getPatientDoctorsOrder(patientCode: string, assessmentCode: string) {
+    return this.http.get(`${environment.apiUrl}GetPatientDoctorsOrder/GetPatientDoctorsOrder?patientCode=${patientCode}&code=${assessmentCode}`);
+  }
   gettrefMPPRQuestionaire() {
     return this.http.get(`${environment.apiUrl}GetPatientMonthlyPsychologicalProgressReport/GettrefMPPRQuestionaire`);
   }
@@ -90,5 +93,8 @@ export class PatientDashboardService {
   }
   postPatientTreatmentPlan(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDataTreatmentPlan/PostPatientTreatmentPlan`, data);
+  }
+  postPatientDoctorsOrder(data: any) {
+    return this.http.post(`${environment.apiUrl}PostPatientDoctorsOrder`, data);
   }
 }

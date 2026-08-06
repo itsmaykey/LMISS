@@ -94,6 +94,7 @@ export class PatientDashboardComponent  implements OnInit {
   currentUserID: number | null = null;
   currentNursingRecNo: number | null = null;
   currentPERecNo: number | null = null;
+  currentDoctorOrderRecNo: number | null = null;
   isLoadingNotes: boolean = false;  
    listPatientMonthlyPReport: any[] = [];
    listPatientMonthlyPReportView: any[] = [];
@@ -103,6 +104,21 @@ export class PatientDashboardComponent  implements OnInit {
     listDoctorOrderReport: any[] = [];
     listMedicationReport: any[] = [];
     listPsychologicalEvaluation: any[] = [];
+  doctorOrdersData: any[] = [];
+  doctorOrdersFiltered: any[] = [];
+  doctorOrdersPaged: any[] = [];
+  selectedDoctorOrder: any = null;
+  doctorOrdersLoading = false;
+  doctorOrdersError = '';
+  doctorOrderSearchTerm = '';
+  doctorOrderSelectedPhysician = '';
+  doctorOrderSelectedNurse = '';
+  doctorOrderSortKey = 'assessmentDate';
+  doctorOrderSortDirection: 'asc' | 'desc' = 'desc';
+  doctorOrderPage = 1;
+  doctorOrderPageSize = 5;
+  doctorOrderTotalPages = 1;
+  doctorOrderMode: 'create' | 'edit' | 'view' = 'create';
   physicalFields = [
     'physicaIndicatorsId',
     'denialId',
@@ -912,15 +928,7 @@ showModalPlan(): void {
   this.bacDropPlanReport.show();
 }
 showModalDocOrder(): void {
-  this.DocOrderForm.reset();
-  const modalElement = document.getElementById('viewDocOrderModal');
-  if (!modalElement) {
-    console.error('Modal element not found in DOM');
-    return;
-  }
-
- this.backDropModalDocOrder = new Modal(modalElement);
-  this.backDropModalDocOrder.show();
+  this.openDoctorOrderModal('create');
 }
 showModalMedication(): void {
   this.MedicationForm.reset();
@@ -957,6 +965,285 @@ showModalMedication(): void {
   hideModalDoctorOrder(): void {
     this.backDropModalDocOrder?.hide();
   }
+  private getCurrentDoctorOrderDefaults(recNo = 0): any {
+    const physicianId = this.medicalOfficers.some((staff: any) => Number(staff.staffIdNo) === Number(this.currentUserID))
+      ? Number(this.currentUserID)
+      : '';
+    const nurseId = this.nursing.some((staff: any) => Number(staff.staffIdNo) === Number(this.currentUserID))
+      ? Number(this.currentUserID)
+      : '';
+
+    return {
+      recNo,
+      patientCode: this.route.snapshot.paramMap.get('patientCode') || this.ExistedPatientCode || '',
+      code: this.route.snapshot.paramMap.get('assessmentCode') || this.ExistedAssessmentCode || '',
+      assessmentDate: '',
+      subjectiveDesc: '',
+      physicalExaminationDesc: '',
+      assessmentDesc: '',
+      interventionDesc: '',
+      physician_IdNo: physicianId,
+      nurse_IdNo: nurseId
+    };
+  }
+  private getStaffDisplayName(staffId: any, staffList: any[]): string {
+    const normalizedId = Number(staffId);
+    if (!normalizedId) {
+      return 'Not specified';
+    }
+
+    const match = staffList.find((staff: any) => Number(staff.staffIdNo) === normalizedId);
+    return match?.uFullName || match?.fullName || 'Unknown staff';
+  }
+  private resolveStaffId(staffValue: any, staffName: string | null | undefined, staffList: any[]): number | '' {
+    const numericId = Number(staffValue);
+    if (numericId) {
+      return numericId;
+    }
+
+    const normalizedName = (staffName || '').trim().toLowerCase();
+    if (!normalizedName) {
+      return '';
+    }
+
+    const match = staffList.find((staff: any) =>
+      (staff.uFullName || staff.fullName || '').trim().toLowerCase() === normalizedName
+    );
+
+    return Number(match?.staffIdNo) || '';
+  }
+  private formatDateTimeForInput(value: string | Date | null | undefined): string {
+    if (!value) {
+      return '';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return localDate.toISOString().slice(0, 16);
+  }
+  private formatDoctorOrderDate(value: string | Date | null | undefined): string {
+    if (!value) {
+      return '';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    return date.toISOString();
+  }
+  private enrichDoctorOrderRecord(item: any): any {
+    return {
+      ...item,
+      physicianDisplayName: item.physicianName || this.getStaffDisplayName(item.physician_IdNo, this.medicalOfficers),
+      nurseDisplayName: item.nurseName || this.getStaffDisplayName(item.nurse_IdNo, this.nursing)
+    };
+  }
+  private getDoctorOrderSortValue(record: any, key: string): string | number {
+    switch (key) {
+      case 'assessmentDate':
+        return new Date(record.assessmentDate || 0).getTime();
+      case 'physicianName':
+        return (record.physicianDisplayName || '').toLowerCase();
+      case 'nurseName':
+        return (record.nurseDisplayName || '').toLowerCase();
+      case 'subjectiveDesc':
+        return (record.subjectiveDesc || '').toLowerCase();
+      default:
+        return (record[key] || '').toString().toLowerCase();
+    }
+  }
+  private sortDoctorOrders(records: any[]): any[] {
+    const direction = this.doctorOrderSortDirection === 'asc' ? 1 : -1;
+
+    return [...records].sort((left, right) => {
+      const leftValue = this.getDoctorOrderSortValue(left, this.doctorOrderSortKey);
+      const rightValue = this.getDoctorOrderSortValue(right, this.doctorOrderSortKey);
+
+      if (leftValue < rightValue) {
+        return -1 * direction;
+      }
+
+      if (leftValue > rightValue) {
+        return 1 * direction;
+      }
+
+      return 0;
+    });
+  }
+  private updateDoctorOrdersPaged(): void {
+    const startIndex = (this.doctorOrderPage - 1) * this.doctorOrderPageSize;
+    this.doctorOrdersPaged = this.doctorOrdersFiltered.slice(startIndex, startIndex + this.doctorOrderPageSize);
+  }
+  applyDoctorOrderFilters(): void {
+    const searchValue = this.doctorOrderSearchTerm.trim().toLowerCase();
+
+    const filtered = this.doctorOrdersData.filter((item) => {
+      const matchesSearch = !searchValue || [
+        item.subjectiveDesc,
+        item.physicalExaminationDesc,
+        item.assessmentDesc,
+        item.interventionDesc,
+        item.physicianDisplayName,
+        item.nurseDisplayName,
+        item.patientFullName
+      ].some((field) => (field || '').toString().toLowerCase().includes(searchValue));
+
+      const matchesPhysician = !this.doctorOrderSelectedPhysician
+        || String(item.physician_IdNo ?? '') === this.doctorOrderSelectedPhysician;
+      const matchesNurse = !this.doctorOrderSelectedNurse
+        || String(item.nurse_IdNo ?? '') === this.doctorOrderSelectedNurse;
+
+      return matchesSearch && matchesPhysician && matchesNurse;
+    });
+
+    this.doctorOrdersFiltered = this.sortDoctorOrders(filtered);
+    this.doctorOrderTotalPages = Math.max(1, Math.ceil(this.doctorOrdersFiltered.length / this.doctorOrderPageSize));
+    if (this.doctorOrderPage > this.doctorOrderTotalPages) {
+      this.doctorOrderPage = this.doctorOrderTotalPages;
+    }
+    this.updateDoctorOrdersPaged();
+  }
+  setDoctorOrderSort(sortKey: string): void {
+    if (this.doctorOrderSortKey === sortKey) {
+      this.doctorOrderSortDirection = this.doctorOrderSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.doctorOrderSortKey = sortKey;
+      this.doctorOrderSortDirection = sortKey === 'assessmentDate' ? 'desc' : 'asc';
+    }
+
+    this.applyDoctorOrderFilters();
+  }
+  onDoctorOrderPageSizeChange(pageSize: string): void {
+    this.doctorOrderPageSize = Number(pageSize) || 5;
+    this.doctorOrderPage = 1;
+    this.applyDoctorOrderFilters();
+  }
+  changeDoctorOrderPage(direction: number): void {
+    const nextPage = this.doctorOrderPage + direction;
+    if (nextPage < 1 || nextPage > this.doctorOrderTotalPages) {
+      return;
+    }
+
+    this.doctorOrderPage = nextPage;
+    this.updateDoctorOrdersPaged();
+  }
+  clearDoctorOrderFilters(): void {
+    this.doctorOrderSearchTerm = '';
+    this.doctorOrderSelectedPhysician = '';
+    this.doctorOrderSelectedNurse = '';
+    this.doctorOrderPage = 1;
+    this.applyDoctorOrderFilters();
+  }
+  openDoctorOrderModal(mode: 'create' | 'edit' | 'view', record?: any): void {
+    this.doctorOrderMode = mode;
+    this.currentDoctorOrderRecNo = record?.recNo ?? null;
+    this.selectedDoctorOrder = record ? this.enrichDoctorOrderRecord(record) : null;
+
+    if (record) {
+      const physicianId = this.resolveStaffId(record.physician_IdNo, record.physicianName, this.medicalOfficers);
+      const nurseId = this.resolveStaffId(record.nurse_IdNo, record.nurseName, this.nursing);
+
+      this.DocOrderForm.patchValue({
+        recNo: record.recNo ?? 0,
+        patientCode: record.patientCode || this.ExistedPatientCode || '',
+        code: record.code || this.ExistedAssessmentCode || '',
+        assessmentDate: this.formatDateTimeForInput(record.assessmentDate),
+        subjectiveDesc: record.subjectiveDesc || '',
+        physicalExaminationDesc: record.physicalExaminationDesc || '',
+        assessmentDesc: record.assessmentDesc || '',
+        interventionDesc: record.interventionDesc || '',
+        physician_IdNo: physicianId,
+        nurse_IdNo: nurseId
+      });
+    } else {
+      this.DocOrderForm.reset(this.getCurrentDoctorOrderDefaults());
+      this.selectedDoctorOrder = null;
+    }
+
+    this.updateOrderSummaryTable();
+
+    const modalElement = document.getElementById('viewDocOrderModal');
+    if (!modalElement) {
+      console.error('Modal element not found in DOM');
+      return;
+    }
+
+    this.backDropModalDocOrder = new Modal(modalElement);
+    this.backDropModalDocOrder.show();
+  }
+  viewDoctorOrder(record: any): void {
+    this.openDoctorOrderModal('view', record);
+  }
+  editDoctorOrder(record: any): void {
+    this.openDoctorOrderModal('edit', record);
+    console.log('Editing doctor order:', record);
+  }
+  onSaveDoctorOrder(): void {
+    if (this.DocOrderForm.invalid) {
+      this.DocOrderForm.markAllAsTouched();
+      return;
+    }
+
+    const patientCode = this.route.snapshot.paramMap.get('patientCode') || this.ExistedPatientCode || '';
+    const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode') || this.ExistedAssessmentCode || '';
+    const formValues = this.DocOrderForm.getRawValue();
+
+    const payload = {
+      recNo: this.doctorOrderMode === 'edit' ? Number(formValues.recNo) || 0 : 0,
+      patientCode,
+      code: assessmentCode,
+      assessmentDate: this.formatDoctorOrderDate(formValues.assessmentDate),
+      subjectiveDesc: formValues.subjectiveDesc?.trim() || '',
+      physicalExaminationDesc: formValues.physicalExaminationDesc?.trim() || '',
+      assessmentDesc: formValues.assessmentDesc?.trim() || '',
+      interventionDesc: formValues.interventionDesc?.trim() || '',
+      physician_IdNo: Number(formValues.physician_IdNo) || 0,
+      nurse_IdNo: Number(formValues.nurse_IdNo) || 0
+    };
+
+    this.isSubmitting = true;
+
+    this.service.postPatientDoctorsOrder(payload).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: `Doctors order ${this.doctorOrderMode === 'edit' ? 'updated' : 'saved'} successfully!`,
+          timer: 1200,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          allowEscapeKey: false
+        });
+
+        this.hideModalDoctorOrder();
+        this.DocOrderForm.reset(this.getCurrentDoctorOrderDefaults());
+        this.selectedDoctorOrder = null;
+        this.currentDoctorOrderRecNo = null;
+        this.doctorOrderMode = 'create';
+        this.isSubmitting = false;
+        this.refreshDoctorOrdersData();
+      },
+      error: (error) => {
+        console.error('Error saving doctor order:', error);
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to save Doctors Order. Please try again.',
+          showConfirmButton: true
+        });
+
+        this.isSubmitting = false;
+      }
+    });
+  }
   backToApp(): void {
   if (!this.router) {
     console.error('Router is undefined!');
@@ -969,7 +1256,7 @@ showModalMedication(): void {
     this.isLoading = false;
   }, 3000);
 
-  const sub = this.router.events.subscribe((event) => {
+	  const sub = this.router.events.subscribe((event) => {
     if (event instanceof NavigationEnd) {
       sub.unsubscribe();
 
@@ -979,8 +1266,11 @@ showModalMedication(): void {
     }
   });
 
-  this.router.navigate(['/application', this.ExistedPatientCode]);
-}
+	  this.router.navigate(['/application', this.ExistedPatientCode]);
+	}
+  goToDoctorOrderSummary(): void {
+    this.showTab('#OrderSummary');
+  }
 
  private showTab(selector: string): void {
   const tabElement = document.querySelector(`[data-bs-target="${selector}"]`);
@@ -1094,21 +1384,17 @@ console.log(this.PsychEvaluationReportForm.value);
 });
 console.log(this.TreatPlanReportForm.value);
  this.DocOrderForm = this.fb.group({
-  recNo: [0],
-  patientCode: [patientCode],
-  code: [assessmentCode],
-  dateIdentified: ['', Validators.required],
-  patientDomainCode: ['', Validators.required],
-  patientProblem: ['', Validators.required],
-  patientGoal: ['', Validators.required],
-  patientObjective: ['', Validators.required],
-  patientIntervention: ['', Validators.required],
-  preparedBy: ['', Validators.required],
-  notedBy: ['', Validators.required],
-  approvedBy: ['', Validators.required],
-  nurseCode: ['', Validators.required],
-  psychometricianCode: ['', Validators.required],
-});
+	  recNo: [0],
+	  patientCode: [patientCode],
+	  code: [assessmentCode],
+	  assessmentDate: ['', Validators.required],
+	  subjectiveDesc: ['', Validators.required],
+	  physicalExaminationDesc: ['', Validators.required],
+	  assessmentDesc: ['', Validators.required],
+	  interventionDesc: ['', Validators.required],
+	  physician_IdNo: ['', Validators.required],
+	  nurse_IdNo: ['', Validators.required],
+	});
 console.log(this.DocOrderForm.value);
  this.MedicationForm = this.fb.group({
   recNo: [0],
@@ -1140,11 +1426,12 @@ this.DocOrderForm.valueChanges.subscribe(() => {
   this.MedicationForm.valueChanges.subscribe(() => {
     this.updateMedicationSummaryTable();
   });
-   this.updatePlanSummaryTable();
-  this.updateSummaryTable();
-  this.updateOrderSummaryTable();
-  this.updateMedicationSummaryTable();
-    this.service.getrefAppearance().subscribe({
+	  this.updatePlanSummaryTable();
+	  this.updateSummaryTable();
+	  this.updateOrderSummaryTable();
+	  this.updateMedicationSummaryTable();
+    this.DocOrderForm.reset(this.getCurrentDoctorOrderDefaults());
+	    this.service.getrefAppearance().subscribe({
       next: (response) => {
         this.Appearance = response as any[];
         console.log(this.Appearance);
@@ -1262,8 +1549,8 @@ this.DocOrderForm.valueChanges.subscribe(() => {
         console.log('API response:', response);
 
         // Defensive check
-        if (Array.isArray(response)) {
-          this.users = response;
+	        if (Array.isArray(response)) {
+	          this.users = response;
 
           this.administratives = this.users.filter(user => user.posCode === 'sa001');
           this.psychologists = this.users.filter(user => user.posCode === 'p002');
@@ -1272,10 +1559,14 @@ this.DocOrderForm.valueChanges.subscribe(() => {
           this.nursing = this.users.filter(user => user.posCode === 'n001');
            this.socialWelfare = this.users.filter(user => user.posCode === 'sw001');
           console.log('users:', this.users);
-          console.log('nursing:', this.nursing);
-          console.log('socialWelfare:', this.socialWelfare);
-          console.log('Medical Officers:', this.medicalOfficers);
-        } else {
+	          console.log('nursing:', this.nursing);
+	          console.log('socialWelfare:', this.socialWelfare);
+	          console.log('Medical Officers:', this.medicalOfficers);
+            if (this.doctorOrdersData.length > 0) {
+              this.doctorOrdersData = this.doctorOrdersData.map((item: any) => this.enrichDoctorOrderRecord(item));
+              this.applyDoctorOrderFilters();
+            }
+	        } else {
           console.error('Expected array, got:', typeof response);
         }
       },
@@ -1412,11 +1703,13 @@ if (patientCode && assessmentCode) {
       console.error('Error fetching patient treatment plan:', error);
     }
   });
-} else {
-  console.error('Missing patientCode or assessmentCode in route parameters.');
-}
+	} else {
+	  console.error('Missing patientCode or assessmentCode in route parameters.');
+	}
 
-    }
+  this.refreshDoctorOrdersData();
+
+	    }
     refreshNursingNotesData(): void {
       const patientCode = this.route.snapshot.paramMap.get('patientCode');
       const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
@@ -1570,6 +1863,44 @@ refreshTreatmentPlanData(): void {
     }
   });
 }
+refreshDoctorOrdersData(): void {
+  const patientCode = this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+
+  if (!patientCode || !assessmentCode) {
+    console.error('Missing patientCode or assessmentCode in route.');
+    this.doctorOrdersData = [];
+    this.doctorOrdersFiltered = [];
+    this.doctorOrdersPaged = [];
+    return;
+  }
+
+  this.doctorOrdersLoading = true;
+  this.doctorOrdersError = '';
+
+  this.service.getPatientDoctorsOrder(patientCode, assessmentCode).subscribe({
+    next: (response) => {
+      const normalized = Array.isArray(response)
+        ? response
+        : Array.isArray((response as any)?.entity)
+          ? (response as any).entity
+          : [];
+
+      this.doctorOrdersData = normalized.map((item: any) => this.enrichDoctorOrderRecord(item));
+      this.doctorOrderPage = 1;
+      this.applyDoctorOrderFilters();
+      this.doctorOrdersLoading = false;
+    },
+    error: (error) => {
+      console.error('Error fetching doctors order:', error);
+      this.doctorOrdersLoading = false;
+      this.doctorOrdersError = 'No Record Found.';
+      this.doctorOrdersData = [];
+      this.doctorOrdersFiltered = [];
+      this.doctorOrdersPaged = [];
+    }
+  });
+}
 updateSummaryTable() {
   const formData = this.PsychEvaluationReportForm.value;
 
@@ -1613,28 +1944,30 @@ updatePlanSummaryTable() {
   ];
 }
 updateOrderSummaryTable() {
-  const formData = this.DocOrderForm.value;
-  const domainDesc = this.domains.find((d: any) => d.domainCode === formData.patientDomainCode)?.domainDesc || '';
+  const formData = this.DocOrderForm.getRawValue();
+  const physicianName = this.getStaffDisplayName(formData.physician_IdNo, this.medicalOfficers);
+  const nurseName = this.getStaffDisplayName(formData.nurse_IdNo, this.nursing);
   this.listDoctorOrderReport = [
 
-     { 
-      section: 'Date Ordered', 
-      values: [
-        { 
-          label: formData.dateIdentified 
-            ? formatDate(formData.dateIdentified, 'MMMM d, yyyy', 'en-US') 
-            : '' 
-        }
-      ] 
-    },
-     { section: 'Subjective', values: [{ label: domainDesc }] },
-    { section: 'Physical Examination', values: [{ label: formData.patientProblem || '' }] },
-    { section: 'Assessment', values: [{ label: formData.patientGoal || '' }] },
-    { section: 'Intervention', values: [{ label: formData.patientIntervention || '' }] },
-    { section: 'Ordered By', values: [{ label: formData.preparedBy || '' }] },
+	     { 
+	      section: 'Date Ordered', 
+	      values: [
+	        { 
+	          label: formData.assessmentDate 
+	            ? formatDate(formData.assessmentDate, 'MMMM d, yyyy, h:mm a', 'en-US') 
+	            : '' 
+	        }
+	      ] 
+	    },
+	     { section: 'Subjective', values: [{ label: formData.subjectiveDesc || '' }] },
+	    { section: 'Physical Examination', values: [{ label: formData.physicalExaminationDesc || '' }] },
+	    { section: 'Assessment', values: [{ label: formData.assessmentDesc || '' }] },
+	    { section: 'Intervention', values: [{ label: formData.interventionDesc || '' }] },
+	    { section: 'Physician', values: [{ label: physicianName }] },
+	    { section: 'Nurse', values: [{ label: nurseName }] },
 
-  ];
-}
+	  ];
+	}
 updateMedicationSummaryTable() {
   const formData = this.MedicationForm.value;
   const domainDesc = this.domains.find((d: any) => d.domainCode === formData.patientDomainCode)?.domainDesc || '';

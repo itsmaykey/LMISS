@@ -387,46 +387,98 @@
         </div>
         <div class="tab-pane fade" id="DoctorsTab">
           <div class="card">
-           <div class="card-header d-flex align-items-center ">
-              <div class="d-flex align-items-center">
+           <div class="card-header d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-between">
+              <div class="d-flex align-items-center gap-2">
                 <h5 class="mb-0">Doctors Order</h5>
-                <button type="button" style="margin-left:5px" class="btn btn-secondary me-2"><label style="color:white"  (click)="showModalDocOrder()"><i class="icon-base bx bx-plus icon-sm me-1_5"></i>Order</label></button>
+                <span class="badge bg-label-primary text-primary">{{ doctorOrdersFiltered.length }} records</span>
               </div>
+              <button type="button" class="btn btn-secondary text-white" (click)="showModalDocOrder()">
+                <i class="icon-base bx bx-plus icon-sm me-1_5"></i>New Order
+              </button>
             </div>
              <div class="card-body">
-              <br>
-              <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
-                <table class="table table-bordered table-striped table-hover">
-                  <thead class="table-dark text-center">
-                    <tr >
-                      <th style="width: 5%;">#</th>
-                       <th style="width: 30%;">Date Ordered</th>
-                      <th style="width: 30%;">Subjective</th>
-                      <th style="width: 5%;">Action</th>
-                    </tr>
-                  </thead>
-                   <tbody class="table-border-bottom-0">
-                    <tr *ngFor="let item of planData; let i = index">
-                      <td class="text-center">{{ i + 1 }}</td>
-                      <td class="text-center">{{ item.dateIdentified | date:'MMMM d, yyyy' }}</td>
-                      <td class="text-center">{{ item.patientDomainDesc}}</td>
-                      <td class="text-center">
-                        <button type="button" class="btn btn-sm btn-primary text-white" (click)="viewPlanModalEdit(item)" title="View Details">
-                          <i class="bx bx-show"></i> 
-                        </button>
-                        <button 
-                          type="button" 
-                          class="btn btn-sm btn-secondary text-white" 
-                          title="Print" 
-                          (click)="printDocOrder(item)">
-                          <i class="bx bx-printer"></i>
-                        </button>
-                      </td>
-                    </tr>
+              <div *ngIf="doctorOrdersLoading" class="alert alert-info d-flex align-items-center gap-2 mb-3" role="status" aria-live="polite">
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                <span>Loading doctors orders...</span>
+              </div>
 
-                    
-                  </tbody>
-                </table>
+              <div *ngIf="doctorOrdersError && !doctorOrdersLoading" class="alert alert-danger d-flex justify-content-between align-items-center mb-3" role="alert">
+                <span>{{ doctorOrdersError }}</span>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="refreshDoctorOrdersData()">Retry</button>
+              </div>
+
+              <div *ngIf="!doctorOrdersLoading && !doctorOrdersError && doctorOrdersFiltered.length === 0" class="empty-state text-center py-5" aria-live="polite">
+                <i class="bx bx-notepad doctor-order-empty-icon"></i>
+                <h6 class="mt-3 mb-1">No doctors orders found</h6>
+                <p class="text-muted mb-3">Try a different search or create the first record for this patient.</p>
+                <button type="button" class="btn btn-primary text-white" (click)="showModalDocOrder()">Create Doctors Order</button>
+              </div>
+
+              <div *ngIf="!doctorOrdersLoading && !doctorOrdersError && doctorOrdersFiltered.length > 0">
+                <div class="table-responsive doctor-order-table-wrapper">
+                  <table class="table table-bordered table-striped table-hover align-middle">
+                    <thead class="table-dark text-center">
+                      <tr>
+                        <th scope="col" style="width: 7%;">#</th>
+                        <th scope="col">
+                          <button type="button" class="btn btn-link doctor-order-sort" (click)="setDoctorOrderSort('assessmentDate')">Date Ordered</button>
+                        </th>
+                        <th scope="col">
+                          <button type="button" class="btn btn-link doctor-order-sort" (click)="setDoctorOrderSort('subjectiveDesc')">Subjective</button>
+                        </th>
+                        <th scope="col">
+                          <button type="button" class="btn btn-link doctor-order-sort" (click)="setDoctorOrderSort('physicianName')">Physician</button>
+                        </th>
+                        <th scope="col">
+                          <button type="button" class="btn btn-link doctor-order-sort" (click)="setDoctorOrderSort('nurseName')">Nurse</button>
+                        </th>
+                        <th scope="col" style="width: 14%;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                      <tr *ngFor="let item of doctorOrdersPaged; let i = index">
+                        <td class="text-center">{{ ((doctorOrderPage - 1) * doctorOrderPageSize) + i + 1 }}</td>
+                        <td>{{ item.assessmentDate | date:'MMMM d, yyyy, h:mm a' }}</td>
+                        <td>{{ item.subjectiveDesc?.length > 80 ? (item.subjectiveDesc | slice:0:80) + '...' : item.subjectiveDesc }}</td>
+                        <td>{{ item.physicianDisplayName }}</td>
+                        <td>{{ item.nurseDisplayName }}</td>
+                        <td class="text-center">
+                          <button type="button" class="btn btn-sm btn-primary text-white me-1" (click)="viewDoctorOrder(item)" title="View details">
+                            <i class="bx bx-show"></i>
+                          </button>
+                          <button type="button" class="btn btn-sm btn-outline-primary" (click)="editDoctorOrder(item)" title="Edit record">
+                            <i class="bx bx-edit-alt"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
+                  <div class="text-muted small">
+                    Showing {{ doctorOrdersPaged.length }} of {{ doctorOrdersFiltered.length }} filtered records
+                  </div>
+                  <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-2">
+                    <label for="doctorOrderPageSize" class="small text-muted mb-0">Rows per page</label>
+                    <select
+                      id="doctorOrderPageSize"
+                      class="form-select form-select-sm"
+                      style="width: auto;"
+                      [ngModel]="doctorOrderPageSize"
+                      (ngModelChange)="onDoctorOrderPageSizeChange($event)"
+                    >
+                      <option [ngValue]="5">5</option>
+                      <option [ngValue]="10">10</option>
+                      <option [ngValue]="15">15</option>
+                    </select>
+                    <div class="btn-group" role="group" aria-label="Doctors order pagination">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="doctorOrderPage === 1" (click)="changeDoctorOrderPage(-1)">Previous</button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary disabled">Page {{ doctorOrderPage }} of {{ doctorOrderTotalPages }}</button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="doctorOrderPage === doctorOrderTotalPages" (click)="changeDoctorOrderPage(1)">Next</button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1844,7 +1896,7 @@
               <label class="form-label fw-bold">Approved By: <span class="text-muted">(Medical Officer)</span></label>
               <select class="form-select" id="approvedBy" formControlName="approvedBy">
                 <option value="" disabled>Select Personnel</option>
-                <option *ngFor="let staff of medicalOfficers" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+                <option *ngFor="let staff of medicalOfficers" [ngValue]="staff.staffIdNo">{{ staff.uFullName }}</option>
               </select>
               <div *ngIf="TreatPlanReportForm.get('approvedBy')?.touched && TreatPlanReportForm.get('approvedBy')?.invalid" class="text-danger">
                 Approved By (Medical Officer) is required.
@@ -1883,7 +1935,9 @@
     <div class="modal-content">
       
       <div class="modal-header">
-        <h5 class="modal-title" id="backDropModalTitle">Doctors Order</h5>
+        <h5 class="modal-title" id="backDropModalTitle">
+          {{ doctorOrderMode === 'create' ? 'Create Doctors Order' : doctorOrderMode === 'edit' ? 'Update Doctors Order' : 'Doctors Order Details' }}
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -1905,67 +1959,82 @@
     <div class="tab-pane fade active show" id="OrderDetailsTab" role="tabpanel">
       <div class="card my-3 shadow-sm rounded-3">
         <div class="card-body pt-4 custom-font" style="max-height: 500px; overflow-y: auto;">
-          
-          <!-- Date Identified -->
+
+          <div *ngIf="doctorOrderMode === 'view'" class="alert alert-light border d-flex flex-column flex-md-row justify-content-between gap-2" aria-live="polite">
+            <span><strong>Record:</strong> #{{ selectedDoctorOrder?.recNo || DocOrderForm.get('recNo')?.value || 0 }}</span>
+            <span><strong>Patient:</strong> {{ selectedDoctorOrder?.patientFullName || ExistedPatient?.fullName || 'Current patient' }}</span>
+          </div>
+
           <div class="row">
             <div class="col-md-6">
-              <label for="dateIdentified" class="form-label me-2">Date Order</label>
-              <input type="datetime-local" class="form-control" id="dateIdentified" formControlName="dateIdentified" />
-              <div *ngIf="DocOrderForm.get('dateIdentified')?.touched && DocOrderForm.get('dateIdentified')?.invalid" class="text-danger">
-                Date Identified is required.
+              <label for="assessmentDate" class="form-label me-2">Assessment Date</label>
+              <input type="datetime-local" class="form-control" id="assessmentDate" formControlName="assessmentDate" [readonly]="doctorOrderMode === 'view'" />
+              <div *ngIf="DocOrderForm.get('assessmentDate')?.touched && DocOrderForm.get('assessmentDate')?.invalid" class="text-danger">
+                Assessment date is required.
               </div>
             </div>
-               <div class="col-md-6 mb-3">
-              <label class="form-label fw-bold">Ordered By</label>
-              <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Enter Full name" formControlName="notedBy">
-              <div *ngIf="DocOrderForm.get('notedBy')?.touched && DocOrderForm.get('notedBy')?.invalid" class="text-danger">
-                Noted By (Admin) is required.
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold" for="physician_IdNo">Physician</label>
+              <select class="form-select" id="physician_IdNo" formControlName="physician_IdNo" [disabled]="doctorOrderMode === 'view'">
+                <option value="" disabled>Select physician</option>
+                <option *ngFor="let staff of medicalOfficers" [value]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="DocOrderForm.get('physician_IdNo')?.touched && DocOrderForm.get('physician_IdNo')?.invalid" class="text-danger">
+                Physician is required.
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold" for="nurse_IdNo">Nurse</label>
+              <select class="form-select" id="nurse_IdNo" formControlName="nurse_IdNo" [disabled]="doctorOrderMode === 'view'">
+                <option value="" disabled>Select nurse</option>
+                <option *ngFor="let staff of nursing" [ngValue]="staff.staffIdNo">{{ staff.uFullName }}</option>
+              </select>
+              <div *ngIf="DocOrderForm.get('nurse_IdNo')?.touched && DocOrderForm.get('nurse_IdNo')?.invalid" class="text-danger">
+                Nurse is required.
               </div>
             </div>
           </div>
           <hr>
 
-          <!-- Domain -->
           <div class="d-flex align-items-start flex-wrap mb-3">
             <div class="col-md-12">
-              <label for="patientObjective" class="form-label">Subjective</label>
-              <textarea class="form-control" id="patientObjective" formControlName="patientObjective" rows="2" placeholder="Enter Purpose"></textarea>
-              <div *ngIf="DocOrderForm.get('patientObjective')?.touched && DocOrderForm.get('patientObjective')?.invalid" class="text-danger">
-                Objective is required.
+              <label for="subjectiveDesc" class="form-label">Subjective</label>
+              <textarea class="form-control" id="subjectiveDesc" formControlName="subjectiveDesc" rows="3" placeholder="Enter subjective notes" [readonly]="doctorOrderMode === 'view'"></textarea>
+              <div *ngIf="DocOrderForm.get('subjectiveDesc')?.touched && DocOrderForm.get('subjectiveDesc')?.invalid" class="text-danger">
+                Subjective notes are required.
               </div>
             </div>
           </div>
           <hr>
 
-          <!-- Problem -->
           <div class="d-flex align-items-start flex-wrap mb-3">
             <div class="col-md-12">
-              <label for="patientProblem" class="form-label">Physical Examination</label>
-              <textarea class="form-control" id="patientProblem" formControlName="patientProblem" rows="2" placeholder="Enter Purpose"></textarea>
-              <div *ngIf="DocOrderForm.get('patientProblem')?.touched && DocOrderForm.get('patientProblem')?.invalid" class="text-danger">
-                Problem is required.
+              <label for="physicalExaminationDesc" class="form-label">Physical Examination</label>
+              <textarea class="form-control" id="physicalExaminationDesc" formControlName="physicalExaminationDesc" rows="3" placeholder="Enter physical examination details" [readonly]="doctorOrderMode === 'view'"></textarea>
+              <div *ngIf="DocOrderForm.get('physicalExaminationDesc')?.touched && DocOrderForm.get('physicalExaminationDesc')?.invalid" class="text-danger">
+                Physical examination is required.
               </div>
             </div>
           </div>
           <hr>
 
-          <!-- Goal -->
           <div class="d-flex align-items-start flex-wrap mb-3">
             <div class="col-md-12">
-              <label for="patientGoal" class="form-label">Assessment</label>
-              <textarea class="form-control" id="patientGoal" formControlName="patientGoal" rows="2" placeholder="Enter Purpose"></textarea>
-              <div *ngIf="DocOrderForm.get('patientGoal')?.touched && DocOrderForm.get('patientGoal')?.invalid" class="text-danger">
-                Goal is required.
+              <label for="assessmentDesc" class="form-label">Assessment</label>
+              <textarea class="form-control" id="assessmentDesc" formControlName="assessmentDesc" rows="3" placeholder="Enter assessment details" [readonly]="doctorOrderMode === 'view'"></textarea>
+              <div *ngIf="DocOrderForm.get('assessmentDesc')?.touched && DocOrderForm.get('assessmentDesc')?.invalid" class="text-danger">
+                Assessment is required.
               </div>
             </div>
           </div>
           <hr>
-          <!-- Intervention -->
           <div class="d-flex align-items-start flex-wrap mb-3">
             <div class="col-md-12">
-              <label for="patientIntervention" class="form-label">Intervention</label>
-              <textarea class="form-control" id="patientIntervention" formControlName="patientIntervention" rows="2" placeholder="Enter Purpose"></textarea>
-              <div *ngIf="DocOrderForm.get('patientIntervention')?.touched && DocOrderForm.get('patientIntervention')?.invalid" class="text-danger">
+              <label for="interventionDesc" class="form-label">Intervention</label>
+              <textarea class="form-control" id="interventionDesc" formControlName="interventionDesc" rows="3" placeholder="Enter intervention details" [readonly]="doctorOrderMode === 'view'"></textarea>
+              <div *ngIf="DocOrderForm.get('interventionDesc')?.touched && DocOrderForm.get('interventionDesc')?.invalid" class="text-danger">
                 Intervention is required.
               </div>
             </div>
@@ -1974,7 +2043,7 @@
       </div>
 
       <div class="mt-3 text-end">
-        <button type="button" (click)="goToPlanSummary()" class="btn btn-secondary text-white">Next</button>
+        <button type="button" (click)="goToDoctorOrderSummary()" class="btn btn-secondary text-white">Next</button>
       </div>
     </div>
 
@@ -2009,12 +2078,14 @@
 
           <div class="mt-3 text-end">
            <button 
+            *ngIf="doctorOrderMode !== 'view'"
             type="button" 
             class="btn btn-primary text-white"
-            [disabled]="isSubmitting || TreatPlanReportForm.invalid"
-            (click)="onSaveTreatment()">
+            [disabled]="isSubmitting || DocOrderForm.invalid"
+            (click)="onSaveDoctorOrder()">
             Save <i class="bx bx-save"></i>
           </button>
+          <button *ngIf="doctorOrderMode === 'view'" type="button" class="btn btn-outline-primary" (click)="editDoctorOrder(selectedDoctorOrder)">Edit This Record</button>
           </div>
           <label class="form-label fw-bold text-muted ">Note: Please ensure all fields are filled out before saving.</label>
 

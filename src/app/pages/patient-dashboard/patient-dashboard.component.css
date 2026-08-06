@@ -221,3 +221,31 @@
   border-width: 0.25em;
   border-color: rgba(0, 123, 255, 0.25) transparent transparent transparent;
 }
+
+.doctor-order-sort {
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0;
+}
+
+.doctor-order-sort:hover,
+.doctor-order-sort:focus {
+  color: #d9ecff;
+  text-decoration: underline;
+}
+
+.doctor-order-table-wrapper {
+  max-height: 420px;
+}
+
+.empty-state {
+  border: 1px dashed #c7d4e2;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.doctor-order-empty-icon {
+  font-size: 3rem;
+  color: #6c8fb3;
+}
