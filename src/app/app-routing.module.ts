@@ -10,45 +10,57 @@ import { ApplicationDashboardComponent } from './pages/application-dashboard/app
 import { AuthGuard } from './Admin/Auth/AuthGuard';
 import { LoginGuard } from './Admin/Auth/LoginGuard';
 const routes: Routes = [
-
-
-
-
+  {
+    path: 'login',
+    component: LoginComponent,
+    canActivate: [LoginGuard]
+  },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  {
+    path: '',
+    component: MainLayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
       {
-        path: 'login',
-        component: LoginComponent,
-        canActivate: [LoginGuard]
+        path: 'dashboard',
+        component: DashboardComponent,
       },
-      { path: '', redirectTo: '/login', pathMatch: 'full' },
-
-
-  {
- path:'',
- component:MainLayoutComponent,
- canActivate: [AuthGuard],
- children: [
-  { path: 'application/:patientCode', component: ApplicationDashboardComponent },
-   {  path: 'patientDashboard/:patientCode/:assessmentCode', component: PatientDashboardComponent },
-  {
-    path:'dashboard',
-    component:DashboardComponent,
-
+      {
+        path: 'userReg',
+        component: UserRegComponent
+      },
+      {
+        path: 'user-Registration',
+        redirectTo: 'userReg',
+        pathMatch: 'full'
+      },
+      {
+        path: 'application',
+        component: ApplicationDashboardComponent
+      },
+      {
+        path: 'patientDashboard',
+        component: PatientDashboardComponent
+      },
+      // Legacy routes supported with immediate URL sanitization/redirection
+      {
+        path: 'application/:patientCode',
+        component: ApplicationDashboardComponent
+      },
+      {
+        path: 'patientDashboard/:patientCode/:assessmentCode',
+        component: PatientDashboardComponent
+      },
+      {
+        path: 'patientDashboard/:patientCode',
+        component: PatientDashboardComponent
+      }
+    ]
   },
   {
-    path:'userReg',
-    component:UserRegComponent
-  },
-  {
-    path:'patientDashboard',
-    component:PatientDashboardComponent
-  },
-  {
-    path:'application',
-    component:ApplicationDashboardComponent
+    path: '**',
+    redirectTo: '/dashboard'
   }
- ]
-  },
-
 ];
 
 

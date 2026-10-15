@@ -50,6 +50,10 @@ getToken(): string | null {
     localStorage.removeItem(this.encryptionKey);
     localStorage.removeItem(this.tokenExpirationKey);
     localStorage.removeItem('userInfo');
+    try {
+      sessionStorage.removeItem('lmiss_active_patient_code');
+      sessionStorage.removeItem('lmiss_active_assessment_code');
+    } catch {}
   }
 
   isLoggedIn(): boolean {
@@ -68,5 +72,9 @@ getToken(): string | null {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.tokenExpirationKey);
     localStorage.removeItem('userInfo');
+    try {
+      sessionStorage.removeItem('lmiss_active_patient_code');
+      sessionStorage.removeItem('lmiss_active_assessment_code');
+    } catch {}
   }
 }

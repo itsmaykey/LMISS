@@ -21,6 +21,7 @@ import { PatientStaffAssessmentService } from './ScriptForms/patientStaffAssessm
 import Swal from 'sweetalert2';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Base64 } from 'js-base64';
+import { PatientStateService } from '../../services/patient-state.service';
 
 import { forkJoin } from 'rxjs';
 import Modal from 'bootstrap/js/dist/modal';
@@ -106,7 +107,8 @@ export class ApplicationDashboardComponent implements OnInit {
     private PatientRehabRecordService: PatientRehabRecordService,
     private PatientFamHealthService: PatientFamHealthService,
     private PatientStaffAssessmentService: PatientStaffAssessmentService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private patientStateService: PatientStateService
   ) {
   }
 
@@ -127,7 +129,7 @@ export class ApplicationDashboardComponent implements OnInit {
       },
     });
   const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
-    const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
+    const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || history.state?.patientCode || this.route.snapshot.paramMap.get('patientCode') || '';
     this.ExistedPatientCode = patientCode;
     
     this.AssessmentForm = this.fb.group({
@@ -140,7 +142,7 @@ export class ApplicationDashboardComponent implements OnInit {
  
   }
  refreshHistoryList(): void {
-  const patientCode = this.ExistedPatientCode || this.route.snapshot.paramMap.get('patientCode') || '';
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || history.state?.patientCode || this.route.snapshot.paramMap.get('patientCode') || '';
   this.service.getApplicationHistory(patientCode).subscribe({
     next: (response) => {
       this.appHistory = response;
@@ -152,13 +154,39 @@ export class ApplicationDashboardComponent implements OnInit {
   });
 }
   checkExisted(): void {
+    const routePatientCode = this.route.snapshot.paramMap.get('patientCode');
+    const statePatientCode = (history.state && history.state.patientCode) ? history.state.patientCode : '';
+    const storedPatientCode = this.patientStateService.getPatientCode();
+    const patientCode = routePatientCode || statePatientCode || storedPatientCode;
+
+    if (routePatientCode) {
+      this.patientStateService.setSelectedPatient(routePatientCode);
+      this.router.navigate(['/application'], {
+        replaceUrl: true,
+        state: { patientCode: routePatientCode }
+      });
+    }
+
+    if (patientCode) {
+      this.ExistedPatientCode = patientCode;
+      this.patientStateService.setPatientCode(patientCode);
+      this.loadExistedPatientData(patientCode);
+      this.refreshHistoryList();
+    } else {
+      this.initializeForms();
+    }
+
     this.route.paramMap.subscribe((params) => {
-      const patientCode = params.get('patientCode');
-      if (patientCode) {
-        this.ExistedPatientCode = patientCode;
-        this.loadExistedPatientData(patientCode);
-      } else {
-        this.initializeForms();
+      const paramCode = params.get('patientCode');
+      if (paramCode && paramCode !== this.ExistedPatientCode) {
+        this.patientStateService.setSelectedPatient(paramCode);
+        this.router.navigate(['/application'], {
+          replaceUrl: true,
+          state: { patientCode: paramCode }
+        });
+        this.ExistedPatientCode = paramCode;
+        this.loadExistedPatientData(paramCode);
+        this.refreshHistoryList();
       }
     });
   }
@@ -504,7 +532,7 @@ export class ApplicationDashboardComponent implements OnInit {
         },
       });
   
-      const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
+      const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || history.state?.patientCode || this.route.snapshot.paramMap.get('patientCode') || '';
       this.service.getApplicationHistory(patientCode).subscribe({
         next: (response) => {
           this.appHistory = response;
@@ -599,11 +627,52 @@ goToDashboard(): void {
   }
 
 previewPdf(patientCode: string, assessmentCode: string): void {
-  const url = `http://172.16.0.20/LMISSWebApi/api/QuestPDFPatientDetails/PatientDataReport?patientCode=${encodeURIComponent(patientCode)}&code=${encodeURIComponent(assessmentCode)}`;
+  const pCode = patientCode || this.ExistedPatientCode || this.patientStateService.getPatientCode();
+  const aCode = assessmentCode || '';
 
-  console.log('Printing for:', patientCode, assessmentCode);
+  if (!pCode || !aCode) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Incomplete Information',
+      text: 'Patient Code or Assessment Code is missing.'
+    });
+    return;
+  }
 
-  window.open(url, '_blank');
+  Swal.fire({
+    title: 'Loading Report...',
+    text: 'Please wait while the PDF report is being prepared.',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  this.service.getPatientDataReport(pCode, aCode).subscribe({
+    next: (blob: Blob) => {
+      Swal.close();
+      const blobUrl = URL.createObjectURL(blob);
+      const printWindow = window.open(blobUrl, '_blank');
+      if (!printWindow) {
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `PatientReport_${pCode}.pdf`;
+        a.click();
+      }
+      setTimeout(() => {
+        URL.revokeObjectURL(blobUrl);
+      }, 60000);
+    },
+    error: (err) => {
+      Swal.close();
+      console.error('Error fetching PDF report:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Report Error',
+        text: 'Failed to generate PDF report. Please try again.'
+      });
+    }
+  });
 }
 AssessmentFormSubmit(): void {
   if (this.isSubmitting) {
@@ -1074,7 +1143,10 @@ goToPatientDashboard(patientCode: string, assessmentCode?: string): void {
   }
 
   if (finalPatientCode && finalAssessmentCode) {
-    this.router.navigate(['/patientDashboard', finalPatientCode, finalAssessmentCode]);
+    this.patientStateService.setSelectedPatient(finalPatientCode, finalAssessmentCode);
+    this.router.navigate(['/patientDashboard'], {
+      state: { patientCode: finalPatientCode, assessmentCode: finalAssessmentCode }
+    });
   } else {
     console.warn('Missing patientCode or assessmentCode. Cannot navigate.');
   }
@@ -1097,10 +1169,13 @@ goToPatientDashboard(patientCode: string, assessmentCode?: string): void {
     this.showTab('#navFamilyHealth');
   }
   goToSelectedApp(patientCode: string): void {
-    this.router.navigate(['/application', patientCode]).then(() => {
+    this.patientStateService.setSelectedPatient(patientCode);
+    this.ExistedPatientCode = patientCode;
+    this.loadExistedPatientData(patientCode);
+    this.refreshHistoryList();
+    this.router.navigate(['/application'], {
+      state: { patientCode }
     });
-
-   
   }
 
   private showTab(selector: string): void {

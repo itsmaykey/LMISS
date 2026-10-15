@@ -97,4 +97,25 @@ export class PatientDashboardService {
   postPatientDoctorsOrder(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientDoctorsOrder`, data);
   }
+
+  getPatientNursingNotesReport(patientCode: string, code: string): Observable<Blob> {
+    return this.http.get(
+      `${environment.apiUrl}QuestPDFPatientNursingNotes/PatientNursingNotes?patientCode=${encodeURIComponent(patientCode)}&code=${encodeURIComponent(code)}`,
+      { responseType: 'blob' }
+    );
+  }
+
+  getPatientMonthlyPsychoPRReport(patientCode: string, code: string): Observable<Blob> {
+    return this.http.get(
+      `${environment.apiUrl}QuestPDFPatientMonthlyPsychoPR/PatientMonthlyPsyPR?patientCode=${encodeURIComponent(patientCode)}&code=${encodeURIComponent(code)}`,
+      { responseType: 'blob' }
+    );
+  }
+
+  getPatientProgressReportPDF(patientCode: string, code: string): Observable<Blob> {
+    return this.http.get(
+      `${environment.apiUrl}QuestPDFPatientProgressReport/PatientProgressReport?patientCode=${encodeURIComponent(patientCode)}&code=${encodeURIComponent(code)}`,
+      { responseType: 'blob' }
+    );
+  }
 }

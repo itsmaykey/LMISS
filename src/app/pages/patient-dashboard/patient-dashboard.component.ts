@@ -6,6 +6,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { PatientDashboardService } from './service/patient-dashboard.service';
+import { PatientStateService } from '../../services/patient-state.service';
 
 import { AuthService } from '../../Admin/Auth/AuthService';
 import { FormBuilder, FormArray, Validators, FormGroup } from '@angular/forms';
@@ -533,8 +534,8 @@ onSaveNursingNotes(): void {
   }
   onSavePE(): void {
     const form = this.PsychEvaluationReportForm;
-  const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
-    const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode') || '';
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode') || '';
+    const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode') || '';
     this.isSubmitting = true;
   // Validate form
   if (form.invalid) {
@@ -599,8 +600,8 @@ const payload = {
   }
    onSaveTreatment(): void {
     const form = this.TreatPlanReportForm;
-  const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
-    const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode') || '';
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode') || '';
+    const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode') || '';
     this.isSubmitting = true;
   // Validate form
   if (form.invalid) {
@@ -669,6 +670,7 @@ const payload = {
      private authService: AuthService,
      fb: FormBuilder,
      private SocialWorkerNotesService: SocialWorkerNotesService,
+     private patientStateService: PatientStateService,
 
   ) {
     this.fb = fb;
@@ -688,8 +690,8 @@ const payload = {
       return staff ? staff.uFullName : 'Unknown Staff';
     }
   viewPerMonth(monthName: string): void {
-  const patientCode = this.route.snapshot.paramMap.get('patientCode');
-  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode');
   
   this.showModalPerMonth(); // Show modal
 
@@ -790,8 +792,8 @@ const payload = {
   }
 }
 viewNursingNotes(recNo: string): void {
-  const patientCode = this.route.snapshot.paramMap.get('patientCode');
-  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode');
 
   if (patientCode && assessmentCode) {
     this.service.getExistedPatientNursingNotes(patientCode, assessmentCode).subscribe({
@@ -823,8 +825,8 @@ viewNursingNotes(recNo: string): void {
 }
 
   viewNotes(recNo: string): void {
-  const patientCode = this.route.snapshot.paramMap.get('patientCode');
-  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode');
   this.isEditing = false;
   this.isEditingTbleView = true;
    this.isLoadingNotes = true;
@@ -1266,7 +1268,11 @@ showModalMedication(): void {
     }
   });
 
-	  this.router.navigate(['/application', this.ExistedPatientCode]);
+    const targetPatientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode();
+    this.patientStateService.setSelectedPatient(targetPatientCode);
+	  this.router.navigate(['/application'], {
+      state: { patientCode: targetPatientCode }
+    });
 	}
   goToDoctorOrderSummary(): void {
     this.showTab('#OrderSummary');
@@ -1290,10 +1296,31 @@ showModalMedication(): void {
     console.log('Staff ID No:', this.userInfo.id);
     this.currentUserID = this.userInfo.id;
 
-    const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
-    const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
+    const routeAssessment = this.route.snapshot.paramMap.get('assessmentCode');
+    const routePatient = this.route.snapshot.paramMap.get('patientCode');
+    const statePatient = (history.state && history.state.patientCode) ? history.state.patientCode : '';
+    const stateAssessment = (history.state && history.state.assessmentCode) ? history.state.assessmentCode : '';
+
+    if (routePatient || routeAssessment) {
+      const pCode = routePatient || '';
+      const aCode = routeAssessment || '';
+      this.patientStateService.setSelectedPatient(pCode, aCode);
+      this.router.navigate(['/patientDashboard'], {
+        replaceUrl: true,
+        state: { patientCode: pCode, assessmentCode: aCode }
+      });
+    }
+
+    const patientCode = routePatient || statePatient || this.patientStateService.getPatientCode() || '';
+    const assessmentCode = routeAssessment || stateAssessment || this.patientStateService.getAssessmentCode() || '';
     this.ExistedPatientCode = patientCode;
     this.ExistedAssessmentCode = assessmentCode || '';
+    if (patientCode) {
+      this.patientStateService.setPatientCode(patientCode);
+    }
+    if (assessmentCode) {
+      this.patientStateService.setAssessmentCode(assessmentCode);
+    }
     console.log('Existed Patient Code:', this.ExistedPatientCode);
     console.log('Existed Assessment Code:', this.ExistedAssessmentCode);
      this.userInfo = this.authService.getUserInfo();
@@ -1585,8 +1612,8 @@ this.DocOrderForm.valueChanges.subscribe(() => {
 }
 
  fetchAdditionalData(): void {
-      const patientCode = this.route.snapshot.paramMap.get('patientCode');
-      const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+      const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode');
+      const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode');
 
 if (patientCode && assessmentCode) {
   this.service.getPatientProgressReport(patientCode, assessmentCode).subscribe({
@@ -1711,8 +1738,8 @@ if (patientCode && assessmentCode) {
 
 	    }
     refreshNursingNotesData(): void {
-      const patientCode = this.route.snapshot.paramMap.get('patientCode');
-      const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+      const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode');
+      const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode');
       if (patientCode && assessmentCode) {
   this.service.getExistedPatientNursingNotes(patientCode, assessmentCode)
     .subscribe({
@@ -1733,8 +1760,8 @@ if (patientCode && assessmentCode) {
 }
     }
 refreshMonthlyProgressData(): void {
-  const patientCode = this.route.snapshot.paramMap.get('patientCode');
-  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode');
   if (!patientCode || !assessmentCode) {
     console.error('Missing patientCode or assessmentCode in route.');
     return;
@@ -1767,8 +1794,8 @@ refreshMonthlyProgressData(): void {
     
 }
 refreshPEData(): void {
-  const patientCode = this.route.snapshot.paramMap.get('patientCode');
-  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode');
   if (!patientCode || !assessmentCode) {
     console.error('Missing patientCode or assessmentCode in route.');
     return;
@@ -1802,39 +1829,54 @@ refreshPEData(): void {
     
 }
 getExisted(): void {
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || (history.state && history.state.patientCode) || this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || (history.state && history.state.assessmentCode) || this.route.snapshot.paramMap.get('assessmentCode');
+
+  if (patientCode && assessmentCode) {
+    this.service.getExistedPatientData(patientCode, assessmentCode).subscribe({
+      next: (response: { patientCode?: string; assessmentCode?: string; [key: string]: any }) => {
+        console.log('API Response:', response);
+        if (response && response.patientCode && response.assessmentCode) {
+          this.ExistedPatient = response;
+          console.log('Existed Patient Data:', this.ExistedPatient);
+        } else {
+          console.log("Invalid or missing data in the response.");
+          this.ExistedPatient = null;
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching Existed Patient Data:', err);
+      },
+    });
+  } else {
+    console.log("Missing patientCode or assessmentCode in state or route parameters.");
+  }
+
   this.route.paramMap.subscribe((params) => {
-    const patientCode = params.get('patientCode');
-    const assessmentCode = params.get('assessmentCode');
-    console.log('Assessment Code:', assessmentCode);
-    console.log('Patient Code:', patientCode);
-
-    if (patientCode && assessmentCode) {
-      this.service.getExistedPatientData(patientCode, assessmentCode).subscribe({
-        next: (response: { patientCode?: string; assessmentCode?: string; [key: string]: any }) => {
-          console.log('API Response:', response);  // Log the entire response for debugging
-
-          // Since the API response is an object, not an array, we directly assign it
+    const pCode = params.get('patientCode');
+    const aCode = params.get('assessmentCode');
+    if (pCode && aCode && (pCode !== this.ExistedPatientCode || aCode !== this.ExistedAssessmentCode)) {
+      this.patientStateService.setSelectedPatient(pCode, aCode);
+      this.router.navigate(['/patientDashboard'], {
+        replaceUrl: true,
+        state: { patientCode: pCode, assessmentCode: aCode }
+      });
+      this.ExistedPatientCode = pCode;
+      this.ExistedAssessmentCode = aCode;
+      this.service.getExistedPatientData(pCode, aCode).subscribe({
+        next: (response: any) => {
           if (response && response.patientCode && response.assessmentCode) {
             this.ExistedPatient = response;
-            console.log('Existed Patient Data:', this.ExistedPatient);  // Log the assigned data
-          } else {
-            console.log("Invalid or missing data in the response.");
-            this.ExistedPatient = null;  // Handle invalid or incomplete response
           }
-        },
-        error: (err) => {
-          console.error('Error fetching Existed Patient Data:', err);
-        },
+        }
       });
-    } else {
-      console.log("Missing patientCode or assessmentCode in route parameters.");
     }
   });
 }
 
 refreshTreatmentPlanData(): void {
-  const patientCode = this.route.snapshot.paramMap.get('patientCode');
-  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode');
   if (!patientCode || !assessmentCode) {
     console.error('Missing patientCode or assessmentCode in route.');
     return;
@@ -1864,8 +1906,8 @@ refreshTreatmentPlanData(): void {
   });
 }
 refreshDoctorOrdersData(): void {
-  const patientCode = this.route.snapshot.paramMap.get('patientCode');
-  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode');
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode');
 
   if (!patientCode || !assessmentCode) {
     console.error('Missing patientCode or assessmentCode in route.');
@@ -2014,15 +2056,13 @@ async downloadReport(reportName: string) {
 // this.downloadReport("MyReport");
 
 checkExisted(): void {
-    this.route.paramMap.subscribe((params) => {
-      const patientCode = params.get('patientCode');
-      if (patientCode) {
-        this.ExistedPatientCode = patientCode;
-        this.loadExistedPatientData(patientCode);
-      } else {
-        this.initializeForms();
-      }
-    });
+    const pCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || (history.state && history.state.patientCode) || this.route.snapshot.paramMap.get('patientCode');
+    if (pCode) {
+      this.ExistedPatientCode = pCode;
+      this.loadExistedPatientData(pCode);
+    } else {
+      this.initializeForms();
+    }
   }
  loadExistedPatientData(patientCode: string): void {
 
@@ -2610,8 +2650,8 @@ onSaveNext(): void {
   const suspensionofActivitiesIds = this.suspensionofActivitiesId.value;
   const cravingsIds = this.cravingsId.value;
   const otherObservations = this.otherObservations.value || '';
-  const patientCode = this.route.snapshot.paramMap.get('patientCode') || '';
-  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode') || '';
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode') || '';
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode') || '';
   const dateSubmitted = this.dateSubmitted().value;
   this.listPatientMonthlyPReportToSave = [];
   
@@ -2719,8 +2759,8 @@ onSaveNext(): void {
   const physicalWsymptomsIds = this.physicalWsymptomsId.value;
   const suspensionofActivitiesIds = this.suspensionofActivitiesId.value;
   const cravingsIds = this.cravingsId.value;
-  const patientCode = this.route.snapshot.paramMap.get('patientCode');
-  const assessmentCode = this.route.snapshot.paramMap.get('assessmentCode');
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode() || this.route.snapshot.paramMap.get('patientCode') || '';
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode() || this.route.snapshot.paramMap.get('assessmentCode') || '';
   const otherObservations = this.MentalStatusForm.get('otherObservations')?.value;
   const monthValue = this.MentalStatusForm.get('dateSubmitted')?.value;
   const notedBy = this.notedBy.value;
@@ -3123,21 +3163,140 @@ requireAtLeastOnePerFieldValidator(formGroup: FormGroup): ValidationErrors | nul
 //   }
 // }
 
+  private openPdfBlob(blob: Blob, filename: string): void {
+    const blobUrl = URL.createObjectURL(blob);
+    const printWindow = window.open(blobUrl, '_blank');
+    if (!printWindow) {
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      a.click();
+    }
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 60000);
+  }
+
 ////Printing Functions
-printSWPN(recNo: string): void {
-  console.log('Printing for:', recNo);
-  // TODO: implement print logic here
+printSWPN(recNo?: string): void {
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode();
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode();
+
+  if (!patientCode || !assessmentCode) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Incomplete Information',
+      text: 'Patient Code or Assessment Code is missing.'
+    });
+    return;
+  }
+
+  Swal.fire({
+    title: 'Loading Report...',
+    text: 'Please wait while the Social Work Progress Notes PDF is being prepared.',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  this.service.getPatientProgressReportPDF(patientCode, assessmentCode).subscribe({
+    next: (blob: Blob) => {
+      Swal.close();
+      this.openPdfBlob(blob, `SWPN_${patientCode}.pdf`);
+    },
+    error: (err: any) => {
+      Swal.close();
+      console.error('Error fetching SWPN PDF report:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Report Error',
+        text: 'Failed to generate Social Work Progress Notes PDF. Please try again.'
+      });
+    }
+  });
 }
-printNurses(recNo: string): void {
-  console.log('Printing for:', recNo);
-  // TODO: implement print logic here
+
+printNurses(recNo?: string): void {
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode();
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode();
+
+  if (!patientCode || !assessmentCode) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Incomplete Information',
+      text: 'Patient Code or Assessment Code is missing.'
+    });
+    return;
+  }
+
+  Swal.fire({
+    title: 'Loading Report...',
+    text: 'Please wait while the Nurses Notes PDF is being prepared.',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  this.service.getPatientNursingNotesReport(patientCode, assessmentCode).subscribe({
+    next: (blob: Blob) => {
+      Swal.close();
+      this.openPdfBlob(blob, `NursesNotes_${patientCode}.pdf`);
+    },
+    error: (err: any) => {
+      Swal.close();
+      console.error('Error fetching Nurses Notes PDF report:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Report Error',
+        text: 'Failed to generate Nurses Notes PDF. Please try again.'
+      });
+    }
+  });
 }
-printMPPR(recNo: string): void {
-  console.log('Printing for:', recNo);
-  // TODO: implement print logic here
+
+printMPPR(recNo?: string): void {
+  const patientCode = this.ExistedPatientCode || this.patientStateService.getPatientCode();
+  const assessmentCode = this.ExistedAssessmentCode || this.patientStateService.getAssessmentCode();
+
+  if (!patientCode || !assessmentCode) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Incomplete Information',
+      text: 'Patient Code or Assessment Code is missing.'
+    });
+    return;
+  }
+
+  Swal.fire({
+    title: 'Loading Report...',
+    text: 'Please wait while the Monthly Psychological Progress Report (MPPR) PDF is being prepared.',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  this.service.getPatientMonthlyPsychoPRReport(patientCode, assessmentCode).subscribe({
+    next: (blob: Blob) => {
+      Swal.close();
+      this.openPdfBlob(blob, `MPPR_${patientCode}.pdf`);
+    },
+    error: (err: any) => {
+      Swal.close();
+      console.error('Error fetching MPPR PDF report:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Report Error',
+        text: 'Failed to generate Monthly Psychological Progress Report PDF. Please try again.'
+      });
+    }
+  });
 }
-printPsychEVal(recNo: string): void {
-  console.log('Printing for:', recNo);
+
+printPsychEVal(item?: any): void {
+  console.log('Printing for:', item);
   // TODO: implement print logic here
 }
 printTreatPlan(recNo: string): void {

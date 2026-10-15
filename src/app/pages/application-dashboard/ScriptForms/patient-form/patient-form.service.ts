@@ -1,4 +1,5 @@
 import { ActivatedRoute, Router } from '@angular/router';
+import { PatientStateService } from '../../../../services/patient-state.service';
 
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -17,7 +18,8 @@ export class PatientFormService {
       private fb: FormBuilder,
       private dashboardService: ApplicationDashboardService,
       private route: ActivatedRoute,
-      private router: Router) {}
+      private router: Router,
+      private patientStateService: PatientStateService) {}
 
 
   ngOninit(): void {
@@ -27,7 +29,12 @@ export class PatientFormService {
    if (patientCode) {
      this.existed = this.dashboardService.getExistedPatientData(patientCode);
      console.log('ExistedPatient:', this.existed);
-     this.router.navigate(['/application', this.existed]);
+     if (this.existed) {
+       this.patientStateService.setSelectedPatient(this.existed);
+     }
+     this.router.navigate(['/application'], {
+       state: { patientCode: this.existed }
+     });
 
    }
  });
@@ -108,7 +115,13 @@ export class PatientFormService {
             allowEscapeKey: false
           });
           this.isSubmitting = false;
-          this.router.navigate(['/application', patientForm.get('patientCode')?.value]);
+          const savedCode = patientForm.get('patientCode')?.value;
+          if (savedCode) {
+            this.patientStateService.setSelectedPatient(savedCode);
+          }
+          this.router.navigate(['/application'], {
+            state: { patientCode: savedCode }
+          });
           
         },
         

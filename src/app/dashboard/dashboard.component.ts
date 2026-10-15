@@ -3,6 +3,7 @@ import { NgxScannerQrcodeComponent, ScannerQRCodeResult } from 'ngx-scanner-qrco
 import { AuthService } from '../Admin/Auth/AuthService';
 import { DashboardServiceService } from './dashboard-service/dashboard-service.service';
 import { Router } from '@angular/router';
+import { PatientStateService } from '../services/patient-state.service';
 import Swal from 'sweetalert2';
 import {Modal} from 'bootstrap';
 
@@ -28,7 +29,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   userInfo: any;
 
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private patientStateService: PatientStateService
+  ) {
 
   }
   ngOnInit(): void {
@@ -77,8 +82,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
 
   goToAppDashboard() {
+    this.patientStateService.clear();
     this.router.navigate(['/application']);
-
   }
   
   goToApplicationDashboard(patientCode: string): void {
@@ -86,11 +91,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       console.error('Router is undefined!'); // Debugging check
       return;
     }
-this.isLoading = true;
-  setTimeout(() => {
-    this.isLoading = false; // Hide loader after 3 seconds
-  }, 3000);
-    this.router.navigate(['/application', patientCode]);
+    this.isLoading = true;
+    setTimeout(() => {
+      this.isLoading = false; // Hide loader after 3 seconds
+    }, 3000);
+    this.patientStateService.setSelectedPatient(patientCode);
+    this.router.navigate(['/application'], {
+      state: { patientCode }
+    });
   }
 
   goTopatientDashboard(patientCode: string): void {
@@ -98,11 +106,14 @@ this.isLoading = true;
       console.error('Router is undefined!'); // Debugging check
       return;
     }
-this.isLoading = true;
-  setTimeout(() => {
-    this.isLoading = false; // Hide loader after 3 seconds
-  }, 3000);
-    this.router.navigate(['/patientDashboard', patientCode]);
+    this.isLoading = true;
+    setTimeout(() => {
+      this.isLoading = false; // Hide loader after 3 seconds
+    }, 3000);
+    this.patientStateService.setSelectedPatient(patientCode);
+    this.router.navigate(['/patientDashboard'], {
+      state: { patientCode }
+    });
   }
   ngOnDestroy(): void {
     if (this.scanner && this.isCameraActive) {

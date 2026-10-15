@@ -44,6 +44,13 @@ constructor(private http: HttpClient) { }
   getApplicationHistory(data: string) {
     return this.http.get(`${environment.apiUrl}GetPatientData/GetApplicationHistory?patientCode=${data}`);
   }
+
+  getPatientDataReport(patientCode: string, code: string): Observable<Blob> {
+    return this.http.get(
+      `${environment.apiUrl}QuestPDFPatientDetails/PatientDataReport?patientCode=${encodeURIComponent(patientCode)}&code=${encodeURIComponent(code)}`,
+      { responseType: 'blob' }
+    );
+  }
   //Post
   postPatientData(data: any) {
     return this.http.post(`${environment.apiUrl}PostPatientData/PostPatientData`, data);
